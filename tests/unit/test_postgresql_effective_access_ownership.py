@@ -9,6 +9,7 @@ from pydbadminkit.adapters.postgresql.mappers.ownership import map_ownership
 from pydbadminkit.adapters.postgresql.security import PostgreSQLSecurityAdapter
 from pydbadminkit.domain.common import DatabaseObjectType
 from pydbadminkit.domain.security import AccessSource, AccessType
+from pydbadminkit.errors import InternalError
 
 pytestmark = [pytest.mark.unit, pytest.mark.security]
 
@@ -79,7 +80,7 @@ def test_effective_access_mapper_requires_source() -> None:
     ):
         row[key] = False
 
-    with pytest.raises(Exception):
+    with pytest.raises(InternalError):
         map_effective_access(row)
 
 
