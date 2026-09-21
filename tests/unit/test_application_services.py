@@ -4,7 +4,13 @@ import pytest
 
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.server import ServerService
-from pydbadminkit.domain.catalog import DatabaseInfo, SchemaInfo, ServerInfo, TableDescription, TableInfo
+from pydbadminkit.domain.catalog import (
+    DatabaseInfo,
+    SchemaInfo,
+    ServerInfo,
+    TableDescription,
+    TableInfo,
+)
 from pydbadminkit.domain.common import DatabaseEngine, DatabaseVersion, QualifiedName
 
 pytestmark = pytest.mark.unit
