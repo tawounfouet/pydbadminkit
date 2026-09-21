@@ -17,13 +17,14 @@ from pydbadminkit.adapters.postgresql import (
 from pydbadminkit.application.capability import CapabilityService
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.connection import ConnectionConfigResolver, ConnectionService
-from pydbadminkit.application.security import SecurityService
+from pydbadminkit.application.security import SecurityMutationService, SecurityService
 from pydbadminkit.application.server import ServerService
 from pydbadminkit.domain.connection import ResolvedConnectionConfig
 from pydbadminkit.infrastructure.config import (
     TomlConnectionProfileRepository,
     default_config_path,
 )
+from pydbadminkit.infrastructure.audit import JsonlAuditSink, default_audit_path
 from pydbadminkit.infrastructure.secrets import EnvironmentSecretProvider
 
 
@@ -84,6 +85,21 @@ def build_security_service(
     config = resolve_connection(profile_name, config_path)
     executor = PostgreSQLExecutor(PostgreSQLConnectionFactory(), config)
     return SecurityService(PostgreSQLSecurityAdapter(executor))
+
+
+def build_security_mutation_service(
+    profile_name: str,
+    config_path: Path | None = None,
+) -> SecurityMutationService:
+    """Build guarded PostgreSQL security mutation orchestration."""
+
+    config = resolve_connection(profile_name, config_path)
+    executor = PostgreSQLExecutor(PostgreSQLConnectionFactory(), config)
+    return SecurityMutationService(
+        mutation_port=PostgreSQLSecurityAdapter(executor),
+        audit_port=JsonlAuditSink(default_audit_path()),
+        config=config,
+    )
 
 
 def build_capability_service() -> CapabilityService:
