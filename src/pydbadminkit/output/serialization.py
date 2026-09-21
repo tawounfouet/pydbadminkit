@@ -14,14 +14,14 @@ MachineValue = None | bool | int | float | str | list["MachineValue"] | dict[str
 def to_machine_value(value: object) -> MachineValue:
     """Convert supported public models to JSON/YAML-safe primitives."""
 
-    if value is None or isinstance(value, (bool, int, float, str)):
-        return value
-
     if isinstance(value, Enum):
         enum_value = value.value
         if isinstance(enum_value, (bool, int, float, str)):
             return enum_value
         raise TypeError(f"Unsupported enum value type: {type(enum_value).__name__}")
+
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
 
     if is_dataclass(value) and not isinstance(value, type):
         return {
