@@ -12,8 +12,8 @@ from pydbadminkit.domain.catalog import (
     ViewInfo,
 )
 from pydbadminkit.domain.common import CapabilityStatus, OperationResult
-from pydbadminkit.domain.safety import OperationPlan
 from pydbadminkit.domain.connection import ConnectionTestResult
+from pydbadminkit.domain.safety import OperationPlan
 from pydbadminkit.domain.security import (
     DirectAccess,
     EffectiveAccess,
