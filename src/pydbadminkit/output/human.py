@@ -261,9 +261,7 @@ def render_index_description(description: IndexDescription) -> str:
 def render_role_list(roles: tuple[RoleInfo, ...]) -> str:
     """Render role summaries."""
 
-    lines = [
-        "NAME\tLOGIN\tSUPERUSER\tCREATEDB\tCREATEROLE\tREPLICATION\tBYPASSRLS\tSYSTEM"
-    ]
+    lines = ["NAME\tLOGIN\tSUPERUSER\tCREATEDB\tCREATEROLE\tREPLICATION\tBYPASSRLS\tSYSTEM"]
     for role in roles:
         lines.append(
             "\t".join(
