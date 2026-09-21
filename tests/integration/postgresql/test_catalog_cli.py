@@ -82,9 +82,7 @@ def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         ) as connection,
         connection.cursor() as cursor,
     ):
-        cursor.execute(
-            "DROP MATERIALIZED VIEW IF EXISTS public.pydbadmin_customer_mv"
-        )
+        cursor.execute("DROP MATERIALIZED VIEW IF EXISTS public.pydbadmin_customer_mv")
         cursor.execute("DROP VIEW IF EXISTS public.pydbadmin_customer_view")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
@@ -151,9 +149,7 @@ def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         ) as connection,
         connection.cursor() as cursor,
     ):
-        cursor.execute(
-            "DROP MATERIALIZED VIEW IF EXISTS public.pydbadmin_customer_mv"
-        )
+        cursor.execute("DROP MATERIALIZED VIEW IF EXISTS public.pydbadmin_customer_mv")
         cursor.execute("DROP VIEW IF EXISTS public.pydbadmin_customer_view")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
