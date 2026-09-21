@@ -13,7 +13,13 @@ from pydbadminkit.domain.catalog import (
 )
 from pydbadminkit.domain.common import CapabilityStatus
 from pydbadminkit.domain.connection import ConnectionTestResult
-from pydbadminkit.domain.security import DirectAccess, RoleDescription, RoleInfo
+from pydbadminkit.domain.security import (
+    DirectAccess,
+    EffectiveAccess,
+    OwnershipInfo,
+    RoleDescription,
+    RoleInfo,
+)
 
 
 def render_connection_test(result: ConnectionTestResult) -> str:
@@ -256,6 +262,42 @@ def render_index_description(description: IndexDescription) -> str:
             description.definition,
         )
     )
+
+
+def render_effective_access_list(entries: tuple[EffectiveAccess, ...]) -> str:
+    """Render effective access entries with their sources."""
+
+    lines = ["PRINCIPAL\tOBJECT\tTYPE\tACCESS\tSOURCES"]
+    for entry in entries:
+        lines.append(
+            "\t".join(
+                (
+                    entry.principal,
+                    str(entry.object.name),
+                    entry.object.object_type.value,
+                    entry.access_type.value,
+                    ",".join(source.value for source in entry.sources),
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_ownership_list(entries: tuple[OwnershipInfo, ...]) -> str:
+    """Render ownership relationships."""
+
+    lines = ["OWNER\tOBJECT\tTYPE"]
+    for entry in entries:
+        lines.append(
+            "\t".join(
+                (
+                    entry.owner,
+                    str(entry.object.name),
+                    entry.object.object_type.value,
+                )
+            )
+        )
+    return "\n".join(lines)
 
 
 def render_access_list(entries: tuple[DirectAccess, ...]) -> str:
