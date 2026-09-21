@@ -15,9 +15,9 @@ from pydbadminkit.domain.common import DatabaseEngine, EnvironmentName
 from pydbadminkit.domain.connection import (
     ConnectionProfileName,
     ResolvedConnectionConfig,
+    SecretValue,
     SSLConfig,
     SSLMode,
-    SecretValue,
     TimeoutConfig,
 )
 
