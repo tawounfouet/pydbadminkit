@@ -21,7 +21,14 @@ LEFT JOIN pg_roles AS issuer
     ON issuer.oid = acl.grantor
 WHERE c.relkind IN ('r', 'p', 'v', 'm', 'f')
   AND principal.rolname = %s
-  AND (%s::boolean OR n.nspname NOT LIKE 'pg_%')
+  AND (
+      %s::boolean
+      OR (
+          n.nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
+          AND n.nspname NOT LIKE 'pg_temp_%%'
+          AND n.nspname NOT LIKE 'pg_toast_temp_%%'
+      )
+  )
   AND (%s::text IS NULL OR n.nspname = %s)
   AND (%s::text IS NULL OR c.relname = %s)
 ORDER BY n.nspname, c.relname, acl.privilege_type
