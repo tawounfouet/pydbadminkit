@@ -43,9 +43,7 @@ def build_view_description(
         if raw_definition is not None:
             definition = str(raw_definition)
 
-    columns: tuple[ColumnInfo, ...] = tuple(
-        map_column_info(row) for row in column_rows
-    )
+    columns: tuple[ColumnInfo, ...] = tuple(map_column_info(row) for row in column_rows)
     return ViewDescription(
         view=map_view_info(view_row),
         columns=columns,
