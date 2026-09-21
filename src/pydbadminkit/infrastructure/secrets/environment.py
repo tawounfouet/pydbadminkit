@@ -14,7 +14,8 @@ class EnvironmentSecretProvider:
     def resolve(self, reference: SecretReference) -> SecretValue:
         if reference.provider != self.name:
             raise SecretResolutionError(
-                f"Secret reference provider '{reference.provider}' cannot be handled by '{self.name}'."
+                "Secret reference provider "
+                f"'{reference.provider}' cannot be handled by '{self.name}'."
             )
 
         value = os.getenv(reference.reference)
