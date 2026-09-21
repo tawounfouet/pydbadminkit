@@ -3,6 +3,7 @@
 import pytest
 import typer
 
+from pydbadminkit.cli.app import app
 from pydbadminkit.cli.context import CLIContext
 from pydbadminkit.cli.safety import mutation_options
 from pydbadminkit.domain.common import EnvironmentName, RiskLevel
@@ -13,8 +14,7 @@ pytestmark = [pytest.mark.unit, pytest.mark.security]
 
 def _context(**kwargs: object) -> typer.Context:
     root = CLIContext(**kwargs)
-    command = typer.main.get_command(typer.Typer())
-    return typer.Context(command, obj=root)
+    return typer.Context(typer.main.get_command(app), obj=root)
 
 
 def _plan(
