@@ -9,6 +9,7 @@ from pydbadminkit.cli.commands.capability import capability_app
 from pydbadminkit.cli.commands.connection import connection_app
 from pydbadminkit.cli.commands.database import database_app
 from pydbadminkit.cli.commands.index import index_app
+from pydbadminkit.cli.commands.role import role_app
 from pydbadminkit.cli.commands.schema import schema_app
 from pydbadminkit.cli.commands.server import server_app
 from pydbadminkit.cli.commands.table import table_app
@@ -29,6 +30,7 @@ app.add_typer(schema_app, name="schema")
 app.add_typer(table_app, name="table")
 app.add_typer(view_app, name="view")
 app.add_typer(index_app, name="index")
+app.add_typer(role_app, name="role")
 app.add_typer(capability_app, name="capability")
 
 
