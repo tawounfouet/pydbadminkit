@@ -2,10 +2,14 @@
 
 from pydbadminkit.domain.catalog import (
     DatabaseInfo,
+    IndexDescription,
+    IndexInfo,
     SchemaInfo,
     ServerInfo,
     TableDescription,
     TableInfo,
+    ViewDescription,
+    ViewInfo,
 )
 from pydbadminkit.domain.common import CapabilityStatus
 
@@ -146,6 +150,97 @@ def render_table_description(description: TableDescription) -> str:
             )
         )
     return "\n".join(lines)
+
+
+def render_view_list(views: tuple[ViewInfo, ...]) -> str:
+    """Render view summaries."""
+
+    lines = ["NAME\tOWNER\tKIND"]
+    for view in views:
+        lines.append(
+            "\t".join(
+                (
+                    str(view.name),
+                    view.owner or "-",
+                    view.kind.value,
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_view_description(description: ViewDescription) -> str:
+    """Render view metadata, columns and definition."""
+
+    view = description.view
+    lines = [
+        f"Name: {view.name}",
+        f"Owner: {view.owner or '-'}",
+        f"Kind: {view.kind.value}",
+        "",
+        "COLUMNS",
+        "POSITION\tNAME\tTYPE\tNULLABLE",
+    ]
+    for column in description.columns:
+        lines.append(
+            "\t".join(
+                (
+                    str(column.position),
+                    column.name,
+                    column.data_type,
+                    "yes" if column.nullable else "no",
+                )
+            )
+        )
+    lines.extend(("", "DEFINITION", description.definition or "-"))
+    return "\n".join(lines)
+
+
+def render_index_list(indexes: tuple[IndexInfo, ...]) -> str:
+    """Render index summaries."""
+
+    lines = [
+        "NAME\tTABLE\tMETHOD\tUNIQUE\tPRIMARY\tVALID\tREADY\tSIZE_BYTES"
+    ]
+    for index in indexes:
+        lines.append(
+            "\t".join(
+                (
+                    str(index.name),
+                    str(index.table),
+                    index.method,
+                    "yes" if index.unique else "no",
+                    "yes" if index.primary else "no",
+                    "yes" if index.valid else "no",
+                    "yes" if index.ready else "no",
+                    _optional_int(index.size_bytes),
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_index_description(description: IndexDescription) -> str:
+    """Render one index in detail."""
+
+    index = description.index
+    return "\n".join(
+        (
+            f"Name: {index.name}",
+            f"Table: {index.table}",
+            f"Owner: {index.owner or '-'}",
+            f"Method: {index.method}",
+            f"Unique: {'yes' if index.unique else 'no'}",
+            f"Primary: {'yes' if index.primary else 'no'}",
+            f"Valid: {'yes' if index.valid else 'no'}",
+            f"Ready: {'yes' if index.ready else 'no'}",
+            f"Size bytes: {_optional_int(index.size_bytes)}",
+            f"Predicate: {description.predicate or '-'}",
+            "",
+            "DEFINITION",
+            description.definition,
+        )
+    )
 
 
 def render_capability_list(capabilities: tuple[CapabilityStatus, ...]) -> str:
