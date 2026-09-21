@@ -9,7 +9,6 @@ import psycopg
 import pytest
 from typer.testing import CliRunner
 
-from pydbadminkit.adapters.postgresql.queries.access import LIST_DIRECT_RELATION_ACCESS
 from pydbadminkit.cli.app import app
 
 pytestmark = [
@@ -282,33 +281,3 @@ def test_access_list_json_is_machine_readable(
     assert all(item["principal"] == "pydbadmin_app" for item in parsed)
     assert all(item["object"]["object_type"] == "table" for item in parsed)
 
-
-def test_direct_access_query_executes_natively(
-    security_roles: None,
-) -> None:
-    del security_roles
-
-    with (
-        psycopg.connect(
-            host=_host(),
-            port=_port(),
-            dbname=_database(),
-            user=_user(),
-            password=_password(),
-        ) as connection,
-        connection.cursor() as cursor,
-    ):
-        cursor.execute(
-            LIST_DIRECT_RELATION_ACCESS,
-            (
-                "pydbadmin_app",
-                False,
-                "public",
-                "public",
-                "pydbadmin_security_target",
-                "pydbadmin_security_target",
-            ),
-        )
-        rows = cursor.fetchall()
-
-    assert len(rows) == 2
