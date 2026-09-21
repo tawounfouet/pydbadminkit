@@ -1,0 +1,30 @@
+name: Package
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: python -m pip install --upgrade pip
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check dist/*
+      - run: python -m venv /tmp/pydbadminkit-smoke
+      - run: /tmp/pydbadminkit-smoke/bin/pip install dist/*.whl
+      - run: /tmp/pydbadminkit-smoke/bin/pydbadmin --version
+      - run: /tmp/pydbadminkit-smoke/bin/pydbadmin --help
