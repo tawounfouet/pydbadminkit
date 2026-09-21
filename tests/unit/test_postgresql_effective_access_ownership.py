@@ -109,9 +109,7 @@ def test_ownership_mapper_supports_schema_and_relation_objects() -> None:
 
 
 def test_security_adapter_forwards_effective_access_filters() -> None:
-    executor = FakeExecutor(
-        {"PG_LIST_EFFECTIVE_RELATION_ACCESS": (_effective_row(),)}
-    )
+    executor = FakeExecutor({"PG_LIST_EFFECTIVE_RELATION_ACCESS": (_effective_row(),)})
     adapter = PostgreSQLSecurityAdapter(executor)  # type: ignore[arg-type]
 
     entries = adapter.list_effective_access(
