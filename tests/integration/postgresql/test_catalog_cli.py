@@ -71,14 +71,17 @@ def _base_args(config: Path) -> list[str]:
 def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setenv("PYDBADMIN_TEST_POSTGRES_PASSWORD", _password())
 
-    with psycopg.connect(
-        host=_host(),
-        port=_port(),
-        dbname=_database(),
-        user=_user(),
-        password=_password(),
-        autocommit=True,
-    ) as connection, connection.cursor() as cursor:
+    with (
+        psycopg.connect(
+            host=_host(),
+            port=_port(),
+            dbname=_database(),
+            user=_user(),
+            password=_password(),
+            autocommit=True,
+        ) as connection,
+        connection.cursor() as cursor,
+    ):
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
         cursor.execute(
