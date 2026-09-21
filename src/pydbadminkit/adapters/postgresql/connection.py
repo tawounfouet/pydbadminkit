@@ -70,17 +70,16 @@ class PostgreSQLConnectionTester:
     def test(self, config: ResolvedConnectionConfig) -> ConnectionTestResult:
         started = perf_counter()
 
-        with self._factory.connect(config) as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT
-                        current_setting('server_version_num')::int,
-                        current_database(),
-                        current_user
-                    """
-                )
-                row = cursor.fetchone()
+        with self._factory.connect(config) as connection, connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    current_setting('server_version_num')::int,
+                    current_database(),
+                    current_user
+                """
+            )
+            row = cursor.fetchone()
 
         latency_ms = (perf_counter() - started) * 1000
 
