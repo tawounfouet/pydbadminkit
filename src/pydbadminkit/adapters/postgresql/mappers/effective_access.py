@@ -27,11 +27,7 @@ def map_effective_access(row: Mapping[str, object]) -> EffectiveAccess:
     """Map one effective-access row with source attribution."""
 
     try:
-        sources = tuple(
-            source
-            for field, source in _SOURCE_FIELDS
-            if _required_bool(row[field])
-        )
+        sources = tuple(source for field, source in _SOURCE_FIELDS if _required_bool(row[field]))
         return EffectiveAccess(
             principal=str(row["principal"]),
             access_type=AccessType(str(row["access_type"]).upper()),
