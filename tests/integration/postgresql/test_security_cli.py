@@ -280,4 +280,3 @@ def test_access_list_json_is_machine_readable(
     assert {item["access_type"] for item in parsed} == {"SELECT", "UPDATE"}
     assert all(item["principal"] == "pydbadmin_app" for item in parsed)
     assert all(item["object"]["object_type"] == "table" for item in parsed)
-
