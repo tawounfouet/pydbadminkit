@@ -35,8 +35,8 @@ class PostgreSQLCapabilityAdapter:
         if name in self._PLANNED:
             return CapabilityStatus(
                 name=name,
-                availability=CapabilityAvailability.DISABLED_BY_POLICY,
-                reason="Capability is defined but not implemented in this release.",
+                availability=CapabilityAvailability.UNKNOWN,
+                reason="Capability is defined in the roadmap but not implemented yet.",
             )
         return CapabilityStatus(
             name=name,
