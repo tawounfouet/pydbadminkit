@@ -67,7 +67,6 @@ class PostgreSQLExecutor:
             return None
         return rows[0]
 
-
     def execute(
         self,
         query: str | sql.Composable,
