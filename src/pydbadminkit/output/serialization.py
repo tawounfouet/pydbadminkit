@@ -4,8 +4,8 @@ import json
 from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import TypeAlias
-import yaml
 
+import yaml
 
 MachineValue: TypeAlias = (
     bool | int | float | str | list["MachineValue"] | dict[str, "MachineValue"] | None
