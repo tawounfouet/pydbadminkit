@@ -101,13 +101,20 @@ pydbadmin --connection local ownership list --owner app
 pydbadmin --connection local --dry-run role create app --login
 pydbadmin --connection local --yes role create app --login
 
-pydbadmin --connection local --yes   access grant   --role app   --object public.customers   --access SELECT
+pydbadmin --connection local --yes \
+  access grant \
+  --role app \
+  --object public.customers \
+  --access SELECT
 ```
 
 Critical operations require an exact target proof, for example:
 
 ```bash
-pydbadmin --connection local --non-interactive   role create privileged_admin   --superuser   --confirm-target privileged_admin
+pydbadmin --connection local --non-interactive \
+  role create privileged_admin \
+  --superuser \
+  --confirm-target privileged_admin
 ```
 
 ## Development setup
