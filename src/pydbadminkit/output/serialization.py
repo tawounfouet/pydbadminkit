@@ -3,8 +3,6 @@
 import json
 from dataclasses import fields, is_dataclass
 from enum import Enum
-from typing import Any
-
 import yaml
 
 
