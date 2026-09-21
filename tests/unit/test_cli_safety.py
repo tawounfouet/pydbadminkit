@@ -1,6 +1,5 @@
 """Unit tests for CLI mutation approval resolution."""
 
-import click
 import pytest
 import typer
 
@@ -14,7 +13,8 @@ pytestmark = [pytest.mark.unit, pytest.mark.security]
 
 def _context(**kwargs: object) -> typer.Context:
     root = CLIContext(**kwargs)
-    return typer.Context(click.Command("root"), obj=root)
+    command = typer.main.get_command(typer.Typer())
+    return typer.Context(command, obj=root)
 
 
 def _plan(
