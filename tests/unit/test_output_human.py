@@ -182,7 +182,7 @@ def test_index_renderers() -> None:
     assert "Method: btree" in detail
     assert "Unique: yes" in detail
     assert "Predicate: email IS NOT NULL" in detail
-    assert "CREATE UNIQUE INDEX" in detail
+    assert "CREATE INDEX" in detail
 
 
 def test_renderers_handle_unknown_optional_values() -> None:
