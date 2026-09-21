@@ -20,11 +20,11 @@ from pydbadminkit.application.connection import ConnectionConfigResolver, Connec
 from pydbadminkit.application.security import SecurityMutationService, SecurityService
 from pydbadminkit.application.server import ServerService
 from pydbadminkit.domain.connection import ResolvedConnectionConfig
+from pydbadminkit.infrastructure.audit import JsonlAuditSink, default_audit_path
 from pydbadminkit.infrastructure.config import (
     TomlConnectionProfileRepository,
     default_config_path,
 )
-from pydbadminkit.infrastructure.audit import JsonlAuditSink, default_audit_path
 from pydbadminkit.infrastructure.secrets import EnvironmentSecretProvider
 
 
