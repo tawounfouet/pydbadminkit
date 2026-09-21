@@ -23,6 +23,7 @@ class PostgreSQLCapabilityAdapter:
             "security.role.list",
             "security.role.describe",
             "security.membership.list",
+            "security.access.direct.list",
         }
     )
 
