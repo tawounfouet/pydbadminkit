@@ -87,6 +87,8 @@ def security_roles(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         ) as connection,
         connection.cursor() as cursor,
     ):
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_owner_target")
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_public_target")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_security_target")
         cursor.execute("DROP ROLE IF EXISTS pydbadmin_app")
         cursor.execute("DROP ROLE IF EXISTS pydbadmin_reader")
@@ -114,6 +116,35 @@ def security_roles(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
             TO pydbadmin_app
             """
         )
+        cursor.execute(
+            """
+            GRANT DELETE
+            ON TABLE public.pydbadmin_security_target
+            TO pydbadmin_reader
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE public.pydbadmin_public_target (
+                id bigint PRIMARY KEY
+            )
+            """
+        )
+        cursor.execute(
+            """
+            GRANT SELECT
+            ON TABLE public.pydbadmin_public_target
+            TO PUBLIC
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE public.pydbadmin_owner_target (
+                id bigint PRIMARY KEY
+            )
+            """
+        )
+        cursor.execute("ALTER TABLE public.pydbadmin_owner_target OWNER TO pydbadmin_app")
 
     yield
 
@@ -128,6 +159,8 @@ def security_roles(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         ) as connection,
         connection.cursor() as cursor,
     ):
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_owner_target")
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_public_target")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_security_target")
         cursor.execute("DROP ROLE IF EXISTS pydbadmin_app")
         cursor.execute("DROP ROLE IF EXISTS pydbadmin_reader")
@@ -280,3 +313,130 @@ def test_access_list_json_is_machine_readable(
     assert {item["access_type"] for item in parsed} == {"SELECT", "UPDATE"}
     assert all(item["principal"] == "pydbadmin_app" for item in parsed)
     assert all(item["object"]["object_type"] == "table" for item in parsed)
+
+
+def test_effective_access_attributes_direct_inherited_public_and_owner(
+    tmp_path: Path,
+    security_roles: None,
+) -> None:
+    del security_roles
+    config = _config(tmp_path)
+
+    direct_inherited = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "--output",
+            "json",
+            "effective-access",
+            "list",
+            "--role",
+            "pydbadmin_app",
+            "--object",
+            "pydbadmin_security_target",
+        ],
+    )
+    public_access = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "--output",
+            "json",
+            "effective-access",
+            "list",
+            "--role",
+            "pydbadmin_app",
+            "--object",
+            "pydbadmin_public_target",
+        ],
+    )
+    owner_access = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "--output",
+            "json",
+            "effective-access",
+            "list",
+            "--role",
+            "pydbadmin_app",
+            "--object",
+            "pydbadmin_owner_target",
+        ],
+    )
+
+    assert direct_inherited.exit_code == 0, direct_inherited.output
+    direct_items = json.loads(direct_inherited.stdout)
+    by_type = {item["access_type"]: item for item in direct_items}
+    assert by_type["SELECT"]["sources"] == ["direct"]
+    assert by_type["UPDATE"]["sources"] == ["direct"]
+    assert "inherited" in by_type["DELETE"]["sources"]
+
+    assert public_access.exit_code == 0, public_access.output
+    public_items = json.loads(public_access.stdout)
+    public_select = next(item for item in public_items if item["access_type"] == "SELECT")
+    assert "public" in public_select["sources"]
+
+    assert owner_access.exit_code == 0, owner_access.output
+    owner_items = json.loads(owner_access.stdout)
+    assert owner_items
+    assert all("owner" in item["sources"] for item in owner_items)
+
+
+def test_effective_access_marks_superuser_source(
+    tmp_path: Path,
+    security_roles: None,
+) -> None:
+    del security_roles
+    config = _config(tmp_path)
+
+    result = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "--output",
+            "json",
+            "effective-access",
+            "list",
+            "--role",
+            _user(),
+            "--object",
+            "pydbadmin_security_target",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    entries = json.loads(result.stdout)
+    assert entries
+    assert all("superuser" in item["sources"] for item in entries)
+
+
+def test_ownership_lists_objects_owned_by_role(
+    tmp_path: Path,
+    security_roles: None,
+) -> None:
+    del security_roles
+    config = _config(tmp_path)
+
+    result = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "--output",
+            "json",
+            "ownership",
+            "list",
+            "--owner",
+            "pydbadmin_app",
+            "--type",
+            "table",
+            "--schema",
+            "public",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    entries = json.loads(result.stdout)
+    names = {item["object"]["name"]["name"] for item in entries}
+    assert "pydbadmin_owner_target" in names
+    assert all(item["object"]["object_type"] == "table" for item in entries)
