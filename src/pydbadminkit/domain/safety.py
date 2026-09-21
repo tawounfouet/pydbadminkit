@@ -37,3 +37,12 @@ class OperationPlan:
             raise ValueError("operation plan requires at least one effect")
         if not self.correlation_id or self.correlation_id.isspace():
             raise ValueError("correlation_id must not be blank")
+
+
+@dataclass(frozen=True, slots=True)
+class MutationOptions:
+    """Caller-supplied execution approval; never prompts by itself."""
+
+    dry_run: bool = False
+    approved: bool = False
+    confirmed_target: str | None = None
