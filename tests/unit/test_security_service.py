@@ -3,7 +3,14 @@
 import pytest
 
 from pydbadminkit.application.security import SecurityService
-from pydbadminkit.domain.security import RoleDescription, RoleInfo, RoleMembership
+from pydbadminkit.domain.common import DatabaseObjectRef, DatabaseObjectType, QualifiedName
+from pydbadminkit.domain.security import (
+    AccessType,
+    DirectAccess,
+    RoleDescription,
+    RoleInfo,
+    RoleMembership,
+)
 
 pytestmark = pytest.mark.unit
 
@@ -35,6 +42,27 @@ class FakeSecurityPort:
     def list_role_memberships(self) -> tuple[RoleMembership, ...]:
         return (RoleMembership(role="reader", member="app"),)
 
+    def list_direct_access(
+        self,
+        role: str,
+        *,
+        schema: str | None = None,
+        object_name: str | None = None,
+        include_system: bool = False,
+    ) -> tuple[DirectAccess, ...]:
+        del schema, object_name, include_system
+        return (
+            DirectAccess(
+                principal=role,
+                access_type=AccessType.SELECT,
+                object=DatabaseObjectRef(
+                    object_type=DatabaseObjectType.TABLE,
+                    name=QualifiedName(schema="public", name="customers"),
+                ),
+                issuer="postgres",
+            ),
+        )
+
 
 def test_security_service_delegates_role_filters() -> None:
     service = SecurityService(FakeSecurityPort())
@@ -49,3 +77,12 @@ def test_security_service_describes_and_lists_memberships() -> None:
 
     assert service.describe_role("app").member_of[0].role == "reader"
     assert service.list_role_memberships()[0].member == "app"
+
+
+def test_security_service_lists_direct_access() -> None:
+    service = SecurityService(FakeSecurityPort())
+
+    entry = service.list_direct_access("app", schema="public")[0]
+
+    assert entry.principal == "app"
+    assert entry.access_type is AccessType.SELECT
