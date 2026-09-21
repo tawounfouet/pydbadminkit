@@ -1,16 +1,19 @@
-"""Translate Psycopg connection errors into public PyDBAdminKit errors."""
+"""Translate Psycopg errors into public PyDBAdminKit errors."""
 
 import psycopg
 
 from pydbadminkit.errors import (
     AuthenticationError,
+    AuthorizationError,
     DatabaseConnectionError,
     DatabaseConnectionTimeoutError,
+    DatabaseOperationError,
     PyDBAdminError,
 )
 from pydbadminkit.errors.context import ErrorContext
 
 _AUTHENTICATION_SQLSTATES = {"28000", "28P01"}
+_INSUFFICIENT_PRIVILEGE_SQLSTATE = "42501"
 
 
 def translate_connection_error(
@@ -35,5 +38,24 @@ def translate_connection_error(
 
     return DatabaseConnectionError(
         "Unable to connect to the database.",
+        context=context,
+    )
+
+
+def translate_database_error(
+    error: psycopg.Error,
+    *,
+    context: ErrorContext,
+) -> PyDBAdminError:
+    """Translate an established-session database error into the public hierarchy."""
+
+    if error.sqlstate == _INSUFFICIENT_PRIVILEGE_SQLSTATE:
+        return AuthorizationError(
+            "The current database principal is not authorized for this operation.",
+            context=context,
+        )
+
+    return DatabaseOperationError(
+        "The database operation failed.",
         context=context,
     )

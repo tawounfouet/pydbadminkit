@@ -1,0 +1,1 @@
+"""PostgreSQL system-catalog queries."""
