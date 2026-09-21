@@ -13,10 +13,11 @@ app = typer.Typer(
 )
 
 
-def _version_callback(value: bool) -> None:
+def _version_callback(value: bool) -> bool:
     if value:
         typer.echo(f"pydbadminkit {__version__}")
         raise typer.Exit()
+    return value
 
 
 @app.callback()
