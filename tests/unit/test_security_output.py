@@ -4,8 +4,19 @@ from datetime import UTC, datetime
 
 import pytest
 
-from pydbadminkit.domain.security import RoleDescription, RoleInfo, RoleMembership
-from pydbadminkit.output.human import render_role_description, render_role_list
+from pydbadminkit.domain.common import DatabaseObjectRef, DatabaseObjectType, QualifiedName
+from pydbadminkit.domain.security import (
+    AccessType,
+    DirectAccess,
+    RoleDescription,
+    RoleInfo,
+    RoleMembership,
+)
+from pydbadminkit.output.human import (
+    render_access_list,
+    render_role_description,
+    render_role_list,
+)
 from pydbadminkit.output.serialization import render_json, render_yaml
 
 pytestmark = pytest.mark.unit
@@ -59,3 +70,19 @@ def test_role_machine_output_serializes_datetime() -> None:
 
     assert json_value["role"]["valid_until"] == "2030-01-01T00:00:00+00:00"
     assert yaml_value["member_of"][0]["role"] == "reader"
+
+
+def test_direct_access_renderer() -> None:
+    entry = DirectAccess(
+        principal="app",
+        access_type=AccessType.SELECT,
+        object=DatabaseObjectRef(
+            object_type=DatabaseObjectType.TABLE,
+            name=QualifiedName(schema="public", name="customers"),
+        ),
+        issuer="postgres",
+    )
+
+    rendered = render_access_list((entry,))
+
+    assert "app\tpublic.customers\ttable\tSELECT\tpostgres\tno" in rendered
