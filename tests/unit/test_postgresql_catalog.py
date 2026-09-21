@@ -287,9 +287,7 @@ def test_catalog_adapter_lists_and_gets_schemas() -> None:
 
 
 def test_catalog_adapter_lists_tables() -> None:
-    executor = FakeExecutor(
-        many_by_id={"PG_LIST_TABLES": (_table_row(),)}
-    )
+    executor = FakeExecutor(many_by_id={"PG_LIST_TABLES": (_table_row(),)})
     adapter = PostgreSQLCatalogAdapter(executor)  # type: ignore[arg-type]
 
     tables = adapter.list_tables(schema="public")
@@ -326,9 +324,7 @@ def test_catalog_adapter_describes_table() -> None:
     )
     adapter = PostgreSQLCatalogAdapter(executor)  # type: ignore[arg-type]
 
-    description = adapter.describe_table(
-        QualifiedName(schema="public", name="customers")
-    )
+    description = adapter.describe_table(QualifiedName(schema="public", name="customers"))
 
     assert description.table.name.name == "customers"
     assert description.columns[0].data_type == "bigint"
