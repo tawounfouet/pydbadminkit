@@ -2,6 +2,8 @@
 
 from pydbadminkit.adapters.postgresql.executor import PostgreSQLExecutor
 from pydbadminkit.adapters.postgresql.mappers.access import map_direct_access
+from pydbadminkit.adapters.postgresql.mappers.effective_access import map_effective_access
+from pydbadminkit.adapters.postgresql.mappers.ownership import map_ownership
 from pydbadminkit.adapters.postgresql.mappers.security import (
     map_role_info,
     map_role_membership,
@@ -9,6 +11,14 @@ from pydbadminkit.adapters.postgresql.mappers.security import (
 from pydbadminkit.adapters.postgresql.queries.access import (
     LIST_DIRECT_RELATION_ACCESS,
     LIST_DIRECT_RELATION_ACCESS_QUERY_ID,
+)
+from pydbadminkit.adapters.postgresql.queries.effective_access import (
+    LIST_EFFECTIVE_RELATION_ACCESS,
+    LIST_EFFECTIVE_RELATION_ACCESS_QUERY_ID,
+)
+from pydbadminkit.adapters.postgresql.queries.ownership import (
+    LIST_OWNERSHIP,
+    LIST_OWNERSHIP_QUERY_ID,
 )
 from pydbadminkit.adapters.postgresql.queries.security import (
     GET_ROLE,
@@ -18,7 +28,15 @@ from pydbadminkit.adapters.postgresql.queries.security import (
     LIST_ROLES,
     LIST_ROLES_QUERY_ID,
 )
-from pydbadminkit.domain.security import DirectAccess, RoleDescription, RoleInfo, RoleMembership
+from pydbadminkit.domain.common import DatabaseObjectType
+from pydbadminkit.domain.security import (
+    DirectAccess,
+    EffectiveAccess,
+    OwnershipInfo,
+    RoleDescription,
+    RoleInfo,
+    RoleMembership,
+)
 from pydbadminkit.errors import ResourceNotFoundError
 
 
@@ -85,3 +103,51 @@ class PostgreSQLSecurityAdapter:
             query_id=LIST_DIRECT_RELATION_ACCESS_QUERY_ID,
         )
         return tuple(map_direct_access(row) for row in rows)
+
+    def list_effective_access(
+        self,
+        role: str,
+        *,
+        schema: str | None = None,
+        object_name: str | None = None,
+        include_system: bool = False,
+    ) -> tuple[EffectiveAccess, ...]:
+        rows = self._executor.fetch_all(
+            LIST_EFFECTIVE_RELATION_ACCESS,
+            (
+                role,
+                include_system,
+                schema,
+                schema,
+                object_name,
+                object_name,
+            ),
+            query_id=LIST_EFFECTIVE_RELATION_ACCESS_QUERY_ID,
+        )
+        return tuple(map_effective_access(row) for row in rows)
+
+    def list_ownership(
+        self,
+        owner: str,
+        *,
+        object_type: DatabaseObjectType | None = None,
+        schema: str | None = None,
+        include_system: bool = False,
+    ) -> tuple[OwnershipInfo, ...]:
+        rows = self._executor.fetch_all(
+            LIST_OWNERSHIP,
+            (
+                owner,
+                owner,
+                include_system,
+                owner,
+                include_system,
+                schema,
+                schema,
+            ),
+            query_id=LIST_OWNERSHIP_QUERY_ID,
+        )
+        ownership = tuple(map_ownership(row) for row in rows)
+        if object_type is None:
+            return ownership
+        return tuple(item for item in ownership if item.object.object_type is object_type)
