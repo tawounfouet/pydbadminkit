@@ -3,11 +3,12 @@
 import json
 from dataclasses import fields, is_dataclass
 from enum import Enum
+from typing import TypeAlias
 
 import yaml
 
 
-MachineValue = None | bool | int | float | str | list["MachineValue"] | dict[str, "MachineValue"]
+MachineValue: TypeAlias = None | bool | int | float | str | list["MachineValue"] | dict[str, "MachineValue"]
 
 
 def to_machine_value(value: object) -> MachineValue:
