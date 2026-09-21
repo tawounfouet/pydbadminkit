@@ -12,18 +12,22 @@ from pydbadminkit.errors.connection import (
     DatabaseConnectionError,
     DatabaseConnectionTimeoutError,
 )
+from pydbadminkit.errors.database import DatabaseOperationError
 from pydbadminkit.errors.internal import InternalError
 from pydbadminkit.errors.resource import (
     ResourceAlreadyExistsError,
     ResourceNotFoundError,
 )
+from pydbadminkit.errors.security import AuthorizationError
 
 __all__ = [
     "AuthenticationError",
+    "AuthorizationError",
     "CapabilityNotAvailableError",
     "ConfigurationError",
     "DatabaseConnectionError",
     "DatabaseConnectionTimeoutError",
+    "DatabaseOperationError",
     "InternalError",
     "ProfileNotFoundError",
     "PyDBAdminError",
