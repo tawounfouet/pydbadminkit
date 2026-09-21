@@ -61,10 +61,10 @@ def describe_table(
             profile_name,
             root_context.config_path,
         ).describe_table(qualified_name)
-    except (PyDBAdminError, ValueError) as error:
-        if isinstance(error, PyDBAdminError):
-            fail_with_error(error)
+    except PyDBAdminError as error:
+        fail_with_error(error)
+    except ValueError as error:
         typer.echo(f"Error: {error}", err=True)
-        raise typer.Exit(2)
+        raise typer.Exit(2) from error
 
     typer.echo(render_table_description(description))
