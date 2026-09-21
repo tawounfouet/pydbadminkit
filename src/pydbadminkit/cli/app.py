@@ -1,9 +1,12 @@
 """Root Typer application."""
 
+from pathlib import Path
 from typing import Annotated
 
 import typer
 
+from pydbadminkit.cli.commands.connection import connection_app
+from pydbadminkit.cli.context import CLIContext
 from pydbadminkit.version import __version__
 
 app = typer.Typer(
@@ -11,6 +14,7 @@ app = typer.Typer(
     no_args_is_help=True,
     help="CLI-first, Python-first database administration toolkit.",
 )
+app.add_typer(connection_app, name="connection")
 
 
 def _version_callback(value: bool) -> bool:
@@ -22,6 +26,22 @@ def _version_callback(value: bool) -> bool:
 
 @app.callback()
 def main(
+    ctx: typer.Context,
+    connection: Annotated[
+        str | None,
+        typer.Option(
+            "--connection",
+            "-c",
+            help="Connection profile name.",
+        ),
+    ] = None,
+    config: Annotated[
+        Path | None,
+        typer.Option(
+            "--config",
+            help="Path to config.toml.",
+        ),
+    ] = None,
     version: Annotated[
         bool,
         typer.Option(
@@ -33,3 +53,8 @@ def main(
     ] = False,
 ) -> None:
     """PyDBAdminKit command-line interface."""
+
+    ctx.obj = CLIContext(
+        connection_profile=connection,
+        config_path=config,
+    )

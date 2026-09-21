@@ -1,31 +1,18 @@
-"""Connection profile domain models."""
+"""Resolved runtime connection configuration."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from pydbadminkit.domain.common.engine import DatabaseEngine
 from pydbadminkit.domain.common.environment import EnvironmentName
-from pydbadminkit.domain.connection.secrets import SecretReference
+from pydbadminkit.domain.connection.profile import ConnectionProfileName
+from pydbadminkit.domain.connection.secrets import SecretValue
 from pydbadminkit.domain.connection.ssl import SSLConfig
 from pydbadminkit.domain.connection.timeouts import TimeoutConfig
 
 
 @dataclass(frozen=True, slots=True)
-class ConnectionProfileName:
-    """Validated connection profile name."""
-
-    value: str
-
-    def __post_init__(self) -> None:
-        if not self.value or self.value.isspace():
-            raise ValueError("connection profile name must not be blank")
-
-    def __str__(self) -> str:
-        return self.value
-
-
-@dataclass(frozen=True, slots=True)
-class ConnectionProfile:
-    """Persisted connection profile without resolved secret material."""
+class ResolvedConnectionConfig:
+    """Connection configuration ready for an engine adapter."""
 
     name: ConnectionProfileName
     engine: DatabaseEngine
@@ -33,11 +20,11 @@ class ConnectionProfile:
     port: int
     database: str
     username: str
-    secret: SecretReference | None = None
-    environment: EnvironmentName = EnvironmentName.UNKNOWN
-    read_only: bool = False
-    ssl: SSLConfig = field(default_factory=SSLConfig)
-    timeouts: TimeoutConfig = field(default_factory=TimeoutConfig)
+    password: SecretValue | None
+    environment: EnvironmentName
+    read_only: bool
+    ssl: SSLConfig
+    timeouts: TimeoutConfig
 
     def __post_init__(self) -> None:
         if not self.host or self.host.isspace():

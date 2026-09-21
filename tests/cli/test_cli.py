@@ -1,5 +1,7 @@
 """CLI bootstrap tests."""
 
+from pathlib import Path
+
 import pytest
 from typer.testing import CliRunner
 
@@ -20,3 +22,25 @@ def test_cli_version() -> None:
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
     assert result.stdout.strip() == "pydbadminkit 0.1.0a1"
+
+
+def test_connection_test_requires_selected_profile() -> None:
+    result = runner.invoke(app, ["connection", "test"])
+    assert result.exit_code == 2
+    assert "Select a profile with --connection" in result.output
+
+
+def test_connection_test_reports_missing_config(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        [
+            "--connection",
+            "local",
+            "--config",
+            str(tmp_path / "missing.toml"),
+            "connection",
+            "test",
+        ],
+    )
+    assert result.exit_code == 2
+    assert "Configuration file" in result.output
