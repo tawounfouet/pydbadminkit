@@ -26,6 +26,13 @@ class PostgreSQLCapabilityAdapter:
             "security.access.direct.list",
             "security.access.effective.list",
             "security.ownership.list",
+            "security.role.create",
+            "security.role.alter",
+            "security.role.drop",
+            "security.membership.add",
+            "security.membership.remove",
+            "security.access.grant",
+            "security.access.revoke",
         }
     )
 
