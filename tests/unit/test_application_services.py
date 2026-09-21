@@ -36,8 +36,20 @@ class FakeCatalogPort:
     def get_database(self, name: str) -> DatabaseInfo:
         return DatabaseInfo(name=name)
 
-    def list_schemas(self) -> tuple[SchemaInfo, ...]:
+    def list_schemas(
+        self,
+        *,
+        include_system: bool = False,
+    ) -> tuple[SchemaInfo, ...]:
+        if include_system:
+            return (
+                SchemaInfo(name="pg_catalog", is_system=True),
+                SchemaInfo(name="public"),
+            )
         return (SchemaInfo(name="public"),)
+
+    def get_schema(self, name: str) -> SchemaInfo:
+        return SchemaInfo(name=name)
 
     def list_tables(
         self,
@@ -65,4 +77,6 @@ def test_catalog_service_delegates_to_port() -> None:
     assert [item.name for item in service.list_databases()] == ["analytics", "postgres"]
     assert service.get_database("analytics").name == "analytics"
     assert service.list_schemas()[0].name == "public"
+    assert service.list_schemas(include_system=True)[0].is_system is True
+    assert service.get_schema("public").name == "public"
     assert service.list_tables(schema="public")[0].name.name == "customers"

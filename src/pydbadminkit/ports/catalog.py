@@ -19,8 +19,16 @@ class CatalogPort(Protocol):
         """Return one visible database by exact name."""
         ...
 
-    def list_schemas(self) -> tuple[SchemaInfo, ...]:
+    def list_schemas(
+        self,
+        *,
+        include_system: bool = False,
+    ) -> tuple[SchemaInfo, ...]:
         """Return visible schemas in deterministic name order."""
+        ...
+
+    def get_schema(self, name: str) -> SchemaInfo:
+        """Return one visible schema by exact name."""
         ...
 
     def list_tables(
