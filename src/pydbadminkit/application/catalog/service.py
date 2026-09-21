@@ -19,8 +19,15 @@ class CatalogService:
     def get_database(self, name: str) -> DatabaseInfo:
         return self._catalog_port.get_database(name)
 
-    def list_schemas(self) -> tuple[SchemaInfo, ...]:
-        return self._catalog_port.list_schemas()
+    def list_schemas(
+        self,
+        *,
+        include_system: bool = False,
+    ) -> tuple[SchemaInfo, ...]:
+        return self._catalog_port.list_schemas(include_system=include_system)
+
+    def get_schema(self, name: str) -> SchemaInfo:
+        return self._catalog_port.get_schema(name)
 
     def list_tables(
         self,
