@@ -1,5 +1,7 @@
 """CLI error mapping."""
 
+from typing import NoReturn
+
 import typer
 
 from pydbadminkit.errors import (
@@ -32,7 +34,7 @@ def exit_code_for_error(error: PyDBAdminError) -> int:
     return 1
 
 
-def fail_with_error(error: PyDBAdminError) -> None:
+def fail_with_error(error: PyDBAdminError) -> NoReturn:
     """Render a concise safe CLI error and exit."""
 
     typer.echo(f"Error: {error}", err=True)
