@@ -13,3 +13,6 @@ class CLIContext:
     connection_profile: str | None = None
     config_path: Path | None = None
     output_format: OutputFormat = OutputFormat.TABLE
+    dry_run: bool = False
+    assume_yes: bool = False
+    non_interactive: bool = False
