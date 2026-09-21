@@ -14,6 +14,7 @@ from pydbadminkit.cli.commands.server import server_app
 from pydbadminkit.cli.commands.table import table_app
 from pydbadminkit.cli.commands.view import view_app
 from pydbadminkit.cli.context import CLIContext
+from pydbadminkit.output.format import OutputFormat
 from pydbadminkit.version import __version__
 
 app = typer.Typer(
@@ -56,6 +57,14 @@ def main(
             help="Path to config.toml.",
         ),
     ] = None,
+    output: Annotated[
+        OutputFormat,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Output format: table, json, or yaml.",
+        ),
+    ] = OutputFormat.TABLE,
     version: Annotated[
         bool,
         typer.Option(
@@ -71,4 +80,5 @@ def main(
     ctx.obj = CLIContext(
         connection_profile=connection,
         config_path=config,
+        output_format=output,
     )

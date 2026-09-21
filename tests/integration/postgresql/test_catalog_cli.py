@@ -170,6 +170,27 @@ def test_server_info_cli(
     assert f"Database: {_database()}" in result.stdout
 
 
+def test_server_info_json_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import json
+
+    monkeypatch.setenv("PYDBADMIN_TEST_POSTGRES_PASSWORD", _password())
+    config = _config(tmp_path)
+
+    result = runner.invoke(
+        app,
+        [*_base_args(config), "--output", "json", "server", "info"],
+    )
+
+    assert result.exit_code == 0, result.output
+    parsed = json.loads(result.stdout)
+    assert parsed["engine"] == "postgresql"
+    assert parsed["version"]["major"] == 18
+    assert parsed["current_database"] == _database()
+
+
 def test_database_list_and_describe_cli(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

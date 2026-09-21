@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from pydbadminkit.output.format import OutputFormat
+
 
 @dataclass(slots=True)
 class CLIContext:
@@ -10,3 +12,4 @@ class CLIContext:
 
     connection_profile: str | None = None
     config_path: Path | None = None
+    output_format: OutputFormat = OutputFormat.TABLE

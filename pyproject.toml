@@ -31,6 +31,7 @@ dev = [
   "pytest-timeout>=2,<3",
   "ruff>=0.12,<1",
   "twine>=6,<7",
+  "types-PyYAML>=6,<7",
 ]
 
 [project.scripts]

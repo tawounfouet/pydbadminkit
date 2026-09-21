@@ -3,9 +3,11 @@
 import typer
 
 from pydbadminkit.bootstrap import build_connection_service
-from pydbadminkit.cli.context import CLIContext
+from pydbadminkit.cli.common import require_connection_profile
 from pydbadminkit.cli.errors import fail_with_error
+from pydbadminkit.cli.output import emit_output
 from pydbadminkit.errors import PyDBAdminError
+from pydbadminkit.output.human import render_connection_test
 
 connection_app = typer.Typer(
     name="connection",
@@ -18,23 +20,11 @@ connection_app = typer.Typer(
 def test_connection(ctx: typer.Context) -> None:
     """Test the selected connection profile."""
 
-    root_context = ctx.find_root().obj
-    if not isinstance(root_context, CLIContext):
-        typer.echo("Error: CLI context was not initialized.", err=True)
-        raise typer.Exit(2)
-    if root_context.connection_profile is None:
-        typer.echo("Error: Select a profile with --connection.", err=True)
-        raise typer.Exit(2)
-
+    root_context, profile_name = require_connection_profile(ctx)
     service = build_connection_service(root_context.config_path)
     try:
-        result = service.test(root_context.connection_profile)
+        result = service.test(profile_name)
     except PyDBAdminError as error:
         fail_with_error(error)
 
-    typer.echo("Connection OK")
-    typer.echo(f"Engine: {result.engine.value}")
-    typer.echo(f"Version: {result.version}")
-    typer.echo(f"Database: {result.current_database}")
-    typer.echo(f"User: {result.current_user}")
-    typer.echo(f"Latency: {result.latency_ms:.2f} ms")
+    emit_output(ctx, result, render_connection_test(result))

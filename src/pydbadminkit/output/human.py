@@ -12,6 +12,22 @@ from pydbadminkit.domain.catalog import (
     ViewInfo,
 )
 from pydbadminkit.domain.common import CapabilityStatus
+from pydbadminkit.domain.connection import ConnectionTestResult
+
+
+def render_connection_test(result: ConnectionTestResult) -> str:
+    """Render a successful connection test."""
+
+    return "\n".join(
+        (
+            "Connection OK",
+            f"Engine: {result.engine.value}",
+            f"Version: {result.version}",
+            f"Database: {result.current_database}",
+            f"User: {result.current_user}",
+            f"Latency: {result.latency_ms:.2f} ms",
+        )
+    )
 
 
 def render_server_info(info: ServerInfo) -> str:

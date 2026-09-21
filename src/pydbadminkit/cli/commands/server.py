@@ -5,6 +5,7 @@ import typer
 from pydbadminkit.bootstrap import build_server_service
 from pydbadminkit.cli.common import require_connection_profile
 from pydbadminkit.cli.errors import fail_with_error
+from pydbadminkit.cli.output import emit_output
 from pydbadminkit.errors import PyDBAdminError
 from pydbadminkit.output.human import render_server_info
 
@@ -25,4 +26,4 @@ def server_info(ctx: typer.Context) -> None:
     except PyDBAdminError as error:
         fail_with_error(error)
 
-    typer.echo(render_server_info(info))
+    emit_output(ctx, info, render_server_info(info))
