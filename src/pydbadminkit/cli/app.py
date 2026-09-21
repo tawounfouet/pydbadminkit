@@ -5,6 +5,7 @@ from typing import Annotated
 
 import typer
 
+from pydbadminkit.cli.commands.capability import capability_app
 from pydbadminkit.cli.commands.connection import connection_app
 from pydbadminkit.cli.commands.database import database_app
 from pydbadminkit.cli.commands.server import server_app
@@ -19,6 +20,7 @@ app = typer.Typer(
 app.add_typer(connection_app, name="connection")
 app.add_typer(server_app, name="server")
 app.add_typer(database_app, name="database")
+app.add_typer(capability_app, name="capability")
 
 
 def _version_callback(value: bool) -> bool:
