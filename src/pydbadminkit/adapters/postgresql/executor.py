@@ -3,6 +3,7 @@
 from typing import Any
 
 import psycopg
+from psycopg import sql
 from psycopg.rows import dict_row
 
 from pydbadminkit.adapters.postgresql.connection import PostgreSQLConnectionFactory
@@ -65,3 +66,29 @@ class PostgreSQLExecutor:
         if not rows:
             return None
         return rows[0]
+
+
+    def execute(
+        self,
+        query: str | sql.Composable,
+        params: tuple[object, ...] | None = None,
+        *,
+        query_id: str,
+    ) -> int:
+        """Execute one bounded mutation statement and return the driver rowcount."""
+
+        context = ErrorContext(
+            operation=query_id,
+            engine=DatabaseEngine.POSTGRESQL,
+            profile=str(self._config.name),
+            environment=self._config.environment,
+        )
+
+        try:
+            with self._factory.connect(self._config) as connection, connection.cursor() as cursor:
+                cursor.execute(query, params)
+                return cursor.rowcount
+        except PyDBAdminError:
+            raise
+        except psycopg.Error as error:
+            raise translate_database_error(error, context=context) from error
