@@ -43,23 +43,13 @@ class PostgreSQLSecurityAdapter:
             query_id=GET_ROLE_QUERY_ID,
         )
         if role_row is None:
-            raise ResourceNotFoundError(
-                f"Role '{name}' was not found or is not visible."
-            )
+            raise ResourceNotFoundError(f"Role '{name}' was not found or is not visible.")
 
         memberships = self.list_role_memberships()
         return RoleDescription(
             role=map_role_info(role_row),
-            member_of=tuple(
-                membership
-                for membership in memberships
-                if membership.member == name
-            ),
-            members=tuple(
-                membership
-                for membership in memberships
-                if membership.role == name
-            ),
+            member_of=tuple(membership for membership in memberships if membership.member == name),
+            members=tuple(membership for membership in memberships if membership.role == name),
         )
 
     def list_role_memberships(self) -> tuple[RoleMembership, ...]:
