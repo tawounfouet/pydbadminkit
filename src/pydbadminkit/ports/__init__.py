@@ -1,5 +1,6 @@
 """Application ports implemented by adapters and infrastructure."""
 
+from pydbadminkit.ports.audit import AuditPort
 from pydbadminkit.ports.capability import CapabilityPort
 from pydbadminkit.ports.catalog import CatalogPort
 from pydbadminkit.ports.config import ConfigRepositoryPort
@@ -9,6 +10,7 @@ from pydbadminkit.ports.security import SecurityPort
 from pydbadminkit.ports.server import ServerPort
 
 __all__ = [
+    "AuditPort",
     "CapabilityPort",
     "CatalogPort",
     "ConfigRepositoryPort",
