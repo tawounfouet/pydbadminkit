@@ -199,9 +199,7 @@ def render_view_description(description: ViewDescription) -> str:
 def render_index_list(indexes: tuple[IndexInfo, ...]) -> str:
     """Render index summaries."""
 
-    lines = [
-        "NAME\tTABLE\tMETHOD\tUNIQUE\tPRIMARY\tVALID\tREADY\tSIZE_BYTES"
-    ]
+    lines = ["NAME\tTABLE\tMETHOD\tUNIQUE\tPRIMARY\tVALID\tREADY\tSIZE_BYTES"]
     for index in indexes:
         lines.append(
             "\t".join(
