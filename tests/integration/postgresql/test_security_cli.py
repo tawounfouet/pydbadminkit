@@ -144,9 +144,7 @@ def security_roles(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
             )
             """
         )
-        cursor.execute(
-            "ALTER TABLE public.pydbadmin_owner_target OWNER TO pydbadmin_app"
-        )
+        cursor.execute("ALTER TABLE public.pydbadmin_owner_target OWNER TO pydbadmin_app")
 
     yield
 
