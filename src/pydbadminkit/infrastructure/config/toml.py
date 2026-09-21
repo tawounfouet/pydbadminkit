@@ -1,9 +1,9 @@
 """TOML-backed connection profile repository."""
 
+import tomllib
 from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
-import tomllib
 
 from pydbadminkit.domain.common.engine import DatabaseEngine
 from pydbadminkit.domain.common.environment import EnvironmentName
@@ -73,11 +73,12 @@ class TomlConnectionProfileRepository:
 
     def _load_profiles(self) -> dict[str, ConnectionProfile]:
         try:
-            document = cast(dict[str, object], tomllib.loads(self._path.read_text(encoding="utf-8")))
+            document = cast(
+                dict[str, object],
+                tomllib.loads(self._path.read_text(encoding="utf-8")),
+            )
         except FileNotFoundError as error:
-            raise ConfigurationError(
-                f"Configuration file '{self._path}' was not found."
-            ) from error
+            raise ConfigurationError(f"Configuration file '{self._path}' was not found.") from error
         except tomllib.TOMLDecodeError as error:
             raise ConfigurationError(
                 f"Configuration file '{self._path}' contains invalid TOML."
@@ -118,6 +119,7 @@ class TomlConnectionProfileRepository:
                     reference=_required_str(secret_data, "reference"),
                 )
 
+            connect_timeout = _optional_int(data, "connect_timeout_seconds")
             return ConnectionProfile(
                 name=ConnectionProfileName(raw_name),
                 engine=engine,
@@ -135,14 +137,12 @@ class TomlConnectionProfileRepository:
                     key=_optional_str(data, "ssl_key"),
                 ),
                 timeouts=TimeoutConfig(
-                    connect_seconds=_optional_int(data, "connect_timeout_seconds") or 10,
+                    connect_seconds=10 if connect_timeout is None else connect_timeout,
                     statement_ms=_optional_int(data, "statement_timeout_ms"),
                     lock_ms=_optional_int(data, "lock_timeout_ms"),
                 ),
             )
-        except (ValueError, TypeError) as error:
-            if isinstance(error, ConfigurationError):
-                raise
+        except ValueError as error:
             raise ConfigurationError(
                 f"Connection profile '{raw_name}' is invalid: {error}"
             ) from error
