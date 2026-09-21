@@ -20,9 +20,11 @@ def test_connection(ctx: typer.Context) -> None:
 
     root_context = ctx.find_root().obj
     if not isinstance(root_context, CLIContext):
-        raise typer.BadParameter("CLI context was not initialized.")
+        typer.echo("Error: CLI context was not initialized.", err=True)
+        raise typer.Exit(2)
     if root_context.connection_profile is None:
-        raise typer.BadParameter("Select a profile with --connection.")
+        typer.echo("Error: Select a profile with --connection.", err=True)
+        raise typer.Exit(2)
 
     service = build_connection_service(root_context.config_path)
     try:
