@@ -8,8 +8,8 @@ from pydbadminkit.application.connection import ConnectionConfigResolver
 from pydbadminkit.domain.common import DatabaseEngine, EnvironmentName
 from pydbadminkit.domain.connection import (
     ConnectionProfileName,
-    SSLMode,
     SecretReference,
+    SSLMode,
 )
 from pydbadminkit.errors import ConfigurationError, ProfileNotFoundError
 from pydbadminkit.infrastructure.config import TomlConnectionProfileRepository
