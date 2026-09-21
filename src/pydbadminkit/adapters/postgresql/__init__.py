@@ -1,7 +1,7 @@
 """PostgreSQL adapter implementation."""
 
-from pydbadminkit.adapters.postgresql.catalog import PostgreSQLCatalogAdapter
 from pydbadminkit.adapters.postgresql.capabilities import PostgreSQLCapabilityAdapter
+from pydbadminkit.adapters.postgresql.catalog import PostgreSQLCatalogAdapter
 from pydbadminkit.adapters.postgresql.connection import (
     PostgreSQLConnectionFactory,
     PostgreSQLConnectionTester,
