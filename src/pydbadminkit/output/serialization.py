@@ -24,10 +24,7 @@ def to_machine_value(value: object) -> MachineValue:
         return value
 
     if is_dataclass(value) and not isinstance(value, type):
-        return {
-            field.name: to_machine_value(getattr(value, field.name))
-            for field in fields(value)
-        }
+        return {field.name: to_machine_value(getattr(value, field.name)) for field in fields(value)}
 
     if isinstance(value, (tuple, list)):
         return [to_machine_value(item) for item in value]
