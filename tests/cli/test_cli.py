@@ -66,4 +66,4 @@ def test_capability_yaml_output_is_machine_only() -> None:
     assert result.exit_code == 0
     parsed = yaml.safe_load(result.stdout)
     assert parsed["name"] == "server.info"
-    assert parsed["available"] is True
+    assert parsed["availability"] == "available"
