@@ -78,37 +78,36 @@ def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         user=_user(),
         password=_password(),
         autocommit=True,
-    ) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
-            cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
-            cursor.execute(
-                """
-                CREATE TABLE public.pydbadmin_accounts (
-                    id bigint PRIMARY KEY,
-                    code text NOT NULL UNIQUE
-                )
-                """
+    ) as connection, connection.cursor() as cursor:
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
+        cursor.execute(
+            """
+            CREATE TABLE public.pydbadmin_accounts (
+                id bigint PRIMARY KEY,
+                code text NOT NULL UNIQUE
             )
-            cursor.execute(
-                """
-                CREATE TABLE public.pydbadmin_customers (
-                    id bigint PRIMARY KEY,
-                    account_id bigint NOT NULL,
-                    email text NOT NULL UNIQUE,
-                    display_name text DEFAULT 'anonymous',
-                    CONSTRAINT pydbadmin_customers_account_fk
-                        FOREIGN KEY (account_id)
-                        REFERENCES public.pydbadmin_accounts(id)
-                )
-                """
+            """
+        )
+        cursor.execute(
+            """
+            CREATE TABLE public.pydbadmin_customers (
+                id bigint PRIMARY KEY,
+                account_id bigint NOT NULL,
+                email text NOT NULL UNIQUE,
+                display_name text DEFAULT 'anonymous',
+                CONSTRAINT pydbadmin_customers_account_fk
+                    FOREIGN KEY (account_id)
+                    REFERENCES public.pydbadmin_accounts(id)
             )
-            cursor.execute(
-                """
-                COMMENT ON COLUMN public.pydbadmin_customers.email
-                IS 'customer email address'
-                """
-            )
+            """
+        )
+        cursor.execute(
+            """
+            COMMENT ON COLUMN public.pydbadmin_customers.email
+            IS 'customer email address'
+            """
+        )
 
     yield
 
@@ -119,10 +118,9 @@ def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         user=_user(),
         password=_password(),
         autocommit=True,
-    ) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
-            cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
+    ) as connection, connection.cursor() as cursor:
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
 
 
 def test_server_info_cli(
