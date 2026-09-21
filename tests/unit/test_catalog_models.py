@@ -9,10 +9,15 @@ from pydbadminkit.domain.catalog import (
     ConstraintInfo,
     ConstraintType,
     DatabaseInfo,
+    IndexDescription,
+    IndexInfo,
     SchemaInfo,
     ServerInfo,
     TableDescription,
     TableInfo,
+    ViewDescription,
+    ViewInfo,
+    ViewKind,
 )
 from pydbadminkit.domain.common import DatabaseEngine, DatabaseVersion, QualifiedName
 
@@ -80,3 +85,46 @@ def test_table_description_uses_immutable_tuples() -> None:
 
     assert description.columns == (column,)
     assert description.constraints == (constraint,)
+
+
+def test_view_description_uses_immutable_columns() -> None:
+    view = ViewInfo(
+        name=QualifiedName(schema="public", name="customer_view"),
+        kind=ViewKind.MATERIALIZED_VIEW,
+    )
+    column = ColumnInfo(
+        name="id",
+        position=1,
+        data_type="bigint",
+        nullable=True,
+    )
+    description = ViewDescription(
+        view=view,
+        columns=(column,),
+        definition="SELECT 1 AS id",
+    )
+
+    assert description.view.kind is ViewKind.MATERIALIZED_VIEW
+    assert description.columns == (column,)
+
+
+def test_index_info_validates_method_and_size() -> None:
+    name = QualifiedName(schema="public", name="customers_idx")
+    table = QualifiedName(schema="public", name="customers")
+
+    with pytest.raises(ValueError):
+        IndexInfo(name=name, table=table, method=" ")
+
+    with pytest.raises(ValueError):
+        IndexInfo(name=name, table=table, method="btree", size_bytes=-1)
+
+
+def test_index_description_requires_definition() -> None:
+    index = IndexInfo(
+        name=QualifiedName(schema="public", name="customers_idx"),
+        table=QualifiedName(schema="public", name="customers"),
+        method="btree",
+    )
+
+    with pytest.raises(ValueError):
+        IndexDescription(index=index, definition=" ")
