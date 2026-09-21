@@ -16,13 +16,15 @@ class PostgreSQLCapabilityAdapter:
             "catalog.schema.describe",
             "catalog.table.list",
             "catalog.table.describe",
+            "catalog.view.list",
+            "catalog.view.describe",
+            "catalog.index.list",
+            "catalog.index.describe",
         }
     )
 
     _PLANNED = frozenset(
         {
-            "catalog.view.list",
-            "catalog.index.list",
             "runtime.session.list",
             "runtime.query.list",
             "runtime.lock.list",

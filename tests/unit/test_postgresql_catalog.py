@@ -367,11 +367,15 @@ def test_postgresql_capability_adapter() -> None:
 
     database = adapter.get_capability("catalog.database.list")
     table = adapter.get_capability("catalog.table.list")
-    planned = adapter.get_capability("catalog.view.list")
+    view = adapter.get_capability("catalog.view.list")
+    index = adapter.get_capability("catalog.index.list")
+    planned = adapter.get_capability("runtime.session.list")
     unknown = adapter.get_capability("future.unknown")
 
     assert database.availability is CapabilityAvailability.AVAILABLE
     assert table.availability is CapabilityAvailability.AVAILABLE
+    assert view.availability is CapabilityAvailability.AVAILABLE
+    assert index.availability is CapabilityAvailability.AVAILABLE
     assert planned.availability is CapabilityAvailability.UNKNOWN
     assert planned.reason is not None
     assert unknown.availability is CapabilityAvailability.UNKNOWN

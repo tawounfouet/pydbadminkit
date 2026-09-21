@@ -7,10 +7,15 @@ from pydbadminkit.domain.catalog import (
     ConstraintInfo,
     ConstraintType,
     DatabaseInfo,
+    IndexDescription,
+    IndexInfo,
     SchemaInfo,
     ServerInfo,
     TableDescription,
     TableInfo,
+    ViewDescription,
+    ViewInfo,
+    ViewKind,
 )
 from pydbadminkit.domain.common import (
     CapabilityAvailability,
@@ -24,11 +29,15 @@ from pydbadminkit.output.human import (
     render_capability_list,
     render_database_info,
     render_database_list,
+    render_index_description,
+    render_index_list,
     render_schema_info,
     render_schema_list,
     render_server_info,
     render_table_description,
     render_table_list,
+    render_view_description,
+    render_view_list,
 )
 
 pytestmark = pytest.mark.unit
@@ -123,6 +132,59 @@ def test_table_renderers() -> None:
     assert "customers_pkey\tprimary_key\tid\tPRIMARY KEY (id)" in detail
 
 
+def test_view_renderers() -> None:
+    view = ViewInfo(
+        name=QualifiedName(schema="public", name="customer_view"),
+        owner="postgres",
+        kind=ViewKind.VIEW,
+    )
+    description = ViewDescription(
+        view=view,
+        columns=(
+            ColumnInfo(
+                name="id",
+                position=1,
+                data_type="bigint",
+                nullable=True,
+            ),
+        ),
+        definition="SELECT id FROM public.customers;",
+    )
+
+    listing = render_view_list((view,))
+    detail = render_view_description(description)
+
+    assert "public.customer_view\tpostgres\tview" in listing
+    assert "Kind: view" in detail
+    assert "1\tid\tbigint\tyes" in detail
+    assert "SELECT id FROM public.customers;" in detail
+
+
+def test_index_renderers() -> None:
+    index = IndexInfo(
+        name=QualifiedName(schema="public", name="customers_email_idx"),
+        table=QualifiedName(schema="public", name="customers"),
+        method="btree",
+        owner="postgres",
+        unique=True,
+        size_bytes=16384,
+    )
+    description = IndexDescription(
+        index=index,
+        definition="CREATE INDEX idx ON public.customers (email)",
+        predicate="email IS NOT NULL",
+    )
+
+    listing = render_index_list((index,))
+    detail = render_index_description(description)
+
+    assert "public.customers_email_idx\tpublic.customers\tbtree\tyes\tno" in listing
+    assert "Method: btree" in detail
+    assert "Unique: yes" in detail
+    assert "Predicate: email IS NOT NULL" in detail
+    assert "CREATE INDEX" in detail
+
+
 def test_renderers_handle_unknown_optional_values() -> None:
     database = DatabaseInfo(name="empty")
     rendered = render_database_info(database)
@@ -132,11 +194,11 @@ def test_renderers_handle_unknown_optional_values() -> None:
 
 def test_capability_renderers() -> None:
     available = CapabilityStatus(
-        name="server.info",
+        name="catalog.view.list",
         availability=CapabilityAvailability.AVAILABLE,
     )
     unavailable = CapabilityStatus(
-        name="catalog.view.list",
+        name="runtime.session.list",
         availability=CapabilityAvailability.UNKNOWN,
         reason="Not implemented.",
     )
@@ -144,6 +206,6 @@ def test_capability_renderers() -> None:
     listing = render_capability_list((available, unavailable))
     detail = render_capability_info(available)
 
-    assert "server.info\tavailable\t-" in listing
-    assert "catalog.view.list\tunknown\tNot implemented." in listing
+    assert "catalog.view.list\tavailable\t-" in listing
+    assert "runtime.session.list\tunknown\tNot implemented." in listing
     assert "Available: yes" in detail

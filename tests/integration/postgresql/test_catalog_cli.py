@@ -82,6 +82,8 @@ def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         ) as connection,
         connection.cursor() as cursor,
     ):
+        cursor.execute("DROP MATERIALIZED VIEW IF EXISTS public.pydbadmin_customer_mv")
+        cursor.execute("DROP VIEW IF EXISTS public.pydbadmin_customer_view")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
         cursor.execute(
@@ -111,6 +113,28 @@ def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
             IS 'customer email address'
             """
         )
+        cursor.execute(
+            """
+            CREATE VIEW public.pydbadmin_customer_view AS
+            SELECT id, email, display_name
+            FROM public.pydbadmin_customers
+            """
+        )
+        cursor.execute(
+            """
+            CREATE MATERIALIZED VIEW public.pydbadmin_customer_mv AS
+            SELECT id, email
+            FROM public.pydbadmin_customers
+            WITH NO DATA
+            """
+        )
+        cursor.execute(
+            """
+            CREATE INDEX pydbadmin_customers_display_idx
+            ON public.pydbadmin_customers (display_name)
+            WHERE display_name IS NOT NULL
+            """
+        )
 
     yield
 
@@ -125,6 +149,8 @@ def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         ) as connection,
         connection.cursor() as cursor,
     ):
+        cursor.execute("DROP MATERIALIZED VIEW IF EXISTS public.pydbadmin_customer_mv")
+        cursor.execute("DROP VIEW IF EXISTS public.pydbadmin_customer_view")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
 
@@ -281,12 +307,120 @@ def test_table_describe_missing_returns_not_found(
     assert "was not found or is not visible" in result.output
 
 
+def test_view_list_and_describe_cli(
+    tmp_path: Path,
+    catalog_objects: None,
+) -> None:
+    del catalog_objects
+    config = _config(tmp_path)
+
+    listing = runner.invoke(
+        app,
+        [*_base_args(config), "view", "list", "--schema", "public"],
+    )
+    detail = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "view",
+            "describe",
+            "public.pydbadmin_customer_view",
+        ],
+    )
+    materialized = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "view",
+            "describe",
+            "public.pydbadmin_customer_mv",
+        ],
+    )
+
+    assert listing.exit_code == 0, listing.output
+    assert "public.pydbadmin_customer_view" in listing.stdout
+    assert "public.pydbadmin_customer_mv" in listing.stdout
+    assert "materialized_view" in listing.stdout
+
+    assert detail.exit_code == 0, detail.output
+    assert "Kind: view" in detail.stdout
+    assert "COLUMNS" in detail.stdout
+    assert "DEFINITION" in detail.stdout
+    assert "pydbadmin_customers" in detail.stdout
+
+    assert materialized.exit_code == 0, materialized.output
+    assert "Kind: materialized_view" in materialized.stdout
+
+
+def test_index_list_and_describe_cli(
+    tmp_path: Path,
+    catalog_objects: None,
+) -> None:
+    del catalog_objects
+    config = _config(tmp_path)
+
+    listing = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "index",
+            "list",
+            "--schema",
+            "public",
+            "--table",
+            "pydbadmin_customers",
+        ],
+    )
+    detail = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "index",
+            "describe",
+            "public.pydbadmin_customers_display_idx",
+        ],
+    )
+
+    assert listing.exit_code == 0, listing.output
+    assert "public.pydbadmin_customers_display_idx" in listing.stdout
+    assert "btree" in listing.stdout
+
+    assert detail.exit_code == 0, detail.output
+    assert "Method: btree" in detail.stdout
+    assert "Predicate:" in detail.stdout
+    assert "display_name IS NOT NULL" in detail.stdout
+    assert "DEFINITION" in detail.stdout
+    assert "CREATE INDEX" in detail.stdout
+
+
+def test_view_and_index_missing_return_not_found(
+    tmp_path: Path,
+    catalog_objects: None,
+) -> None:
+    del catalog_objects
+    config = _config(tmp_path)
+
+    view = runner.invoke(
+        app,
+        [*_base_args(config), "view", "describe", "public.__missing_view__"],
+    )
+    index = runner.invoke(
+        app,
+        [*_base_args(config), "index", "describe", "public.__missing_index__"],
+    )
+
+    assert view.exit_code == 5
+    assert index.exit_code == 5
+
+
 def test_capability_cli() -> None:
     listing = runner.invoke(app, ["capability", "list"])
     detail = runner.invoke(app, ["capability", "get", "catalog.table.describe"])
 
     assert listing.exit_code == 0
     assert "catalog.table.list\tavailable" in listing.stdout
-    assert "catalog.view.list\tunknown" in listing.stdout
+    assert "catalog.view.list\tavailable" in listing.stdout
+    assert "catalog.index.list\tavailable" in listing.stdout
+    assert "runtime.session.list\tunknown" in listing.stdout
     assert detail.exit_code == 0
     assert "Available: yes" in detail.stdout
