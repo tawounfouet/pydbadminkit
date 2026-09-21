@@ -135,13 +135,18 @@ def test_catalog_service_delegates_to_port() -> None:
     assert service.get_schema("public").name == "public"
     assert service.list_tables(schema="public")[0].name.name == "customers"
     assert service.list_views(schema="public")[0].name.name == "customer_view"
-    assert service.describe_view(
-        QualifiedName(schema="public", name="customer_view")
-    ).definition == "SELECT 1"
-    assert service.list_indexes(
-        schema="public",
-        table="customers",
-    )[0].primary is True
-    assert service.describe_index(
-        QualifiedName(schema="public", name="customers_pkey")
-    ).index.method == "btree"
+    assert (
+        service.describe_view(QualifiedName(schema="public", name="customer_view")).definition
+        == "SELECT 1"
+    )
+    assert (
+        service.list_indexes(
+            schema="public",
+            table="customers",
+        )[0].primary
+        is True
+    )
+    assert (
+        service.describe_index(QualifiedName(schema="public", name="customers_pkey")).index.method
+        == "btree"
+    )
