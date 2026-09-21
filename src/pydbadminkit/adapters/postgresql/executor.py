@@ -41,10 +41,12 @@ class PostgreSQLExecutor:
         )
 
         try:
-            with self._factory.connect(self._config) as connection:
-                with connection.cursor(row_factory=dict_row) as cursor:
-                    cursor.execute(query, params)
-                    return tuple(dict(row) for row in cursor.fetchall())
+            with (
+                self._factory.connect(self._config) as connection,
+                connection.cursor(row_factory=dict_row) as cursor,
+            ):
+                cursor.execute(query, params)
+                return tuple(dict(row) for row in cursor.fetchall())
         except PyDBAdminError:
             raise
         except psycopg.Error as error:
