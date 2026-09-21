@@ -1,6 +1,12 @@
 """Simple stable human-readable renderers for the initial CLI."""
 
-from pydbadminkit.domain.catalog import DatabaseInfo, SchemaInfo, ServerInfo, TableDescription, TableInfo
+from pydbadminkit.domain.catalog import (
+    DatabaseInfo,
+    SchemaInfo,
+    ServerInfo,
+    TableDescription,
+    TableInfo,
+)
 from pydbadminkit.domain.common import CapabilityStatus
 
 
