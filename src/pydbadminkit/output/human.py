@@ -1,6 +1,6 @@
 """Simple stable human-readable renderers for the initial CLI."""
 
-from pydbadminkit.domain.catalog import DatabaseInfo, ServerInfo
+from pydbadminkit.domain.catalog import DatabaseInfo, SchemaInfo, ServerInfo, TableDescription, TableInfo
 from pydbadminkit.domain.common import CapabilityStatus
 
 
@@ -47,6 +47,98 @@ def render_database_info(database: DatabaseInfo) -> str:
         f"Connection limit: {_optional_int(database.connection_limit)}",
         f"Size bytes: {_optional_int(database.size_bytes)}",
     ]
+    return "\n".join(lines)
+
+
+def render_schema_list(schemas: tuple[SchemaInfo, ...]) -> str:
+    """Render schema summaries."""
+
+    lines = ["NAME\tOWNER\tSYSTEM"]
+    for schema in schemas:
+        lines.append(
+            "\t".join(
+                (
+                    schema.name,
+                    schema.owner or "-",
+                    "yes" if schema.is_system else "no",
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_schema_info(schema: SchemaInfo) -> str:
+    """Render one schema."""
+
+    return "\n".join(
+        (
+            f"Name: {schema.name}",
+            f"Owner: {schema.owner or '-'}",
+            f"System: {'yes' if schema.is_system else 'no'}",
+        )
+    )
+
+
+def render_table_list(tables: tuple[TableInfo, ...]) -> str:
+    """Render table summaries."""
+
+    lines = ["NAME\tOWNER\tKIND\tEST_ROWS\tSIZE_BYTES"]
+    for table in tables:
+        lines.append(
+            "\t".join(
+                (
+                    str(table.name),
+                    table.owner or "-",
+                    table.kind.value,
+                    _optional_int(table.estimated_rows),
+                    _optional_int(table.size_bytes),
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_table_description(description: TableDescription) -> str:
+    """Render table metadata, columns and constraints."""
+
+    table = description.table
+    lines = [
+        f"Name: {table.name}",
+        f"Owner: {table.owner or '-'}",
+        f"Kind: {table.kind.value}",
+        f"Estimated rows: {_optional_int(table.estimated_rows)}",
+        f"Size bytes: {_optional_int(table.size_bytes)}",
+        "",
+        "COLUMNS",
+        "POSITION\tNAME\tTYPE\tNULLABLE\tDEFAULT\tIDENTITY\tGENERATED",
+    ]
+    for column in description.columns:
+        lines.append(
+            "\t".join(
+                (
+                    str(column.position),
+                    column.name,
+                    column.data_type,
+                    "yes" if column.nullable else "no",
+                    column.default or "-",
+                    "yes" if column.identity else "no",
+                    "yes" if column.generated else "no",
+                )
+            )
+        )
+
+    lines.extend(("", "CONSTRAINTS", "NAME\tTYPE\tCOLUMNS\tDEFINITION"))
+    for constraint in description.constraints:
+        lines.append(
+            "\t".join(
+                (
+                    constraint.name,
+                    constraint.constraint_type.value,
+                    ",".join(constraint.columns) or "-",
+                    constraint.definition or "-",
+                )
+            )
+        )
     return "\n".join(lines)
 
 
