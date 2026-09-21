@@ -97,7 +97,11 @@ class SecurityMutationService:
         )
 
     def plan_drop_role(self, name: str) -> OperationPlan:
-        risk = RiskLevel.CRITICAL if self._config.environment is EnvironmentName.PRODUCTION else RiskLevel.HIGH
+        risk = (
+            RiskLevel.CRITICAL
+            if self._config.environment is EnvironmentName.PRODUCTION
+            else RiskLevel.HIGH
+        )
         return self._plan(
             operation="security.role.drop",
             target=name,
@@ -232,8 +236,7 @@ class SecurityMutationService:
             target=target,
             risk=self._escalate_for_environment(base_risk),
             effects=(
-                f"{verb} {command.access_type.value} on '{relation}' "
-                f"for '{command.principal}'.",
+                f"{verb} {command.access_type.value} on '{relation}' for '{command.principal}'.",
             ),
             warnings=(
                 ("WITH GRANT OPTION delegates privilege management.",)
@@ -321,7 +324,9 @@ class SecurityMutationService:
             )
         if protected_role is not None:
             if protected_role.startswith("pg_"):
-                raise PolicyDeniedError("Built-in PostgreSQL roles are protected from this operation.")
+                raise PolicyDeniedError(
+                    "Built-in PostgreSQL roles are protected from this operation."
+                )
             if destructive and protected_role == self._config.username:
                 raise PolicyDeniedError("Dropping the current connection role is blocked.")
         if plan.target.startswith("pg_") and plan.operation.startswith("security.role."):
