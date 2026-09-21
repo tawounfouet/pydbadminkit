@@ -1,0 +1,14 @@
+[connections.local]
+engine = "postgresql"
+host = "localhost"
+port = 5432
+database = "pydbadmin_dev"
+username = "postgres"
+environment = "development"
+read_only = false
+ssl_mode = "disable"
+connect_timeout_seconds = 10
+
+[connections.local.secret]
+provider = "env"
+reference = "PYDBADMIN_LOCAL_PASSWORD"
