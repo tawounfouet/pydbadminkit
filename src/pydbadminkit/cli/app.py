@@ -6,8 +6,8 @@ from typing import Annotated
 import typer
 
 from pydbadminkit.cli.commands.access import access_app
-from pydbadminkit.cli.commands.effective_access import effective_access_app
 from pydbadminkit.cli.commands.capability import capability_app
+from pydbadminkit.cli.commands.effective_access import effective_access_app
 from pydbadminkit.cli.commands.connection import connection_app
 from pydbadminkit.cli.commands.database import database_app
 from pydbadminkit.cli.commands.index import index_app
