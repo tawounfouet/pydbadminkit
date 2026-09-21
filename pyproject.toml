@@ -1,0 +1,90 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pydbadminkit"
+dynamic = ["version"]
+description = "CLI-first, Python-first database administration framework."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "Thomas Awounfouet" }
+]
+dependencies = [
+  "platformdirs>=4,<5",
+  "psycopg>=3.3,<4",
+  "PyYAML>=6,<7",
+  "rich>=13,<15",
+  "typer>=0.12,<1",
+]
+
+[project.optional-dependencies]
+binary = ["psycopg[binary]>=3.3,<4"]
+pool = ["psycopg[pool]>=3.3,<4"]
+dev = [
+  "build>=1,<2",
+  "mypy>=1.16,<2",
+  "pip-audit>=2,<3",
+  "pytest>=8,<9",
+  "pytest-cov>=5,<7",
+  "pytest-timeout>=2,<3",
+  "ruff>=0.12,<1",
+  "twine>=6,<7",
+]
+
+[project.scripts]
+pydbadmin = "pydbadminkit.cli.app:app"
+
+[tool.hatch.version]
+path = "src/pydbadminkit/version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pydbadminkit"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["pydbadminkit"]
+warn_unused_configs = true
+show_error_codes = true
+pretty = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+markers = [
+  "unit: fast isolated tests",
+  "contract: port contract tests",
+  "integration: integration tests",
+  "postgresql: PostgreSQL-specific tests",
+  "cli: CLI behavior tests",
+  "security: security tests",
+  "runtime: runtime tests",
+  "backup: backup tests",
+  "restore: restore tests",
+  "maintenance: maintenance tests",
+  "slow: slow tests",
+  "destructive: destructive tests",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["pydbadminkit"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 85
