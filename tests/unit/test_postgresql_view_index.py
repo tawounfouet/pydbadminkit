@@ -130,8 +130,7 @@ def test_index_mapper_and_description() -> None:
         _index_row(),
         {
             "definition": (
-                "CREATE UNIQUE INDEX customers_email_idx "
-                "ON public.customers USING btree (email)"
+                "CREATE UNIQUE INDEX customers_email_idx ON public.customers USING btree (email)"
             ),
             "predicate": "email IS NOT NULL",
         },
@@ -160,18 +159,14 @@ def test_catalog_adapter_lists_and_describes_views() -> None:
     executor = FakeExecutor(
         one_by_id={
             "PG_GET_VIEW": _view_row(),
-            "PG_GET_VIEW_DEFINITION": {
-                "definition": "SELECT id FROM public.customers;"
-            },
+            "PG_GET_VIEW_DEFINITION": {"definition": "SELECT id FROM public.customers;"},
         },
         many_by_id={"PG_LIST_VIEWS": (_view_row(),), "PG_GET_VIEW_COLUMNS": (_column_row(),)},
     )
     adapter = PostgreSQLCatalogAdapter(executor)  # type: ignore[arg-type]
 
     views = adapter.list_views(schema="public")
-    description = adapter.describe_view(
-        QualifiedName(schema="public", name="customer_view")
-    )
+    description = adapter.describe_view(QualifiedName(schema="public", name="customer_view"))
 
     assert views[0].kind is ViewKind.VIEW
     assert executor.calls[0][1] == (False, "public", "public")
@@ -216,9 +211,7 @@ def test_catalog_adapter_lists_and_describes_indexes() -> None:
     adapter = PostgreSQLCatalogAdapter(executor)  # type: ignore[arg-type]
 
     indexes = adapter.list_indexes(schema="public", table="customers")
-    description = adapter.describe_index(
-        QualifiedName(schema="public", name="customers_email_idx")
-    )
+    description = adapter.describe_index(QualifiedName(schema="public", name="customers_email_idx"))
 
     assert indexes[0].unique is True
     assert executor.calls[0][1] == (
