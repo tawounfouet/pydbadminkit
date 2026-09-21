@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import fields, is_dataclass
+from datetime import date, datetime
 from enum import Enum
 from typing import TypeAlias
 
@@ -23,6 +24,9 @@ def to_machine_value(value: object) -> MachineValue:
 
     if value is None or isinstance(value, (bool, int, float, str)):
         return value
+
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
 
     if is_dataclass(value) and not isinstance(value, type):
         return {field.name: to_machine_value(getattr(value, field.name)) for field in fields(value)}
