@@ -1,6 +1,6 @@
 """Security application service."""
 
-from pydbadminkit.domain.security import RoleDescription, RoleInfo, RoleMembership
+from pydbadminkit.domain.security import DirectAccess, RoleDescription, RoleInfo, RoleMembership
 from pydbadminkit.ports.security import SecurityPort
 
 
@@ -26,3 +26,18 @@ class SecurityService:
 
     def list_role_memberships(self) -> tuple[RoleMembership, ...]:
         return self._security_port.list_role_memberships()
+
+    def list_direct_access(
+        self,
+        role: str,
+        *,
+        schema: str | None = None,
+        object_name: str | None = None,
+        include_system: bool = False,
+    ) -> tuple[DirectAccess, ...]:
+        return self._security_port.list_direct_access(
+            role,
+            schema=schema,
+            object_name=object_name,
+            include_system=include_system,
+        )

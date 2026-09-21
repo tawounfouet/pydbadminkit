@@ -13,7 +13,7 @@ from pydbadminkit.domain.catalog import (
 )
 from pydbadminkit.domain.common import CapabilityStatus
 from pydbadminkit.domain.connection import ConnectionTestResult
-from pydbadminkit.domain.security import RoleDescription, RoleInfo
+from pydbadminkit.domain.security import DirectAccess, RoleDescription, RoleInfo
 
 
 def render_connection_test(result: ConnectionTestResult) -> str:
@@ -256,6 +256,26 @@ def render_index_description(description: IndexDescription) -> str:
             description.definition,
         )
     )
+
+
+def render_access_list(entries: tuple[DirectAccess, ...]) -> str:
+    """Render explicit relation access entries."""
+
+    lines = ["PRINCIPAL\tOBJECT\tTYPE\tACCESS\tISSUER\tDELEGABLE"]
+    for entry in entries:
+        lines.append(
+            "\t".join(
+                (
+                    entry.principal,
+                    str(entry.object.name),
+                    entry.object.object_type.value,
+                    entry.access_type.value,
+                    entry.issuer or "-",
+                    "yes" if entry.delegable else "no",
+                )
+            )
+        )
+    return "\n".join(lines)
 
 
 def render_role_list(roles: tuple[RoleInfo, ...]) -> str:

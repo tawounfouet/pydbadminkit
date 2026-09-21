@@ -87,6 +87,7 @@ def security_roles(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         ) as connection,
         connection.cursor() as cursor,
     ):
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_security_target")
         cursor.execute("DROP ROLE IF EXISTS pydbadmin_app")
         cursor.execute("DROP ROLE IF EXISTS pydbadmin_reader")
         cursor.execute("CREATE ROLE pydbadmin_reader NOLOGIN")
@@ -98,6 +99,21 @@ def security_roles(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
             """
         )
         cursor.execute("GRANT pydbadmin_reader TO pydbadmin_app")
+        cursor.execute(
+            """
+            CREATE TABLE public.pydbadmin_security_target (
+                id bigint PRIMARY KEY,
+                payload text
+            )
+            """
+        )
+        cursor.execute(
+            """
+            GRANT SELECT, UPDATE
+            ON TABLE public.pydbadmin_security_target
+            TO pydbadmin_app
+            """
+        )
 
     yield
 
@@ -112,6 +128,7 @@ def security_roles(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
         ) as connection,
         connection.cursor() as cursor,
     ):
+        cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_security_target")
         cursor.execute("DROP ROLE IF EXISTS pydbadmin_app")
         cursor.execute("DROP ROLE IF EXISTS pydbadmin_reader")
 
@@ -205,3 +222,61 @@ def test_role_describe_missing_returns_not_found(
 
     assert result.exit_code == 5
     assert "was not found or is not visible" in result.output
+
+
+def test_access_list_exposes_explicit_relation_entries(
+    tmp_path: Path,
+    security_roles: None,
+) -> None:
+    del security_roles
+    config = _config(tmp_path)
+
+    result = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "access",
+            "list",
+            "--role",
+            "pydbadmin_app",
+            "--schema",
+            "public",
+            "--object",
+            "pydbadmin_security_target",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "public.pydbadmin_security_target" in result.stdout
+    assert "\tSELECT\t" in result.stdout
+    assert "\tUPDATE\t" in result.stdout
+    assert "pydbadmin_reader" not in result.stdout
+
+
+def test_access_list_json_is_machine_readable(
+    tmp_path: Path,
+    security_roles: None,
+) -> None:
+    del security_roles
+    config = _config(tmp_path)
+
+    result = runner.invoke(
+        app,
+        [
+            *_base_args(config),
+            "--output",
+            "json",
+            "access",
+            "list",
+            "--role",
+            "pydbadmin_app",
+            "--object",
+            "pydbadmin_security_target",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    parsed = json.loads(result.stdout)
+    assert {item["access_type"] for item in parsed} == {"SELECT", "UPDATE"}
+    assert all(item["principal"] == "pydbadmin_app" for item in parsed)
+    assert all(item["object"]["object_type"] == "table" for item in parsed)

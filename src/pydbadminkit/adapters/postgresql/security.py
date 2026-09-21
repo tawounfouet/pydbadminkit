@@ -1,9 +1,14 @@
 """PostgreSQL SecurityPort implementation."""
 
 from pydbadminkit.adapters.postgresql.executor import PostgreSQLExecutor
+from pydbadminkit.adapters.postgresql.mappers.access import map_direct_access
 from pydbadminkit.adapters.postgresql.mappers.security import (
     map_role_info,
     map_role_membership,
+)
+from pydbadminkit.adapters.postgresql.queries.access import (
+    LIST_DIRECT_RELATION_ACCESS,
+    LIST_DIRECT_RELATION_ACCESS_QUERY_ID,
 )
 from pydbadminkit.adapters.postgresql.queries.security import (
     GET_ROLE,
@@ -13,7 +18,7 @@ from pydbadminkit.adapters.postgresql.queries.security import (
     LIST_ROLES,
     LIST_ROLES_QUERY_ID,
 )
-from pydbadminkit.domain.security import RoleDescription, RoleInfo, RoleMembership
+from pydbadminkit.domain.security import DirectAccess, RoleDescription, RoleInfo, RoleMembership
 from pydbadminkit.errors import ResourceNotFoundError
 
 
@@ -58,3 +63,25 @@ class PostgreSQLSecurityAdapter:
             query_id=LIST_ROLE_MEMBERSHIPS_QUERY_ID,
         )
         return tuple(map_role_membership(row) for row in rows)
+
+    def list_direct_access(
+        self,
+        role: str,
+        *,
+        schema: str | None = None,
+        object_name: str | None = None,
+        include_system: bool = False,
+    ) -> tuple[DirectAccess, ...]:
+        rows = self._executor.fetch_all(
+            LIST_DIRECT_RELATION_ACCESS,
+            (
+                role,
+                include_system,
+                schema,
+                schema,
+                object_name,
+                object_name,
+            ),
+            query_id=LIST_DIRECT_RELATION_ACCESS_QUERY_ID,
+        )
+        return tuple(map_direct_access(row) for row in rows)
