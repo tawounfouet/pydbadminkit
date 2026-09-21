@@ -69,7 +69,7 @@ class PostgreSQLExecutor:
 
     def execute(
         self,
-        query: str | sql.Composable,
+        query: str | sql.SQL | sql.Composed,
         params: tuple[object, ...] | None = None,
         *,
         query_id: str,
