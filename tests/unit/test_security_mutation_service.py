@@ -1,7 +1,5 @@
 """Unit tests for guarded security mutation orchestration."""
 
-from pathlib import Path
-
 import pytest
 
 from pydbadminkit.application.security import SecurityMutationService
