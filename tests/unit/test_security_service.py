@@ -23,8 +23,7 @@ class FakeSecurityPort:
         return tuple(
             role
             for role in roles
-            if (include_system or not role.is_system)
-            and (not login_only or role.can_login)
+            if (include_system or not role.is_system) and (not login_only or role.can_login)
         )
 
     def describe_role(self, name: str) -> RoleDescription:
