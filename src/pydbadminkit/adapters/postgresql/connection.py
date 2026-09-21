@@ -34,13 +34,13 @@ class PostgreSQLConnectionFactory:
             environment=config.environment,
         )
 
-        parameters: dict[str, str | int] = {
+        parameters: dict[str, str] = {
             "host": config.host,
-            "port": config.port,
+            "port": str(config.port),
             "dbname": config.database,
             "user": config.username,
             "sslmode": config.ssl.mode.value,
-            "connect_timeout": config.timeouts.connect_seconds,
+            "connect_timeout": str(config.timeouts.connect_seconds),
             "application_name": f"pydbadminkit/{__version__}/cli",
         }
 
