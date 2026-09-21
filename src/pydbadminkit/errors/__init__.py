@@ -18,21 +18,31 @@ from pydbadminkit.errors.resource import (
     ResourceAlreadyExistsError,
     ResourceNotFoundError,
 )
+from pydbadminkit.errors.safety import (
+    AuditUnavailableError,
+    ConfirmationRequiredError,
+    PolicyDeniedError,
+    SafetyPolicyError,
+)
 from pydbadminkit.errors.security import AuthorizationError
 
 __all__ = [
+    "AuditUnavailableError",
     "AuthenticationError",
     "AuthorizationError",
     "CapabilityNotAvailableError",
+    "ConfirmationRequiredError",
     "ConfigurationError",
     "DatabaseConnectionError",
     "DatabaseConnectionTimeoutError",
     "DatabaseOperationError",
     "InternalError",
+    "PolicyDeniedError",
     "ProfileNotFoundError",
     "PyDBAdminError",
     "ResourceAlreadyExistsError",
     "ResourceNotFoundError",
+    "SafetyPolicyError",
     "SecretResolutionError",
     "ValidationError",
 ]
