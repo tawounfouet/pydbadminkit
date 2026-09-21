@@ -11,8 +11,9 @@ from pydbadminkit.domain.catalog import (
     ViewDescription,
     ViewInfo,
 )
-from pydbadminkit.domain.common import CapabilityStatus
+from pydbadminkit.domain.common import CapabilityStatus, OperationResult
 from pydbadminkit.domain.connection import ConnectionTestResult
+from pydbadminkit.domain.safety import OperationPlan
 from pydbadminkit.domain.security import (
     DirectAccess,
     EffectiveAccess,
@@ -20,6 +21,41 @@ from pydbadminkit.domain.security import (
     RoleDescription,
     RoleInfo,
 )
+
+
+def render_operation_plan(plan: OperationPlan) -> str:
+    """Render a mutation plan."""
+
+    lines = [
+        f"Operation: {plan.operation}",
+        f"Target: {plan.target}",
+        f"Environment: {plan.environment.value}",
+        f"Risk: {plan.risk.label}",
+        f"Confirmation: {plan.confirmation.value}",
+        f"Correlation ID: {plan.correlation_id}",
+        "",
+        "EFFECTS",
+    ]
+    lines.extend(f"- {effect}" for effect in plan.effects)
+    if plan.warnings:
+        lines.extend(("", "WARNINGS"))
+        lines.extend(f"- {warning}" for warning in plan.warnings)
+    return "\n".join(lines)
+
+
+def render_operation_result(result: OperationResult) -> str:
+    """Render a mutation result."""
+
+    lines = [
+        f"Operation: {result.operation}",
+        f"Status: {result.status.value}",
+        f"Changed: {'yes' if result.changed else 'no' if result.changed is False else '-'}",
+        f"Message: {result.message or '-'}",
+    ]
+    if result.metadata:
+        lines.extend(("", "METADATA"))
+        lines.extend(f"{key}: {value}" for key, value in result.metadata.items())
+    return "\n".join(lines)
 
 
 def render_connection_test(result: ConnectionTestResult) -> str:

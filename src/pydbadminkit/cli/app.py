@@ -73,6 +73,18 @@ def main(
             help="Output format: table, json, or yaml.",
         ),
     ] = OutputFormat.TABLE,
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run", help="Plan mutations without changing the database."),
+    ] = False,
+    yes: Annotated[
+        bool,
+        typer.Option("--yes", "-y", help="Approve simple/explicit confirmations."),
+    ] = False,
+    non_interactive: Annotated[
+        bool,
+        typer.Option("--non-interactive", help="Never prompt for confirmation."),
+    ] = False,
     version: Annotated[
         bool,
         typer.Option(
@@ -89,4 +101,7 @@ def main(
         connection_profile=connection,
         config_path=config,
         output_format=output,
+        dry_run=dry_run,
+        assume_yes=yes,
+        non_interactive=non_interactive,
     )

@@ -1,12 +1,15 @@
 """Machine-readable serialization outside the domain layer."""
 
 import json
+from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from datetime import date, datetime
 from enum import Enum
 from typing import TypeAlias
 
 import yaml
+
+from pydbadminkit.domain.common import RiskLevel
 
 MachineValue: TypeAlias = (
     bool | int | float | str | list["MachineValue"] | dict[str, "MachineValue"] | None
@@ -15,6 +18,9 @@ MachineValue: TypeAlias = (
 
 def to_machine_value(value: object) -> MachineValue:
     """Convert supported public models to JSON/YAML-safe primitives."""
+
+    if isinstance(value, RiskLevel):
+        return value.label
 
     if isinstance(value, Enum):
         enum_value = value.value
@@ -34,7 +40,7 @@ def to_machine_value(value: object) -> MachineValue:
     if isinstance(value, (tuple, list)):
         return [to_machine_value(item) for item in value]
 
-    if isinstance(value, dict):
+    if isinstance(value, Mapping):
         result: dict[str, MachineValue] = {}
         for key, item in value.items():
             if not isinstance(key, str):
