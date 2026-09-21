@@ -51,6 +51,7 @@ def test_role_human_renderers() -> None:
 
 def test_role_machine_output_serializes_datetime() -> None:
     import json
+
     import yaml
 
     json_value = json.loads(render_json(_description()))
