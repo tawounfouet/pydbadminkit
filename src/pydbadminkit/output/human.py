@@ -13,6 +13,7 @@ from pydbadminkit.domain.catalog import (
 )
 from pydbadminkit.domain.common import CapabilityStatus
 from pydbadminkit.domain.connection import ConnectionTestResult
+from pydbadminkit.domain.security import RoleDescription, RoleInfo
 
 
 def render_connection_test(result: ConnectionTestResult) -> str:
@@ -255,6 +256,74 @@ def render_index_description(description: IndexDescription) -> str:
             description.definition,
         )
     )
+
+
+def render_role_list(roles: tuple[RoleInfo, ...]) -> str:
+    """Render role summaries."""
+
+    lines = [
+        "NAME\tLOGIN\tSUPERUSER\tCREATEDB\tCREATEROLE\tREPLICATION\tBYPASSRLS\tSYSTEM"
+    ]
+    for role in roles:
+        lines.append(
+            "\t".join(
+                (
+                    role.name,
+                    "yes" if role.can_login else "no",
+                    "yes" if role.is_superuser else "no",
+                    "yes" if role.can_create_db else "no",
+                    "yes" if role.can_create_role else "no",
+                    "yes" if role.can_replicate else "no",
+                    "yes" if role.bypass_rls else "no",
+                    "yes" if role.is_system else "no",
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_role_description(description: RoleDescription) -> str:
+    """Render one role and its membership relationships."""
+
+    role = description.role
+    lines = [
+        f"Name: {role.name}",
+        f"Login: {'yes' if role.can_login else 'no'}",
+        f"Superuser: {'yes' if role.is_superuser else 'no'}",
+        f"Create DB: {'yes' if role.can_create_db else 'no'}",
+        f"Create role: {'yes' if role.can_create_role else 'no'}",
+        f"Replication: {'yes' if role.can_replicate else 'no'}",
+        f"Inherit: {'yes' if role.inherit else 'no'}",
+        f"Bypass RLS: {'yes' if role.bypass_rls else 'no'}",
+        f"Connection limit: {_optional_int(role.connection_limit)}",
+        f"Valid until: {role.valid_until.isoformat() if role.valid_until else '-'}",
+        "",
+        "MEMBER OF",
+        "ROLE\tGRANTOR\tADMIN",
+    ]
+    for membership in description.member_of:
+        lines.append(
+            "\t".join(
+                (
+                    membership.role,
+                    membership.grantor or "-",
+                    "yes" if membership.admin_option else "no",
+                )
+            )
+        )
+
+    lines.extend(("", "MEMBERS", "MEMBER\tGRANTOR\tADMIN"))
+    for membership in description.members:
+        lines.append(
+            "\t".join(
+                (
+                    membership.member,
+                    membership.grantor or "-",
+                    "yes" if membership.admin_option else "no",
+                )
+            )
+        )
+    return "\n".join(lines)
 
 
 def render_capability_list(capabilities: tuple[CapabilityStatus, ...]) -> str:
