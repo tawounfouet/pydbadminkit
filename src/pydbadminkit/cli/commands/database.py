@@ -7,6 +7,7 @@ import typer
 from pydbadminkit.bootstrap import build_catalog_service
 from pydbadminkit.cli.common import require_connection_profile
 from pydbadminkit.cli.errors import fail_with_error
+from pydbadminkit.cli.output import emit_output
 from pydbadminkit.errors import PyDBAdminError
 from pydbadminkit.output.human import render_database_info, render_database_list
 
@@ -27,7 +28,7 @@ def list_databases(ctx: typer.Context) -> None:
     except PyDBAdminError as error:
         fail_with_error(error)
 
-    typer.echo(render_database_list(databases))
+    emit_output(ctx, databases, render_database_list(databases))
 
 
 @database_app.command("describe")
@@ -43,4 +44,4 @@ def describe_database(
     except PyDBAdminError as error:
         fail_with_error(error)
 
-    typer.echo(render_database_info(database))
+    emit_output(ctx, database, render_database_info(database))
