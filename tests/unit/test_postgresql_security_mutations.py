@@ -63,9 +63,7 @@ def test_postgresql_security_mutation_adapter_executes_all_commands() -> None:
         )
     )
     adapter.drop_role("app")
-    adapter.add_membership(
-        MembershipCommand(role="reader", member="app", admin_option=True)
-    )
+    adapter.add_membership(MembershipCommand(role="reader", member="app", admin_option=True))
     adapter.remove_membership(MembershipCommand(role="reader", member="app"))
     command = RelationAccessCommand(
         principal="app",
