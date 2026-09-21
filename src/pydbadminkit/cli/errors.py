@@ -4,6 +4,7 @@ import typer
 
 from pydbadminkit.errors import (
     AuthenticationError,
+    AuthorizationError,
     CapabilityNotAvailableError,
     ConfigurationError,
     DatabaseConnectionError,
@@ -20,7 +21,7 @@ def exit_code_for_error(error: PyDBAdminError) -> int:
         return 2
     if isinstance(error, DatabaseConnectionTimeoutError):
         return 9
-    if isinstance(error, AuthenticationError):
+    if isinstance(error, (AuthenticationError, AuthorizationError)):
         return 4
     if isinstance(error, DatabaseConnectionError):
         return 3
