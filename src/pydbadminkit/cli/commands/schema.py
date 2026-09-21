@@ -7,6 +7,7 @@ import typer
 from pydbadminkit.bootstrap import build_catalog_service
 from pydbadminkit.cli.common import require_connection_profile
 from pydbadminkit.cli.errors import fail_with_error
+from pydbadminkit.cli.output import emit_output
 from pydbadminkit.errors import PyDBAdminError
 from pydbadminkit.output.human import render_schema_info, render_schema_list
 
@@ -36,7 +37,7 @@ def list_schemas(
     except PyDBAdminError as error:
         fail_with_error(error)
 
-    typer.echo(render_schema_list(schemas))
+    emit_output(ctx, schemas, render_schema_list(schemas))
 
 
 @schema_app.command("describe")
@@ -52,4 +53,4 @@ def describe_schema(
     except PyDBAdminError as error:
         fail_with_error(error)
 
-    typer.echo(render_schema_info(schema))
+    emit_output(ctx, schema, render_schema_info(schema))
