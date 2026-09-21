@@ -6,12 +6,14 @@ The initial bootstrap is intentionally explicit and PostgreSQL-first.
 from pathlib import Path
 
 from pydbadminkit.adapters.postgresql import (
+    PostgreSQLCapabilityAdapter,
     PostgreSQLCatalogAdapter,
     PostgreSQLConnectionFactory,
     PostgreSQLConnectionTester,
     PostgreSQLExecutor,
     PostgreSQLServerAdapter,
 )
+from pydbadminkit.application.capability import CapabilityService
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.connection import ConnectionConfigResolver, ConnectionService
 from pydbadminkit.application.server import ServerService
@@ -69,3 +71,9 @@ def build_catalog_service(
     config = resolve_connection(profile_name, config_path)
     executor = PostgreSQLExecutor(PostgreSQLConnectionFactory(), config)
     return CatalogService(PostgreSQLCatalogAdapter(executor))
+
+
+def build_capability_service() -> CapabilityService:
+    """Build PostgreSQL capability discovery for the current release."""
+
+    return CapabilityService(PostgreSQLCapabilityAdapter())
