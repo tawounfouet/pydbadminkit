@@ -24,11 +24,7 @@ class QualifiedName:
             _require_non_blank(self.database, "database")
 
     def __str__(self) -> str:
-        parts = (
-            value
-            for value in (self.database, self.schema, self.name)
-            if value is not None
-        )
+        parts = (value for value in (self.database, self.schema, self.name) if value is not None)
         return ".".join(parts)
 
 
