@@ -160,7 +160,6 @@ class PostgreSQLSecurityAdapter:
             return ownership
         return tuple(item for item in ownership if item.object.object_type is object_type)
 
-
     def create_role(self, command: CreateRoleCommand) -> None:
         options = (
             sql.SQL("LOGIN" if command.can_login else "NOLOGIN"),
@@ -172,9 +171,8 @@ class PostgreSQLSecurityAdapter:
             sql.SQL("BYPASSRLS" if command.bypass_rls else "NOBYPASSRLS"),
             sql.SQL("CONNECTION LIMIT {}").format(sql.Literal(command.connection_limit)),
         )
-        query = (
-            sql.SQL("CREATE ROLE {} ").format(sql.Identifier(command.name))
-            + sql.SQL(" ").join(options)
+        query = sql.SQL("CREATE ROLE {} ").format(sql.Identifier(command.name)) + sql.SQL(" ").join(
+            options
         )
         self._executor.execute(query, query_id="PG_CREATE_ROLE")
 
@@ -187,13 +185,9 @@ class PostgreSQLSecurityAdapter:
         if command.can_create_db is not None:
             options.append(sql.SQL("CREATEDB" if command.can_create_db else "NOCREATEDB"))
         if command.can_create_role is not None:
-            options.append(
-                sql.SQL("CREATEROLE" if command.can_create_role else "NOCREATEROLE")
-            )
+            options.append(sql.SQL("CREATEROLE" if command.can_create_role else "NOCREATEROLE"))
         if command.can_replicate is not None:
-            options.append(
-                sql.SQL("REPLICATION" if command.can_replicate else "NOREPLICATION")
-            )
+            options.append(sql.SQL("REPLICATION" if command.can_replicate else "NOREPLICATION"))
         if command.inherit is not None:
             options.append(sql.SQL("INHERIT" if command.inherit else "NOINHERIT"))
         if command.bypass_rls is not None:
@@ -203,9 +197,8 @@ class PostgreSQLSecurityAdapter:
                 sql.SQL("CONNECTION LIMIT {}").format(sql.Literal(command.connection_limit))
             )
 
-        query = (
-            sql.SQL("ALTER ROLE {} ").format(sql.Identifier(command.name))
-            + sql.SQL(" ").join(options)
+        query = sql.SQL("ALTER ROLE {} ").format(sql.Identifier(command.name)) + sql.SQL(" ").join(
+            options
         )
         self._executor.execute(query, query_id="PG_ALTER_ROLE")
 
