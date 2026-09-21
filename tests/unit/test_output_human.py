@@ -171,10 +171,7 @@ def test_index_renderers() -> None:
     )
     description = IndexDescription(
         index=index,
-        definition=(
-            "CREATE UNIQUE INDEX customers_email_idx "
-            "ON public.customers USING btree (email)"
-        ),
+        definition="CREATE INDEX idx ON public.customers (email)",
         predicate="email IS NOT NULL",
     )
 
