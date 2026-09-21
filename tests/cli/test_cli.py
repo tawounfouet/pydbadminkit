@@ -44,3 +44,26 @@ def test_connection_test_reports_missing_config(tmp_path: Path) -> None:
     )
     assert result.exit_code == 2
     assert "Configuration file" in result.output
+
+
+def test_capability_json_output_is_machine_only() -> None:
+    import json
+
+    result = runner.invoke(app, ["--output", "json", "capability", "get", "server.info"])
+
+    assert result.exit_code == 0
+    parsed = json.loads(result.stdout)
+    assert parsed["name"] == "server.info"
+    assert parsed["availability"] == "available"
+    assert "Name:" not in result.stdout
+
+
+def test_capability_yaml_output_is_machine_only() -> None:
+    import yaml
+
+    result = runner.invoke(app, ["--output", "yaml", "capability", "get", "server.info"])
+
+    assert result.exit_code == 0
+    parsed = yaml.safe_load(result.stdout)
+    assert parsed["name"] == "server.info"
+    assert parsed["available"] is True
