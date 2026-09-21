@@ -5,6 +5,7 @@ from typing import Annotated
 
 import typer
 
+from pydbadminkit.cli.commands.access import access_app
 from pydbadminkit.cli.commands.capability import capability_app
 from pydbadminkit.cli.commands.connection import connection_app
 from pydbadminkit.cli.commands.database import database_app
@@ -31,6 +32,7 @@ app.add_typer(table_app, name="table")
 app.add_typer(view_app, name="view")
 app.add_typer(index_app, name="index")
 app.add_typer(role_app, name="role")
+app.add_typer(access_app, name="access")
 app.add_typer(capability_app, name="capability")
 
 
