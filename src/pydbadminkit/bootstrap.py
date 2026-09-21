@@ -11,11 +11,13 @@ from pydbadminkit.adapters.postgresql import (
     PostgreSQLConnectionFactory,
     PostgreSQLConnectionTester,
     PostgreSQLExecutor,
+    PostgreSQLSecurityAdapter,
     PostgreSQLServerAdapter,
 )
 from pydbadminkit.application.capability import CapabilityService
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.connection import ConnectionConfigResolver, ConnectionService
+from pydbadminkit.application.security import SecurityService
 from pydbadminkit.application.server import ServerService
 from pydbadminkit.domain.connection import ResolvedConnectionConfig
 from pydbadminkit.infrastructure.config import (
@@ -71,6 +73,17 @@ def build_catalog_service(
     config = resolve_connection(profile_name, config_path)
     executor = PostgreSQLExecutor(PostgreSQLConnectionFactory(), config)
     return CatalogService(PostgreSQLCatalogAdapter(executor))
+
+
+def build_security_service(
+    profile_name: str,
+    config_path: Path | None = None,
+) -> SecurityService:
+    """Build a read-only security inspection service."""
+
+    config = resolve_connection(profile_name, config_path)
+    executor = PostgreSQLExecutor(PostgreSQLConnectionFactory(), config)
+    return SecurityService(PostgreSQLSecurityAdapter(executor))
 
 
 def build_capability_service() -> CapabilityService:
