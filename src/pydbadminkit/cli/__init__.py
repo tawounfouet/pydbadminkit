@@ -1,0 +1,1 @@
+"""PyDBAdminKit command-line interface."""
