@@ -8,7 +8,9 @@ from typing import TypeAlias
 import yaml
 
 
-MachineValue: TypeAlias = None | bool | int | float | str | list["MachineValue"] | dict[str, "MachineValue"]
+MachineValue: TypeAlias = (
+    None | bool | int | float | str | list["MachineValue"] | dict[str, "MachineValue"]
+)
 
 
 def to_machine_value(value: object) -> MachineValue:
