@@ -8,11 +8,21 @@ from pydbadminkit.domain.common import DatabaseEngine
 from pydbadminkit.errors import InternalError
 
 
+def _required_int(value: object) -> int:
+    if isinstance(value, bool):
+        raise TypeError("boolean is not a valid integer value")
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        return int(value)
+    raise TypeError("expected integer-compatible value")
+
+
 def map_server_info(row: Mapping[str, object]) -> ServerInfo:
     """Map a validated PostgreSQL server-info row."""
 
     try:
-        raw_version = int(row["server_version_num"])
+        raw_version = _required_int(row["server_version_num"])
         current_database = str(row["current_database"])
         current_user = str(row["current_user"])
     except (KeyError, TypeError, ValueError) as error:
