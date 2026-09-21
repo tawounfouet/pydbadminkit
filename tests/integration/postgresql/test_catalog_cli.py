@@ -114,14 +114,17 @@ def catalog_objects(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
 
     yield
 
-    with psycopg.connect(
-        host=_host(),
-        port=_port(),
-        dbname=_database(),
-        user=_user(),
-        password=_password(),
-        autocommit=True,
-    ) as connection, connection.cursor() as cursor:
+    with (
+        psycopg.connect(
+            host=_host(),
+            port=_port(),
+            dbname=_database(),
+            user=_user(),
+            password=_password(),
+            autocommit=True,
+        ) as connection,
+        connection.cursor() as cursor,
+    ):
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_customers")
         cursor.execute("DROP TABLE IF EXISTS public.pydbadmin_accounts")
 
