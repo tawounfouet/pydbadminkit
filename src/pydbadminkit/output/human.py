@@ -1,6 +1,7 @@
 """Simple stable human-readable renderers for the initial CLI."""
 
 from pydbadminkit.domain.catalog import DatabaseInfo, ServerInfo
+from pydbadminkit.domain.common import CapabilityStatus
 
 
 def render_server_info(info: ServerInfo) -> str:
@@ -47,6 +48,36 @@ def render_database_info(database: DatabaseInfo) -> str:
         f"Size bytes: {_optional_int(database.size_bytes)}",
     ]
     return "\n".join(lines)
+
+
+def render_capability_list(capabilities: tuple[CapabilityStatus, ...]) -> str:
+    """Render capabilities in deterministic tab-separated form."""
+
+    lines = ["NAME\tSTATUS\tREASON"]
+    for capability in capabilities:
+        lines.append(
+            "\t".join(
+                (
+                    capability.name,
+                    capability.availability.value,
+                    capability.reason or "-",
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_capability_info(capability: CapabilityStatus) -> str:
+    """Render one capability."""
+
+    return "\n".join(
+        (
+            f"Name: {capability.name}",
+            f"Status: {capability.availability.value}",
+            f"Available: {'yes' if capability.available else 'no'}",
+            f"Reason: {capability.reason or '-'}",
+        )
+    )
 
 
 def _connections_value(value: bool | None) -> str:
