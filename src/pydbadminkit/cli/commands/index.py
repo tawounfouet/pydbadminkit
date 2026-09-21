@@ -7,6 +7,7 @@ import typer
 from pydbadminkit.bootstrap import build_catalog_service
 from pydbadminkit.cli.common import require_connection_profile
 from pydbadminkit.cli.errors import fail_with_error
+from pydbadminkit.cli.output import emit_output
 from pydbadminkit.domain.common import parse_qualified_name
 from pydbadminkit.errors import PyDBAdminError
 from pydbadminkit.output.human import render_index_description, render_index_list
@@ -49,7 +50,7 @@ def list_indexes(
     except PyDBAdminError as error:
         fail_with_error(error)
 
-    typer.echo(render_index_list(indexes))
+    emit_output(ctx, indexes, render_index_list(indexes))
 
 
 @index_app.command("describe")
@@ -72,4 +73,4 @@ def describe_index(
         typer.echo(f"Error: {error}", err=True)
         raise typer.Exit(2) from error
 
-    typer.echo(render_index_description(description))
+    emit_output(ctx, description, render_index_description(description))
