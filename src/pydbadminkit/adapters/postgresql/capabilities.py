@@ -20,6 +20,9 @@ class PostgreSQLCapabilityAdapter:
             "catalog.view.describe",
             "catalog.index.list",
             "catalog.index.describe",
+            "security.role.list",
+            "security.role.describe",
+            "security.membership.list",
         }
     )
 
