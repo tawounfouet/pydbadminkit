@@ -568,7 +568,6 @@ def _query_preview(value: str | None, limit: int = 160) -> str:
     return single_line[: limit - 1] + "…"
 
 
-
 def render_wait_list(waits: tuple[WaitInfo, ...]) -> str:
     """Render current backend waits."""
 
