@@ -445,5 +445,6 @@ def test_capability_cli() -> None:
     assert "runtime.session.list\tavailable" in listing.stdout
     assert "runtime.query.cancel\tavailable" in listing.stdout
     assert "runtime.session.terminate\tavailable" in listing.stdout
+    assert "backup.restore\tavailable" in listing.stdout
     assert detail.exit_code == 0
     assert "Available: yes" in detail.stdout

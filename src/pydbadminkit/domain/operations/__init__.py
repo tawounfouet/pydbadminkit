@@ -12,6 +12,11 @@ from pydbadminkit.domain.operations.backup import (
     ExternalTool,
     ProcessResult,
 )
+from pydbadminkit.domain.operations.restore import (
+    RestoreBackupCommand,
+    RestoreOperation,
+    RestoreValidation,
+)
 
 __all__ = [
     "Backup",
@@ -24,4 +29,7 @@ __all__ = [
     "CreateBackupCommand",
     "ExternalTool",
     "ProcessResult",
+    "RestoreBackupCommand",
+    "RestoreOperation",
+    "RestoreValidation",
 ]

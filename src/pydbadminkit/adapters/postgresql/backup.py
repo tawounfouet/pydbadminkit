@@ -78,7 +78,7 @@ class PostgreSQLBackupAdapter:
             )
             process = self._runner.run(
                 args,
-                env=_postgres_child_env(config),
+                env=postgres_child_env(config),
                 timeout_seconds=command.timeout_seconds,
             )
             tool_result = BackupToolResult(tool=tool, process=process)
@@ -302,7 +302,7 @@ def parse_postgresql_tool_version(tool: ExternalTool) -> DatabaseVersion:
     )
 
 
-def _postgres_child_env(config: ResolvedConnectionConfig) -> dict[str, str]:
+def postgres_child_env(config: ResolvedConnectionConfig) -> dict[str, str]:
     env = {
         "PGSSLMODE": config.ssl.mode.value,
         "PGCONNECT_TIMEOUT": str(config.timeouts.connect_seconds),

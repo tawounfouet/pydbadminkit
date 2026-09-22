@@ -13,7 +13,11 @@ from pydbadminkit.domain.catalog import (
 )
 from pydbadminkit.domain.common import CapabilityStatus, OperationResult
 from pydbadminkit.domain.connection import ConnectionTestResult
-from pydbadminkit.domain.operations import Backup, BackupValidation
+from pydbadminkit.domain.operations import (
+    Backup,
+    BackupValidation,
+    RestoreOperation,
+)
 from pydbadminkit.domain.runtime import (
     BlockingRelation,
     LockInfo,
@@ -689,3 +693,20 @@ def render_backup_validation(validation: BackupValidation) -> str:
         lines.extend(("", "ERRORS"))
         lines.extend(f"- {error}" for error in validation.errors)
     return "\n".join(lines)
+
+
+
+def render_restore_operation(operation: RestoreOperation) -> str:
+    """Render one completed logical restore."""
+
+    return "\n".join(
+        (
+            f"Backup: {operation.backup.path}",
+            f"Target: {operation.target_database}",
+            f"Status: {operation.status.value}",
+            f"Duration: {operation.duration_ms} ms",
+            f"Verification: {'passed' if operation.verification_passed else 'failed'}",
+            f"Tool: {operation.tool}",
+            f"Tool version: {operation.tool_version or '-'}",
+        )
+    )

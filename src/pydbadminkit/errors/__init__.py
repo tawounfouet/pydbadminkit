@@ -22,6 +22,7 @@ from pydbadminkit.errors.connection import (
 from pydbadminkit.errors.database import DatabaseOperationError
 from pydbadminkit.errors.internal import InternalError
 from pydbadminkit.errors.operation import OperationTimeoutError
+from pydbadminkit.errors.restore import RestoreError, RestoreValidationError
 from pydbadminkit.errors.resource import (
     ResourceAlreadyExistsError,
     ResourceNotFoundError,
@@ -62,6 +63,8 @@ __all__ = [
     "PyDBAdminError",
     "ResourceAlreadyExistsError",
     "ResourceNotFoundError",
+    "RestoreError",
+    "RestoreValidationError",
     "SafetyPolicyError",
     "SecretResolutionError",
     "ToolExecutionError",

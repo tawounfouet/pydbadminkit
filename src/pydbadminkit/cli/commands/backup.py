@@ -8,16 +8,25 @@ import typer
 from pydbadminkit.bootstrap import (
     build_backup_service,
     build_backup_validation_service,
+    build_restore_service,
 )
 from pydbadminkit.cli.common import require_cli_context, require_connection_profile
 from pydbadminkit.cli.errors import fail_with_error
 from pydbadminkit.cli.mutations import emit_mutation_outcome
 from pydbadminkit.cli.output import emit_output
 from pydbadminkit.cli.safety import mutation_options
-from pydbadminkit.domain.operations import BackupFormat, CreateBackupCommand
+from pydbadminkit.domain.operations import (
+    BackupFormat,
+    CreateBackupCommand,
+    RestoreBackupCommand,
+)
 from pydbadminkit.domain.safety import OperationPlan
 from pydbadminkit.errors import PyDBAdminError
-from pydbadminkit.output.human import render_backup, render_backup_validation
+from pydbadminkit.output.human import (
+    render_backup,
+    render_backup_validation,
+    render_restore_operation,
+)
 
 backup_app = typer.Typer(
     name="backup",
@@ -120,6 +129,79 @@ def validate_backup(
         fail_with_error(error)
 
     emit_output(ctx, validation, render_backup_validation(validation))
+
+
+
+@backup_app.command("restore")
+def restore_backup(
+    ctx: typer.Context,
+    path: Annotated[Path, typer.Argument(help="Backup artifact to restore.")],
+    database: Annotated[
+        str,
+        typer.Option("--database", help="Target database name."),
+    ],
+    clean: Annotated[
+        bool,
+        typer.Option("--clean", help="Drop archive-owned objects before custom restore."),
+    ] = False,
+    create: Annotated[
+        bool,
+        typer.Option("--create", help="Create an absent target database before restore."),
+    ] = False,
+    jobs: Annotated[
+        int | None,
+        typer.Option("--jobs", help="Parallel pg_restore jobs for custom backups."),
+    ] = None,
+    timeout: Annotated[
+        float | None,
+        typer.Option("--timeout", help="Native restore timeout in seconds."),
+    ] = None,
+    confirm_target: Annotated[
+        str | None,
+        typer.Option(
+            "--confirm-target",
+            help="Exact target confirmation for critical non-interactive restores.",
+        ),
+    ] = None,
+) -> None:
+    """Restore a validated logical backup into an explicit target database."""
+
+    root_context, profile_name = require_connection_profile(ctx)
+    try:
+        command = RestoreBackupCommand(
+            backup_path=str(path),
+            target_database=database,
+            clean=clean,
+            create=create,
+            jobs=jobs,
+            timeout_seconds=timeout,
+        )
+        service = build_restore_service(
+            profile_name,
+            root_context.config_path,
+        )
+        plan = service.plan_restore(command)
+        options = mutation_options(
+            ctx,
+            plan,
+            confirmed_target=confirm_target,
+        )
+        outcome = service.restore(
+            command,
+            options,
+            plan=plan,
+        )
+    except PyDBAdminError as error:
+        fail_with_error(error)
+    except ValueError as error:
+        typer.echo(f"Error: {error}", err=True)
+        raise typer.Exit(2) from error
+
+    if isinstance(outcome, OperationPlan):
+        emit_mutation_outcome(ctx, outcome)
+        return
+
+    emit_output(ctx, outcome, render_restore_operation(outcome))
 
 
 def _default_output_path(database: str, backup_format: BackupFormat) -> Path:

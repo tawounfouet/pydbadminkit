@@ -377,6 +377,7 @@ def test_postgresql_capability_adapter() -> None:
     runtime_blocking = adapter.get_capability("runtime.blocking.list")
     runtime_cancel = adapter.get_capability("runtime.query.cancel")
     runtime_terminate = adapter.get_capability("runtime.session.terminate")
+    restore = adapter.get_capability("backup.restore")
     unknown = adapter.get_capability("future.unknown")
 
     assert database.availability is CapabilityAvailability.AVAILABLE
@@ -390,6 +391,7 @@ def test_postgresql_capability_adapter() -> None:
     assert runtime_blocking.availability is CapabilityAvailability.AVAILABLE
     assert runtime_cancel.availability is CapabilityAvailability.AVAILABLE
     assert runtime_terminate.availability is CapabilityAvailability.AVAILABLE
+    assert restore.availability is CapabilityAvailability.AVAILABLE
     assert unknown.availability is CapabilityAvailability.UNKNOWN
     assert [item.name for item in adapter.list_capabilities()] == sorted(
         item.name for item in adapter.list_capabilities()
@@ -412,3 +414,29 @@ def test_backup_create_capability_reports_missing_pg_dump() -> None:
 
     assert status.availability is CapabilityAvailability.UNAVAILABLE_TOOL
     assert status.reason == "Required tool 'pg_dump' was not found."
+
+
+
+def test_backup_restore_capability_reports_missing_native_tools() -> None:
+    class PartialToolResolver:
+        def resolve(self, name: str) -> ExternalTool:
+            if name == "pg_restore":
+                return ExternalTool(
+                    name=name,
+                    path="/usr/bin/pg_restore",
+                    version="pg_restore (PostgreSQL) 18.1",
+                    available=True,
+                )
+            return ExternalTool(
+                name=name,
+                path=None,
+                version=None,
+                available=False,
+            )
+
+    adapter = PostgreSQLCapabilityAdapter(tool_resolver=PartialToolResolver())
+
+    status = adapter.get_capability("backup.restore")
+
+    assert status.availability is CapabilityAvailability.UNAVAILABLE_TOOL
+    assert "psql" in (status.reason or "")

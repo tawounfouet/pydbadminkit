@@ -2,6 +2,61 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.5.0a2] — Restore Foundation
+
+### Restore domain
+
+- `RestoreBackupCommand`, `RestoreValidation` and `RestoreOperation`.
+- Engine-neutral `RestorePort` and restore-target database port.
+- Dedicated `RestoreError` and `RestoreValidationError` public errors.
+
+### PostgreSQL restore
+
+- Custom archive restore through `pg_restore`.
+- Plain SQL restore through `psql` with `ON_ERROR_STOP=1`.
+- Explicit target inspection before execution.
+- New target creation uses a safely quoted PostgreSQL identifier.
+- Existing targets are blocked by default.
+- `--clean` is limited to custom archives and maps to
+  `pg_restore --clean --if-exists`.
+- Parallel `--jobs` is limited to custom archives.
+- Restore tools older than the target PostgreSQL major are rejected.
+- Backups from a newer PostgreSQL major than the target server are rejected.
+
+### Restore guardrails
+
+- Dry-run produces the shared immutable `OperationPlan`; no simulated restore is
+  claimed.
+- Non-production restore is high risk and requires explicit approval.
+- Production restore is critical and requires exact typed-target confirmation.
+- Read-only connection profiles block restore.
+- Unknown environments fail closed.
+- Restore execution revalidates target/tool state immediately before mutation.
+- A partially restored database created by `--create` is retained on failure rather
+  than silently deleted.
+
+### Verification and audit
+
+- Successful restore requires connectivity to the target database.
+- Basic catalog presence is verified after native-tool completion.
+- Started, blocked, failed and succeeded restore events use the shared JSONL audit sink.
+- Passwords remain in the child environment only and are never placed in process
+  arguments.
+
+### Qualification
+
+- Unit coverage for restore models, adapter, application guardrails and CLI.
+- PostgreSQL 18 integration performs real custom and plain backups, restores each into
+  a new database, then reads restored table data.
+- Integration also proves that an existing target is rejected until custom `--clean`
+  is explicitly requested.
+- Capability discovery reports `backup.restore` and validates `pg_restore` / `psql`
+  availability.
+
+### Next
+
+`0.5.0b1` introduces Maintenance.
+
 ## [0.5.0a1] — Backup Foundation
 
 ### Backup domain

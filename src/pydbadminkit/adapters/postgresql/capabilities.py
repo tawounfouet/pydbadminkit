@@ -44,12 +44,12 @@ class PostgreSQLCapabilityAdapter:
             "runtime.session.terminate",
             "backup.create",
             "backup.validate",
+            "backup.restore",
         }
     )
 
     _PLANNED = frozenset(
         {
-            "backup.restore",
             "maintenance.vacuum",
             "maintenance.analyze",
             "maintenance.reindex",
@@ -67,6 +67,19 @@ class PostgreSQLCapabilityAdapter:
                     name=name,
                     availability=CapabilityAvailability.UNAVAILABLE_TOOL,
                     reason="Required tool 'pg_dump' was not found.",
+                )
+
+        if name == "backup.restore" and self._tool_resolver is not None:
+            missing = [
+                tool_name
+                for tool_name in ("pg_restore", "psql")
+                if not self._tool_resolver.resolve(tool_name).available
+            ]
+            if missing:
+                return CapabilityStatus(
+                    name=name,
+                    availability=CapabilityAvailability.UNAVAILABLE_TOOL,
+                    reason=f"Required restore tool(s) not found: {', '.join(missing)}.",
                 )
 
         if name in self._IMPLEMENTED:

@@ -12,6 +12,8 @@ from pydbadminkit.adapters.postgresql import (
     PostgreSQLConnectionFactory,
     PostgreSQLConnectionTester,
     PostgreSQLExecutor,
+    PostgreSQLRestoreAdapter,
+    PostgreSQLRestoreDatabaseAdapter,
     PostgreSQLRuntimeAdapter,
     PostgreSQLSecurityAdapter,
     PostgreSQLServerAdapter,
@@ -19,7 +21,11 @@ from pydbadminkit.adapters.postgresql import (
 from pydbadminkit.application.capability import CapabilityService
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.connection import ConnectionConfigResolver, ConnectionService
-from pydbadminkit.application.operations import BackupService, BackupValidationService
+from pydbadminkit.application.operations import (
+    BackupService,
+    BackupValidationService,
+    RestoreService,
+)
 from pydbadminkit.application.runtime import RuntimeMutationService, RuntimeService
 from pydbadminkit.application.security import SecurityMutationService, SecurityService
 from pydbadminkit.application.server import ServerService
@@ -120,6 +126,44 @@ def build_backup_validation_service() -> BackupValidationService:
     return BackupValidationService(
         backup_port=backup_adapter,
         file_store=file_store,
+    )
+
+
+def build_restore_service(
+    profile_name: str,
+    config_path: Path | None = None,
+) -> RestoreService:
+    """Build guarded PostgreSQL logical restore orchestration."""
+
+    config = resolve_connection(profile_name, config_path)
+    factory = PostgreSQLConnectionFactory()
+    executor = PostgreSQLExecutor(factory, config)
+    runner = SubprocessRunner()
+    tool_resolver = PathToolResolver(runner)
+    file_store = LocalBackupFileStore()
+    server_port = PostgreSQLServerAdapter(executor)
+    backup_adapter = PostgreSQLBackupAdapter(
+        runner=runner,
+        tool_resolver=tool_resolver,
+        file_store=file_store,
+    )
+    restore_adapter = PostgreSQLRestoreAdapter(
+        runner=runner,
+        tool_resolver=tool_resolver,
+        target_port=PostgreSQLRestoreDatabaseAdapter(
+            executor=executor,
+            connection_factory=factory,
+            config=config,
+        ),
+        server_port=server_port,
+        config=config,
+    )
+    return RestoreService(
+        restore_port=restore_adapter,
+        backup_port=backup_adapter,
+        file_store=file_store,
+        audit_port=JsonlAuditSink(default_audit_path()),
+        config=config,
     )
 
 

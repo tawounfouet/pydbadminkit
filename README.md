@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.5.0a1` — Backup Foundation.
+> **Current release:** `0.5.0a2` — Restore Foundation.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -198,7 +198,7 @@ pydbadmin --connection local --yes session terminate 12345
 In production, session termination escalates to critical risk and requires an exact typed
 target such as `--confirm-target pid:12345`; `--yes` does not bypass that proof.
 
-### Operations — Backup Foundation 0.5.0a1
+### Operations — Backup & Restore Foundation 0.5.0a2
 
 The first Operations slice adds logical PostgreSQL backups on top of native tools.
 
@@ -230,7 +230,34 @@ pydbadmin --connection local --dry-run backup create accounting \
 pydbadmin backup validate ./accounting.dump
 ```
 
-`directory`, `tar`, Restore and Maintenance remain outside this first alpha.
+Restore is now available for the implemented logical formats:
+
+```bash
+# New target: explicit creation is required
+pydbadmin --connection local --yes backup restore ./accounting.dump \
+  --database accounting_restore \
+  --create
+
+# Existing target: only custom archives may opt into destructive cleanup
+pydbadmin --connection local --yes backup restore ./accounting.dump \
+  --database accounting_restore \
+  --clean
+
+# Production restore requires typed target confirmation
+pydbadmin --connection prod --non-interactive backup restore ./accounting.dump \
+  --database accounting_restore \
+  --create \
+  --confirm-target accounting_restore
+```
+
+Restore preflight validates the backup, inspects the target, checks the required
+native tool and version, then returns the shared `OperationPlan` for dry-run.
+Read-only profiles and unknown environments block real restore execution.
+Custom archives use `pg_restore`; plain SQL uses `psql` with
+`ON_ERROR_STOP=1`. The post-restore verification checks connectivity and basic
+catalog presence.
+
+`directory`, `tar` backup creation and Maintenance remain outside this alpha.
 
 ## Development setup
 
@@ -428,9 +455,9 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.2.x  Object Explorer            ✅
 0.3.x  Security Administration    ✅
 0.4.x  Runtime Administration     ✅ `0.4.0`
-0.5.x  Operations                     🚧 `0.5.0a1`
+0.5.x  Operations                     🚧 `0.5.0a2`
 0.6.x  Observability
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.5.0a1` opens the Operations line with Backup Foundation. The next milestone is Restore, followed by Maintenance before promotion to stable `0.5.0`.
+`0.5.0a2` adds Restore Foundation on top of the qualified Backup slice. The next milestone is Maintenance before promotion to stable `0.5.0`.
