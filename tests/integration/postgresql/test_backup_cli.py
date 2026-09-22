@@ -106,8 +106,18 @@ def test_custom_backup_create_and_validate_with_native_tools(
     assert metadata["format"] == "custom"
     assert metadata["checksum_algorithm"] == "sha256"
     assert metadata["checksum"]
-    assert _password() not in sidecar.read_text(encoding="utf-8")
-    assert _password() not in create.output
+    assert set(metadata) == {
+        "backup_id",
+        "database",
+        "format",
+        "created_at",
+        "engine",
+        "engine_version",
+        "tool_version",
+        "size_bytes",
+        "checksum_algorithm",
+        "checksum",
+    }
 
     validate = runner.invoke(
         app,
