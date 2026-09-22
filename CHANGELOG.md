@@ -2,6 +2,77 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.5.0b1] — Maintenance Foundation
+
+### Maintenance domain
+
+- `VacuumCommand`, `AnalyzeCommand`, `ReindexCommand`.
+- `MaintenanceOperation`, `MaintenanceOperationType`, `MaintenanceProgress`.
+- MVP `ReindexTargetType` scopes: index and table.
+- Engine-neutral `MaintenancePort`.
+- Dedicated public `MaintenanceError`.
+
+### PostgreSQL maintenance
+
+- Routine `VACUUM`.
+- `VACUUM ANALYZE`, `VACUUM FREEZE` and explicit `VACUUM FULL`.
+- Database-wide or relation-targeted `ANALYZE`.
+- Column-specific `ANALYZE`.
+- `REINDEX INDEX` and `REINDEX TABLE`.
+- `REINDEX CONCURRENTLY` with an explicit PostgreSQL version guard.
+- Relation targets are checked against PostgreSQL catalog relation kinds before mutation.
+- Identifiers are composed exclusively through Psycopg SQL identifier objects.
+- Cross-database relation targets are rejected.
+
+### Execution semantics and timeouts
+
+- Maintenance uses the PostgreSQL connection factory's autocommit sessions.
+- `statement_timeout` and `lock_timeout` are set in the same session as the
+  maintenance command through parameterized `set_config()`.
+- PostgreSQL timeout cancellations map to the public `OperationTimeoutError`.
+- Database errors continue through the shared PostgreSQL error translator.
+
+### Guardrails and audit
+
+- Dry-run performs target preflight and returns the shared `OperationPlan`.
+- Routine VACUUM and ANALYZE are medium risk outside production.
+- VACUUM FULL and REINDEX are high risk outside production.
+- Production escalates medium to high and high to critical.
+- Critical maintenance requires exact typed-target confirmation.
+- Read-only profiles and unknown environments fail closed.
+- Started, blocked, failed and succeeded lifecycle events use the shared JSONL audit sink.
+
+### Progress
+
+- `postgres progress vacuum` reads `pg_stat_progress_vacuum`.
+- VACUUM FULL progress is included from `pg_stat_progress_cluster`.
+- `postgres progress reindex` reads REINDEX rows from
+  `pg_stat_progress_create_index`.
+- Percent is emitted only when completed/total counters are meaningful.
+
+### CLI
+
+- `postgres vacuum`.
+- `postgres analyze`.
+- `postgres reindex`.
+- `postgres progress vacuum`.
+- `postgres progress reindex`.
+- Human, JSON and YAML output continue through the shared machine interface.
+
+### Qualification
+
+- Unit coverage for domain invariants, guardrails, adapter preflight, timeout session
+  setup, progress mapping and CLI contracts.
+- PostgreSQL 18 integration creates a real table and index, then executes VACUUM,
+  ANALYZE, REINDEX INDEX CONCURRENTLY and REINDEX TABLE.
+- Successful VACUUM integration also proves the required non-transaction-block
+  execution semantics.
+- Integration verifies data and index validity after maintenance.
+
+### Next
+
+Qualify the complete `0.5.x` Operations line and promote it to stable `0.5.0`.
+
 ## [0.5.0a2] — Restore Foundation
 
 ### Restore domain

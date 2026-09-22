@@ -12,6 +12,15 @@ from pydbadminkit.domain.operations.backup import (
     ExternalTool,
     ProcessResult,
 )
+from pydbadminkit.domain.operations.maintenance import (
+    AnalyzeCommand,
+    MaintenanceOperation,
+    MaintenanceOperationType,
+    MaintenanceProgress,
+    ReindexCommand,
+    ReindexTargetType,
+    VacuumCommand,
+)
 from pydbadminkit.domain.operations.restore import (
     RestoreBackupCommand,
     RestoreOperation,
@@ -26,10 +35,17 @@ __all__ = [
     "BackupPaths",
     "BackupToolResult",
     "BackupValidation",
+    "AnalyzeCommand",
     "CreateBackupCommand",
     "ExternalTool",
+    "MaintenanceOperation",
+    "MaintenanceOperationType",
+    "MaintenanceProgress",
     "ProcessResult",
+    "ReindexCommand",
+    "ReindexTargetType",
     "RestoreBackupCommand",
     "RestoreOperation",
     "RestoreValidation",
+    "VacuumCommand",
 ]

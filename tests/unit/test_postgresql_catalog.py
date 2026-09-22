@@ -378,6 +378,11 @@ def test_postgresql_capability_adapter() -> None:
     runtime_cancel = adapter.get_capability("runtime.query.cancel")
     runtime_terminate = adapter.get_capability("runtime.session.terminate")
     restore = adapter.get_capability("backup.restore")
+    maintenance_vacuum = adapter.get_capability("maintenance.vacuum")
+    maintenance_analyze = adapter.get_capability("maintenance.analyze")
+    maintenance_reindex = adapter.get_capability("maintenance.reindex")
+    vacuum_progress = adapter.get_capability("postgres.vacuum.progress")
+    reindex_progress = adapter.get_capability("postgres.reindex.progress")
     unknown = adapter.get_capability("future.unknown")
 
     assert database.availability is CapabilityAvailability.AVAILABLE
@@ -392,6 +397,11 @@ def test_postgresql_capability_adapter() -> None:
     assert runtime_cancel.availability is CapabilityAvailability.AVAILABLE
     assert runtime_terminate.availability is CapabilityAvailability.AVAILABLE
     assert restore.availability is CapabilityAvailability.AVAILABLE
+    assert maintenance_vacuum.availability is CapabilityAvailability.AVAILABLE
+    assert maintenance_analyze.availability is CapabilityAvailability.AVAILABLE
+    assert maintenance_reindex.availability is CapabilityAvailability.AVAILABLE
+    assert vacuum_progress.availability is CapabilityAvailability.AVAILABLE
+    assert reindex_progress.availability is CapabilityAvailability.AVAILABLE
     assert unknown.availability is CapabilityAvailability.UNKNOWN
     assert [item.name for item in adapter.list_capabilities()] == sorted(
         item.name for item in adapter.list_capabilities()

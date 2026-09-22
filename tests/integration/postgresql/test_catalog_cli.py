@@ -446,5 +446,10 @@ def test_capability_cli() -> None:
     assert "runtime.query.cancel\tavailable" in listing.stdout
     assert "runtime.session.terminate\tavailable" in listing.stdout
     assert "backup.restore\tavailable" in listing.stdout
+    assert "maintenance.vacuum\tavailable" in listing.stdout
+    assert "maintenance.analyze\tavailable" in listing.stdout
+    assert "maintenance.reindex\tavailable" in listing.stdout
+    assert "postgres.vacuum.progress\tavailable" in listing.stdout
+    assert "postgres.reindex.progress\tavailable" in listing.stdout
     assert detail.exit_code == 0
     assert "Available: yes" in detail.stdout

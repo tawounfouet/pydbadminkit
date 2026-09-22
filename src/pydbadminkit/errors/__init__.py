@@ -21,6 +21,7 @@ from pydbadminkit.errors.connection import (
 )
 from pydbadminkit.errors.database import DatabaseOperationError
 from pydbadminkit.errors.internal import InternalError
+from pydbadminkit.errors.maintenance import MaintenanceError
 from pydbadminkit.errors.operation import OperationTimeoutError
 from pydbadminkit.errors.resource import (
     ResourceAlreadyExistsError,
@@ -57,6 +58,7 @@ __all__ = [
     "ExternalToolError",
     "FileCollisionError",
     "InternalError",
+    "MaintenanceError",
     "OperationTimeoutError",
     "PolicyDeniedError",
     "ProfileNotFoundError",

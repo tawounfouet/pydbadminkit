@@ -24,6 +24,7 @@ from pydbadminkit.domain.common import (
     DatabaseVersion,
     QualifiedName,
 )
+from pydbadminkit.domain.operations import MaintenanceOperationType, MaintenanceProgress
 from pydbadminkit.output.human import (
     render_capability_info,
     render_capability_list,
@@ -31,6 +32,7 @@ from pydbadminkit.output.human import (
     render_database_list,
     render_index_description,
     render_index_list,
+    render_maintenance_progress,
     render_schema_info,
     render_schema_list,
     render_server_info,
@@ -209,3 +211,33 @@ def test_capability_renderers() -> None:
     assert "catalog.view.list\tavailable\t-" in listing
     assert "runtime.session.list\tunknown\tNot implemented." in listing
     assert "Available: yes" in detail
+
+
+
+def test_maintenance_progress_renderer() -> None:
+    rendered = render_maintenance_progress(
+        (
+            MaintenanceProgress(
+                operation_type=MaintenanceOperationType.VACUUM,
+                pid=42,
+                target=QualifiedName(schema="public", name="events"),
+                phase="scanning heap",
+                completed=50,
+                total=100,
+                percent=50.0,
+            ),
+            MaintenanceProgress(
+                operation_type=MaintenanceOperationType.REINDEX,
+                pid=43,
+                target=None,
+                phase="initializing",
+                completed=None,
+                total=None,
+                percent=None,
+            ),
+        )
+    )
+
+    assert rendered.startswith("OPERATION\tPID\tTARGET")
+    assert "vacuum\t42\tpublic.events\tscanning heap\t50\t100\t50.00" in rendered
+    assert "reindex\t43\t-\tinitializing\t-\t-\t-" in rendered

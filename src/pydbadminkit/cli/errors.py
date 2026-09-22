@@ -13,6 +13,7 @@ from pydbadminkit.errors import (
     DatabaseConnectionError,
     DatabaseConnectionTimeoutError,
     ExternalToolError,
+    MaintenanceError,
     OperationTimeoutError,
     PyDBAdminError,
     ResourceNotFoundError,
@@ -38,7 +39,7 @@ def exit_code_for_error(error: PyDBAdminError) -> int:
         return 6
     if isinstance(error, SafetyPolicyError):
         return 7
-    if isinstance(error, (ExternalToolError, BackupError, RestoreError)):
+    if isinstance(error, (ExternalToolError, BackupError, RestoreError, MaintenanceError)):
         return 8
     return 1
 

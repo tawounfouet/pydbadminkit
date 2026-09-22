@@ -12,6 +12,7 @@ from pydbadminkit.adapters.postgresql import (
     PostgreSQLConnectionFactory,
     PostgreSQLConnectionTester,
     PostgreSQLExecutor,
+    PostgreSQLMaintenanceAdapter,
     PostgreSQLRestoreAdapter,
     PostgreSQLRestoreDatabaseAdapter,
     PostgreSQLRuntimeAdapter,
@@ -24,6 +25,7 @@ from pydbadminkit.application.connection import ConnectionConfigResolver, Connec
 from pydbadminkit.application.operations import (
     BackupService,
     BackupValidationService,
+    MaintenanceService,
     RestoreService,
 )
 from pydbadminkit.application.runtime import RuntimeMutationService, RuntimeService
@@ -162,6 +164,28 @@ def build_restore_service(
         restore_port=restore_adapter,
         backup_port=backup_adapter,
         file_store=file_store,
+        audit_port=JsonlAuditSink(default_audit_path()),
+        config=config,
+    )
+
+
+def build_maintenance_service(
+    profile_name: str,
+    config_path: Path | None = None,
+) -> MaintenanceService:
+    """Build guarded PostgreSQL maintenance orchestration."""
+
+    config = resolve_connection(profile_name, config_path)
+    factory = PostgreSQLConnectionFactory()
+    executor = PostgreSQLExecutor(factory, config)
+    server_version = PostgreSQLServerAdapter(executor).get_info().version
+    adapter = PostgreSQLMaintenanceAdapter(
+        connection_factory=factory,
+        config=config,
+        server_version=server_version,
+    )
+    return MaintenanceService(
+        maintenance_port=adapter,
         audit_port=JsonlAuditSink(default_audit_path()),
         config=config,
     )

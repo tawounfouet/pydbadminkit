@@ -45,16 +45,16 @@ class PostgreSQLCapabilityAdapter:
             "backup.create",
             "backup.validate",
             "backup.restore",
-        }
-    )
-
-    _PLANNED = frozenset(
-        {
             "maintenance.vacuum",
             "maintenance.analyze",
             "maintenance.reindex",
+            "postgres.vacuum.progress",
+            "postgres.reindex.progress",
+            "postgres.reindex.concurrently",
         }
     )
+
+    _PLANNED = frozenset()
 
     def __init__(self, tool_resolver: ToolResolverPort | None = None) -> None:
         self._tool_resolver = tool_resolver

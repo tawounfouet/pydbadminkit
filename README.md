@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.5.0a2` — Restore Foundation.
+> **Current release:** `0.5.0b1` — Maintenance Foundation.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -198,7 +198,7 @@ pydbadmin --connection local --yes session terminate 12345
 In production, session termination escalates to critical risk and requires an exact typed
 target such as `--confirm-target pid:12345`; `--yes` does not bypass that proof.
 
-### Operations — Backup & Restore Foundation 0.5.0a2
+### Operations — Backup, Restore & Maintenance 0.5.0b1
 
 The first Operations slice adds logical PostgreSQL backups on top of native tools.
 
@@ -257,7 +257,35 @@ Custom archives use `pg_restore`; plain SQL uses `psql` with
 `ON_ERROR_STOP=1`. The post-restore verification checks connectivity and basic
 catalog presence.
 
-`directory`, `tar` backup creation and Maintenance remain outside this alpha.
+Maintenance is now available through the PostgreSQL-specific namespace:
+
+```bash
+pydbadmin --connection local --yes postgres vacuum \
+  --table public.events \
+  --analyze
+
+pydbadmin --connection local --yes postgres analyze \
+  --table public.events \
+  --column created_at
+
+pydbadmin --connection local --yes postgres reindex \
+  --index public.events_created_at_idx \
+  --concurrently
+
+pydbadmin --connection local postgres progress vacuum
+pydbadmin --connection local postgres progress reindex
+```
+
+Maintenance preflight validates relation targets before execution. SQL identifiers are
+composed through Psycopg identifier objects, maintenance timeouts are configured in the
+same PostgreSQL session, and VACUUM runs through the adapter's autocommit connection
+semantics. Read-only profiles and unknown environments fail closed.
+
+Risk is operation- and environment-aware: routine VACUUM/ANALYZE are medium risk
+outside production, VACUUM FULL and REINDEX are high risk, and high-risk maintenance
+escalates to critical in production with exact typed-target confirmation.
+
+`directory` and `tar` backup creation remain outside the current Operations line.
 
 ## Development setup
 
@@ -455,9 +483,9 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.2.x  Object Explorer            ✅
 0.3.x  Security Administration    ✅
 0.4.x  Runtime Administration     ✅ `0.4.0`
-0.5.x  Operations                     🚧 `0.5.0a2`
+0.5.x  Operations                     🚧 `0.5.0b1`
 0.6.x  Observability
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.5.0a2` adds Restore Foundation on top of the qualified Backup slice. The next milestone is Maintenance before promotion to stable `0.5.0`.
+`0.5.0b1` completes the planned Backup / Restore / Maintenance feature line. The next milestone is transverse qualification and promotion to stable `0.5.0`.

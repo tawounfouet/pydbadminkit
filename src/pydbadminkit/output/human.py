@@ -16,6 +16,7 @@ from pydbadminkit.domain.connection import ConnectionTestResult
 from pydbadminkit.domain.operations import (
     Backup,
     BackupValidation,
+    MaintenanceProgress,
     RestoreOperation,
 )
 from pydbadminkit.domain.runtime import (
@@ -709,3 +710,26 @@ def render_restore_operation(operation: RestoreOperation) -> str:
             f"Tool version: {operation.tool_version or '-'}",
         )
     )
+
+
+
+def render_maintenance_progress(entries: tuple[MaintenanceProgress, ...]) -> str:
+    """Render maintenance progress rows."""
+
+    lines = ["OPERATION\tPID\tTARGET\tPHASE\tCOMPLETED\tTOTAL\tPERCENT"]
+    for entry in entries:
+        percent = "-" if entry.percent is None else f"{entry.percent:.2f}"
+        lines.append(
+            "\t".join(
+                (
+                    entry.operation_type.value,
+                    str(entry.pid),
+                    str(entry.target) if entry.target is not None else "-",
+                    entry.phase or "-",
+                    _optional_int(entry.completed),
+                    _optional_int(entry.total),
+                    percent,
+                )
+            )
+        )
+    return "\n".join(lines)

@@ -15,6 +15,7 @@ from pydbadminkit.cli.commands.effective_access import effective_access_app
 from pydbadminkit.cli.commands.index import index_app
 from pydbadminkit.cli.commands.lock import lock_app
 from pydbadminkit.cli.commands.ownership import ownership_app
+from pydbadminkit.cli.commands.postgres import postgres_app
 from pydbadminkit.cli.commands.query import query_app
 from pydbadminkit.cli.commands.role import role_app
 from pydbadminkit.cli.commands.schema import schema_app
@@ -45,6 +46,7 @@ app.add_typer(role_app, name="role")
 app.add_typer(access_app, name="access")
 app.add_typer(effective_access_app, name="effective-access")
 app.add_typer(ownership_app, name="ownership")
+app.add_typer(postgres_app, name="postgres")
 app.add_typer(session_app, name="session")
 app.add_typer(query_app, name="query")
 app.add_typer(transaction_app, name="transaction")
