@@ -294,4 +294,8 @@ def _optional_int(value: object) -> int | None:
         return None
     if isinstance(value, bool):
         raise TypeError("boolean is not a valid size")
-    return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        return int(value)
+    raise TypeError("backup metadata size must be an integer")
