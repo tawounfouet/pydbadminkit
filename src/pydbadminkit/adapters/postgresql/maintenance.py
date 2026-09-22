@@ -372,12 +372,12 @@ def _map_progress(
     row: tuple[object, ...],
     operation_type: MaintenanceOperationType,
 ) -> MaintenanceProgress:
-    pid = int(row[0])
+    pid = _required_int(row[0], "pid")
     schema_name = str(row[1]) if row[1] is not None else None
     relation_name = str(row[2]) if row[2] is not None else None
     phase = str(row[3]) if row[3] is not None else None
-    completed = int(row[4]) if row[4] is not None else None
-    total = int(row[5]) if row[5] is not None else None
+    completed = _optional_int(row[4], "completed")
+    total = _optional_int(row[5], "total")
     percent = None
     if completed is not None and total is not None and total > 0:
         percent = min(100.0, max(0.0, (completed / total) * 100.0))
@@ -398,3 +398,20 @@ def _map_progress(
         total=total,
         percent=percent,
     )
+
+
+
+def _required_int(value: object, field: str) -> int:
+    if isinstance(value, bool):
+        raise TypeError(f"maintenance progress {field} must be an integer")
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        return int(value)
+    raise TypeError(f"maintenance progress {field} must be an integer")
+
+
+def _optional_int(value: object, field: str) -> int | None:
+    if value is None:
+        return None
+    return _required_int(value, field)

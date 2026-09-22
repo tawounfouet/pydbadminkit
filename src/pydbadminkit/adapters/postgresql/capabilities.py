@@ -54,7 +54,7 @@ class PostgreSQLCapabilityAdapter:
         }
     )
 
-    _PLANNED = frozenset()
+    _PLANNED: frozenset[str] = frozenset()
 
     def __init__(self, tool_resolver: ToolResolverPort | None = None) -> None:
         self._tool_resolver = tool_resolver
