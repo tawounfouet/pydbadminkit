@@ -8,4 +8,4 @@ pytestmark = pytest.mark.unit
 
 
 def test_package_exposes_version() -> None:
-    assert pydbadminkit.__version__ == "0.4.0b1"
+    assert pydbadminkit.__version__ == "0.4.0"

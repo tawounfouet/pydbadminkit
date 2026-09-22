@@ -2,6 +2,50 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.4.0] — Runtime Administration
+
+### Stable Runtime surface
+
+- Stabilized the complete Runtime Administration Python and CLI contracts introduced
+  through `0.4.0a1`, `0.4.0a2` and `0.4.0b1`.
+- Public read models cover sessions, active queries, transactions, waits, locks and
+  recursive blocking relations.
+- Public mutation commands cover guarded query cancellation and client-session
+  termination.
+- Runtime capabilities are reported as available through capability discovery.
+
+### PostgreSQL Runtime inspection
+
+- Session, query and transaction inspection through `pg_stat_activity`.
+- Wait inspection through PostgreSQL wait-event metadata.
+- Lock inspection through `pg_locks`.
+- Recursive blocking-chain inspection through `pg_blocking_pids()`.
+- Optional Runtime filters use explicit PostgreSQL parameter casts for stable NULL
+  handling on PostgreSQL 18.
+
+### Runtime safety
+
+- Query cancellation requires a visible client backend with an active query.
+- Session termination is restricted to visible client backends.
+- The PyDBAdminKit execution backend cannot signal itself.
+- Read-only profiles and unknown environments fail closed.
+- Production risk escalation is preserved.
+- Critical termination requires exact typed-target confirmation.
+- Dry-run planning, operation correlation IDs and JSONL audit semantics are stable.
+
+### Qualification
+
+- Stable Runtime public exports are covered by explicit contract tests.
+- Runtime capability names are covered as part of the stable 0.4.0 contract.
+- Unit tests retain the project-wide coverage gate.
+- PostgreSQL 18 integration covers sessions, active queries, transactions, waits,
+  locks, blocking chains, real query cancellation and real session termination.
+- Package build and installed-wheel smoke tests cover the stable version and CLI.
+
+### Next
+
+`0.5.x` begins the Operations line.
+
 ## [0.4.0b1] — Guarded Runtime Mutations
 
 ### Runtime mutation domain

@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.4.0b1` — Guarded Runtime Mutations.
+> **Current release:** `0.4.0` — Runtime Administration.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -162,7 +162,7 @@ python -m pydbadminkit --connection local --non-interactive `
 ```
 
 
-### Runtime Administration — 0.4.0b1
+### Runtime Administration — 0.4.0
 
 Runtime Administration now combines read-only diagnostics with guarded backend signaling.
 
@@ -393,10 +393,10 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.1.x  Foundation                  ✅
 0.2.x  Object Explorer            ✅
 0.3.x  Security Administration    ✅
-0.4.x  Runtime Administration     🚧 in qualification (`0.4.0b1`)
+0.4.x  Runtime Administration     ✅ `0.4.0`
 0.5.x  Operations
 0.6.x  Observability
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.4.0b1` adds guarded query cancellation and session termination. The remaining `0.4.x` work is transverse qualification and promotion to `0.4.0` stable.
+`0.4.0` stabilizes the complete Runtime Administration surface: sessions, queries, transactions, waits, locks, blocking chains, guarded query cancellation and guarded session termination. The next roadmap line is `0.5.x` Operations.
