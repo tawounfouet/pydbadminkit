@@ -175,6 +175,7 @@ Implemented inspection surfaces:
 - current wait events with optional wait-event type filtering;
 - backend locks, including granted and waiting locks;
 - recursive blocking chains with root PID and depth;
+- PostgreSQL PID `0` preserved for prepared-transaction blockers;
 - normalized runtime models exposed through the public Python API;
 - table, JSON and YAML CLI output;
 - self-inspection excluded by default and available explicitly with `--include-self`.

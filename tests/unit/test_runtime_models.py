@@ -54,6 +54,14 @@ def test_runtime_models_accept_valid_values() -> None:
     assert lock.granted is True
     assert blocking.blocking_pid == 107
 
+    prepared_blocker = BlockingRelation(
+        root_pid=108,
+        blocked_pid=108,
+        blocking_pid=0,
+        depth=1,
+    )
+    assert prepared_blocker.blocking_pid == 0
+
 
 @pytest.mark.parametrize(
     ("factory", "message"),

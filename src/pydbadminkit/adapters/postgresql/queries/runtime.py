@@ -135,7 +135,7 @@ WITH RECURSIVE blocking_chain AS (
       AND (%s IS NULL OR activity.usename = %s)
       AND (%s OR activity.pid <> pg_backend_pid())
 
-    UNION ALL
+    UNION
 
     SELECT
         chain.root_pid,

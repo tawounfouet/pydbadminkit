@@ -18,6 +18,8 @@ All notable PyDBAdminKit milestones are documented here.
 - Relation, transaction and virtual transaction lock metadata.
 - Waiting-only lock filtering.
 - Recursive blocking-chain discovery through `pg_blocking_pids()`.
+- PostgreSQL PID `0` preserved for prepared-transaction blockers.
+- Duplicate blocker PIDs collapsed by recursive `UNION` traversal.
 - Cycle-safe recursive traversal using a visited PID path.
 
 ### CLI and machine interface

@@ -137,7 +137,11 @@ class LockInfo:
 
 @dataclass(frozen=True, slots=True)
 class BlockingRelation:
-    """One edge in a blocking chain rooted at a waiting backend."""
+    """One edge in a blocking chain rooted at a waiting backend.
+
+    ``blocking_pid`` may be ``0`` when an engine represents a non-session blocker
+    with a sentinel identifier, as PostgreSQL does for prepared transactions.
+    """
 
     root_pid: int
     blocked_pid: int
