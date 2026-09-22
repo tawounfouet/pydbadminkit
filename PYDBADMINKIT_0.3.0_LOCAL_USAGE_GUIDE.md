@@ -1,8 +1,9 @@
-# PyDBAdminKit 0.3.0 — Guide d’exploitation locale
+# PyDBAdminKit 0.3.0 — Guide d'exploitation locale
 
-> Guide pratique pour installer, exécuter et tester localement l’état actuel de PyDBAdminKit.
+> Guide pratique pour installer, exécuter et tester localement l'état actuel de PyDBAdminKit.
+> **Ce guide couvre Windows PowerShell et Linux/macOS**, ainsi que les deux modes de démarrage PostgreSQL (Docker et installation locale).
 
-PyDBAdminKit `0.3.0` est déjà exécutable localement et permet de tester un workflow PostgreSQL réel de bout en bout.
+PyDBAdminKit `0.3.0` est exécutable localement et permet de tester un workflow PostgreSQL réel de bout en bout.
 
 À ce stade, trois grandes briques sont disponibles :
 
@@ -14,14 +15,31 @@ La ligne `0.4.x` ajoutera ensuite Runtime Administration : sessions, requêtes, 
 
 ---
 
+> **Convention de lecture**
+> Chaque section de commande est présentée en deux blocs :
+> - ` ```bash ` → Linux / macOS
+> - ` ```powershell ` → Windows PowerShell
+>
+> Les commandes sont identiques dans les grandes lignes ; seuls la syntaxe de continuation de ligne et les appels de programme diffèrent.
+
+---
+
 ## 1. Récupérer `main` et installer le projet
 
-Depuis le repo local :
+### Cloner le dépôt
 
 ```bash
+# Linux / macOS & Windows (même commande dans Git Bash ou PowerShell)
+git clone https://github.com/tawounfouet/pydbadminkit.git
+cd pydbadminkit
 git checkout main
 git pull origin main
+```
 
+### Créer l'environnement virtuel et installer
+
+```bash
+# Linux / macOS
 python -m venv .venv
 source .venv/bin/activate
 
@@ -29,9 +47,8 @@ python -m pip install --upgrade pip
 pip install -e ".[dev,binary]"
 ```
 
-Sous Windows PowerShell :
-
 ```powershell
+# Windows PowerShell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
@@ -39,10 +56,16 @@ python -m pip install --upgrade pip
 pip install -e ".[dev,binary]"
 ```
 
-Vérifier la version :
+### Vérifier la version
 
 ```bash
+# Linux / macOS
 pydbadmin --version
+```
+
+```powershell
+# Windows PowerShell
+python -m pydbadminkit --version
 ```
 
 Résultat attendu :
@@ -51,100 +74,196 @@ Résultat attendu :
 pydbadminkit 0.3.0
 ```
 
-Puis :
-
-```bash
-pydbadmin --help
-```
+> **Windows — commande `pydbadmin` :** pip génère un `pydbadmin.exe` qui peut être bloqué
+> par certains environnements. Si vous obtenez "Accès refusé", ajoutez ceci à votre `$PROFILE` :
+> ```powershell
+> function pydbadmin { python -m pydbadminkit @args }
+> ```
+> Rechargez avec `. $PROFILE`. Après cela, `pydbadmin` fonctionnera comme sur Linux.
+> Dans ce guide, les exemples Windows utilisent systématiquement `python -m pydbadminkit`.
 
 ---
 
 ## 2. Démarrer PostgreSQL localement
 
-Le repo fournit déjà un `docker-compose.yml` avec PostgreSQL 18.
+Deux options sont disponibles : **Docker** (recommandé, version figée) ou **PostgreSQL installé localement**.
+
+---
+
+### Option A — Docker (PostgreSQL 18)
+
+#### Linux / macOS et Windows (même commande)
 
 ```bash
 docker compose up -d postgres
-```
-
-Vérifier l’état :
-
-```bash
 docker compose ps
 ```
 
-Configuration Docker actuelle :
+Configuration Docker :
 
 | Paramètre | Valeur |
 |---|---|
 | Image | `postgres:18` |
-| Host | `127.0.0.1` |
+| Host | `localhost` |
 | Port | `5432` |
 | User | `postgres` |
 | Password | `postgres` |
 | Database | `pydbadmin_dev` |
 
-Afficher les logs si nécessaire :
+Afficher les logs :
 
 ```bash
-docker compose logs postgres
+docker compose logs postgres --tail 20
 ```
 
-Si `psql` est installé localement :
+> **Note Windows — postgres:18 :** À partir de la version 18, PostgreSQL stocke ses données
+> dans un sous-dossier de `/var/lib/postgresql` (et non plus directement dans `/var/lib/postgresql/data`).
+> Le fichier `docker-compose.yml` fourni est déjà corrigé en conséquence.
+>
+> Si le conteneur plante au démarrage (`Exited (1)`), réinitialisez le volume :
+> ```bash
+> docker compose down -v
+> docker compose up -d postgres
+> ```
+
+#### Se connecter au conteneur pour exécuter du SQL
 
 ```bash
-psql --version
+# Linux / macOS & Windows
+docker compose exec postgres psql -U postgres -d pydbadmin_dev
 ```
+
+---
+
+### Option B — PostgreSQL installé localement
+
+#### Windows — Vérifier le service PostgreSQL
+
+```powershell
+Get-Service -Name "*postgres*"
+# Exemple : postgresql-x64-17  Running  Automatic
+```
+
+```powershell
+# Démarrer le service si arrêté
+Start-Service postgresql-x64-17
+```
+
+#### Linux / macOS — Vérifier le service
+
+```bash
+pg_isready
+# ou
+sudo systemctl status postgresql
+```
+
+#### Créer la base de données de développement (première fois)
+
+```powershell
+# Windows PowerShell
+$env:PGPASSWORD = "votre_mot_de_passe"
+& "C:\Program Files\PostgreSQL\17\bin\psql.exe" -U postgres -c "CREATE DATABASE pydbadmin_dev;"
+```
+
+```bash
+# Linux / macOS
+PGPASSWORD="votre_mot_de_passe" psql -U postgres -c "CREATE DATABASE pydbadmin_dev;"
+# ou si peer auth est configuré :
+sudo -u postgres psql -c "CREATE DATABASE pydbadmin_dev;"
+```
+
+#### Se connecter directement avec psql
+
+```powershell
+# Windows PowerShell
+$env:PGPASSWORD = "votre_mot_de_passe"
+& "C:\Program Files\PostgreSQL\17\bin\psql.exe" -U postgres -d pydbadmin_dev
+```
+
+```bash
+# Linux / macOS
+psql -U postgres -d pydbadmin_dev
+```
+
+---
+
+### Tableau récapitulatif des options
+
+| Option | Avantage | Prérequis |
+|--------|----------|-----------|
+| Docker postgres:18 | Version figée, reproductible, isolée | Docker Desktop installé |
+| PostgreSQL local | Pas besoin de Docker, démarrage automatique | PostgreSQL installé sur la machine |
 
 ---
 
 ## 3. Créer un profil PyDBAdminKit
 
-Créer par exemple un fichier local :
+Créer ou mettre à jour `./config.toml` dans le répertoire du projet.
 
-```text
-./config.toml
-```
-
-avec :
+### Profil Docker (`local`)
 
 ```toml
 [connections.local]
 engine = "postgresql"
-host = "127.0.0.1"
+host = "localhost"
 port = 5432
 database = "pydbadmin_dev"
 username = "postgres"
-environment = "testing"
+environment = "development"
 read_only = false
 ssl_mode = "disable"
-connect_timeout_seconds = 5
+connect_timeout_seconds = 10
 
 [connections.local.secret]
 provider = "env"
-reference = "PYDBADMIN_POSTGRES_PASSWORD"
+reference = "PYDBADMIN_LOCAL_PASSWORD"
 ```
 
-Exporter le mot de passe utilisé par Docker :
+Exporter le mot de passe :
 
 ```bash
-export PYDBADMIN_POSTGRES_PASSWORD="postgres"
+# Linux / macOS
+export PYDBADMIN_LOCAL_PASSWORD="postgres"
 ```
-
-Sous PowerShell :
 
 ```powershell
-$env:PYDBADMIN_POSTGRES_PASSWORD = "postgres"
+# Windows PowerShell
+$env:PYDBADMIN_LOCAL_PASSWORD = "postgres"
 ```
 
-Tester la connexion :
+### Profil PostgreSQL local (`local-native`)
+
+```toml
+[connections.local-native]
+engine = "postgresql"
+host = "localhost"
+port = 5432
+database = "pydbadmin_dev"
+username = "postgres"
+environment = "development"
+read_only = false
+ssl_mode = "disable"
+connect_timeout_seconds = 10
+
+[connections.local-native.secret]
+provider = "env"
+reference = "PYDBADMIN_NATIVE_PASSWORD"
+```
+
+Exporter le mot de passe :
 
 ```bash
-pydbadmin \
-  --connection local \
-  --config ./config.toml \
-  connection test
+# Linux / macOS
+export PYDBADMIN_NATIVE_PASSWORD="votre_mot_de_passe"
 ```
+
+```powershell
+# Windows PowerShell
+$env:PYDBADMIN_NATIVE_PASSWORD = "votre_mot_de_passe"
+```
+
+> Dans la suite du guide, les exemples utilisent `--connection local` (Docker).
+> Remplacez par `--connection local-native` si vous utilisez le PostgreSQL local.
 
 ---
 
@@ -153,24 +272,54 @@ pydbadmin \
 ## 4.1 Connection test
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   connection test
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  connection test
+```
+
+Résultat attendu :
+
+```text
+Connection OK
+Engine:   postgresql
+Version:  18.x  (ou 17.x selon votre installation)
+Database: pydbadmin_dev
+User:     postgres
+Latency:  xx ms
+```
+
 ## 4.2 Server info
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   server info
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  server info
+```
+
 ## 4.3 Sortie JSON
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -178,9 +327,19 @@ pydbadmin \
   server info
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --output json `
+  server info
+```
+
 ## 4.4 Sortie YAML
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -188,42 +347,67 @@ pydbadmin \
   server info
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --output yaml `
+  server info
+```
+
 Les formats machine sont conçus pour être exploitables par des scripts, CI/CD, `jq`, `yq` ou de futurs agents.
 
 ---
 
-# 5. Tester l’Object Explorer — 0.2.x
+# 5. Tester l'Object Explorer — 0.2.x
 
 ## 5.1 Bases de données
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   database list
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  database list
+```
+
 Décrire une base :
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   database describe pydbadmin_dev
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  database describe pydbadmin_dev
+```
+
 ## 5.2 Schemas
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   schema list
-```
 
-Inclure les schemas système :
-
-```bash
+# Inclure les schemas système
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -231,9 +415,24 @@ pydbadmin \
   --include-system
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  schema list
+
+# Inclure les schemas système
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  schema list `
+  --include-system
+```
+
 ## 5.3 Créer quelques objets PostgreSQL de démonstration
 
-Avec `psql` :
+Avec `psql` (SQL identique sur toutes les plateformes) :
 
 ```sql
 CREATE TABLE public.customers (
@@ -251,19 +450,33 @@ SELECT id, email, name
 FROM public.customers;
 ```
 
-Ou directement via le conteneur :
+Via le conteneur Docker :
 
 ```bash
+# Linux / macOS & Windows
 docker compose exec postgres psql -U postgres -d pydbadmin_dev
 ```
 
-puis exécuter le SQL précédent.
+Via PostgreSQL local (Windows) :
+
+```powershell
+# Windows PowerShell
+$env:PGPASSWORD = "votre_mot_de_passe"
+& "C:\Program Files\PostgreSQL\17\bin\psql.exe" -U postgres -d pydbadmin_dev
+```
+
+Via PostgreSQL local (Linux / macOS) :
+
+```bash
+psql -U postgres -d pydbadmin_dev
+```
 
 ## 5.4 Tables
 
 Lister les tables :
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -271,62 +484,96 @@ pydbadmin \
   --schema public
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  table list `
+  --schema public
+```
+
 Décrire une table :
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   table describe public.customers
 ```
 
-Le `describe` expose notamment :
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  table describe public.customers
+```
 
-- colonnes ;
-- types PostgreSQL ;
-- nullabilité ;
-- valeurs par défaut ;
-- identity/generated ;
-- contraintes ;
-- PK ;
-- UNIQUE ;
-- FK ;
-- CHECK lorsque présent.
+Le `describe` expose : colonnes, types, nullabilité, valeurs par défaut, identity/generated, contraintes (PK, UNIQUE, FK, CHECK).
 
 ## 5.5 Vues
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   view list \
   --schema public
-```
 
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
   view describe public.active_customers
 ```
 
-Les vues matérialisées sont également distinguées des vues classiques.
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  view list `
+  --schema public
+
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  view describe public.active_customers
+```
+
+Les vues matérialisées sont distinguées des vues classiques.
 
 ## 5.6 Index
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   index list \
   --schema public \
   --table customers
-```
 
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
+  index describe public.customers_name_idx
+```
+
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  index list `
+  --schema public `
+  --table customers
+
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
   index describe public.customers_name_idx
 ```
 
@@ -338,84 +585,77 @@ PyDBAdminKit peut déjà être utilisé comme un **Object Explorer PostgreSQL CL
 
 ## 6.1 Inspection des rôles
 
-Lister les rôles :
-
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   role list
-```
 
-Seulement les rôles capables de se connecter :
-
-```bash
+# Login-only
 pydbadmin \
   --connection local \
   --config ./config.toml \
   role list \
   --login-only
-```
 
-Inclure les rôles système PostgreSQL :
-
-```bash
+# Inclure les rôles système
 pydbadmin \
   --connection local \
   --config ./config.toml \
   role list \
   --include-system
-```
 
-Décrire un rôle :
-
-```bash
+# Décrire un rôle
 pydbadmin \
   --connection local \
   --config ./config.toml \
   role describe postgres
 ```
 
-Le modèle PostgreSQL retenu est explicite :
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  role list
 
-```text
-User PostgreSQL
-    =
-Role
-    +
-LOGIN
+# Login-only
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  role list `
+  --login-only
+
+# Inclure les rôles système
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  role list `
+  --include-system
+
+# Décrire un rôle
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  role describe postgres
 ```
 
-La description d’un rôle expose notamment :
-
-- LOGIN ;
-- SUPERUSER ;
-- CREATEDB ;
-- CREATEROLE ;
-- REPLICATION ;
-- INHERIT ;
-- BYPASSRLS ;
-- connection limit ;
-- VALID UNTIL ;
-- memberships entrants/sortants.
+La description d'un rôle expose : LOGIN, SUPERUSER, CREATEDB, CREATEROLE, REPLICATION, INHERIT, BYPASSRLS, connection limit, VALID UNTIL, memberships entrants/sortants.
 
 ---
 
 # 7. Tester les accès directs
 
-Une fois un rôle créé et quelques ACL attribuées :
-
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   access list \
   --role app
-```
 
-Filtrer sur un objet :
-
-```bash
+# Filtrer sur un objet
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -425,20 +665,32 @@ pydbadmin \
   --object customers
 ```
 
-Cette commande expose les ACL **explicitement attribuées** au rôle.
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  access list `
+  --role app
 
-Elle ne confond pas les accès directs avec :
+# Filtrer sur un objet
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  access list `
+  --role app `
+  --schema public `
+  --object customers
+```
 
-- héritage de rôle ;
-- `PUBLIC` ;
-- ownership ;
-- superuser.
+Cette commande expose les ACL **explicitement attribuées** au rôle (ne mélange pas héritage, PUBLIC, ownership, superuser).
 
 ---
 
 # 8. Tester les accès effectifs
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -446,41 +698,30 @@ pydbadmin \
   --role app
 ```
 
-Les sources possibles sont :
-
-```text
-direct
-inherited
-public
-owner
-superuser
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  effective-access list `
+  --role app
 ```
 
-Cela permet de distinguer :
-
-```text
-ACL attribuée directement
-        ≠
-accès réellement disponible pour le rôle
-```
+Sources possibles : `direct`, `inherited`, `public`, `owner`, `superuser`.
 
 ---
 
-# 9. Tester l’ownership
-
-Lister les objets possédés par `postgres` :
+# 9. Tester l'ownership
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   ownership list \
   --owner postgres
-```
 
-Uniquement les tables du schema `public` :
-
-```bash
+# Tables du schema public seulement
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -490,39 +731,38 @@ pydbadmin \
   --schema public
 ```
 
-L’ownership reste volontairement distinct des ACL.
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  ownership list `
+  --owner postgres
+
+# Tables du schema public seulement
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  ownership list `
+  --owner postgres `
+  --type table `
+  --schema public
+```
 
 ---
 
 # 10. Tester les mutations — toujours commencer par `--dry-run`
 
-Exemple :
-
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   --dry-run \
   role create test_user \
   --login
-```
 
-Le résultat doit être un `OperationPlan`, par exemple conceptuellement :
-
-```text
-Operation: security.role.create
-Target: test_user
-Environment: testing
-Risk: medium
-Confirmation: simple
-Correlation ID: ...
-```
-
-Aucune mutation PostgreSQL n’est exécutée.
-
-En JSON :
-
-```bash
+# En JSON
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -532,35 +772,57 @@ pydbadmin \
   --login
 ```
 
-Le dry-run est le parcours recommandé avant toute mutation.
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --dry-run `
+  role create test_user `
+  --login
+
+# En JSON
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --dry-run `
+  --output json `
+  role create test_user `
+  --login
+```
+
+Résultat attendu (`OperationPlan`) :
+
+```text
+Operation:      security.role.create
+Target:         test_user
+Environment:    development
+Risk:           medium
+Confirmation:   simple
+Correlation ID: ...
+```
+
+Aucune mutation PostgreSQL n'est exécutée en dry-run.
 
 ---
 
 # 11. Exécuter réellement une création de rôle
 
-Dans un PostgreSQL local/disposable :
-
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   --yes \
   role create test_user \
   --login
-```
 
-Puis :
-
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
   role describe test_user
-```
 
-Modifier le rôle :
-
-```bash
+# Modifier le rôle
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -569,59 +831,53 @@ pydbadmin \
   --createdb enable
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  role create test_user `
+  --login
+
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  role describe test_user
+
+# Modifier le rôle
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  role alter test_user `
+  --createdb enable
+```
+
 ---
 
 # 12. Tester les memberships
 
-Créer un rôle de lecture :
-
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   --yes \
   role create reader
-```
 
-Ajouter `test_user` au rôle `reader` :
-
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
   --yes \
   role membership-add reader test_user
-```
 
-Puis :
-
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
   role describe test_user
-```
 
-Le rôle doit apparaître dans la section :
-
-```text
-MEMBER OF
-```
-
-Et :
-
-```bash
-pydbadmin \
-  --connection local \
-  --config ./config.toml \
-  role describe reader
-```
-
-doit exposer `test_user` parmi ses membres.
-
-Retirer le membership :
-
-```bash
+# Retirer le membership
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -629,13 +885,39 @@ pydbadmin \
   role membership-remove reader test_user
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  role create reader
+
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  role membership-add reader test_user
+
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  role describe test_user
+
+# Retirer le membership
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  role membership-remove reader test_user
+```
+
 ---
 
 # 13. Tester GRANT / REVOKE
 
-Attribuer `SELECT` :
-
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -644,31 +926,19 @@ pydbadmin \
   --role test_user \
   --object public.customers \
   --access SELECT
-```
 
-Vérifier l’ACL directe :
-
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
   access list \
   --role test_user
-```
 
-Vérifier l’accès effectif :
-
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
   effective-access list \
   --role test_user
-```
 
-Révoquer ensuite l’accès :
-
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -679,21 +949,55 @@ pydbadmin \
   --access SELECT
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  access grant `
+  --role test_user `
+  --object public.customers `
+  --access SELECT
+
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  access list `
+  --role test_user
+
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  effective-access list `
+  --role test_user
+
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  access revoke `
+  --role test_user `
+  --object public.customers `
+  --access SELECT
+```
+
 ---
 
 # 14. Tester les guardrails
 
 ## 14.1 Profil read-only
 
-Modifier temporairement :
+Modifier temporairement `config.toml` :
 
 ```toml
 read_only = true
 ```
 
-Puis :
+Puis tenter une mutation :
 
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -701,39 +1005,33 @@ pydbadmin \
   role create should_fail
 ```
 
-L’opération doit être bloquée.
-
-Code de sortie attendu pour un blocage de policy :
-
-```text
-7
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  role create should_fail
 ```
 
-Remettre ensuite :
+L'opération doit être bloquée. Code de sortie attendu : `7`
 
-```toml
-read_only = false
-```
+Remettre ensuite `read_only = false`.
 
 ## 14.2 Environnement UNKNOWN
 
-Les mutations sont conçues pour fonctionner en **fail-closed** si l’environnement n’est pas connu.
+Les mutations fonctionnent en **fail-closed** si l'environnement n'est pas connu :
 
 ```text
-UNKNOWN
-    ↓
-PolicyDenied
-    ↓
-aucune mutation
+UNKNOWN → PolicyDenied → aucune mutation
 ```
 
 ---
 
 # 15. Tester une opération critique
 
-Exemple volontairement local :
-
 ```bash
+# Linux / macOS — doit être REFUSÉ
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -741,21 +1039,8 @@ pydbadmin \
   --non-interactive \
   role create local_super \
   --superuser
-```
 
-Cette commande doit être refusée.
-
-Pourquoi ?
-
-```text
---yes
-   ≠
-autorisation universelle
-```
-
-Une opération critique nécessite une preuve explicite de target :
-
-```bash
+# Version correcte avec confirmation explicite
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -765,64 +1050,59 @@ pydbadmin \
   --confirm-target local_super
 ```
 
-Le principe est :
+```powershell
+# Windows PowerShell — doit être REFUSÉ
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  --non-interactive `
+  role create local_super `
+  --superuser
+
+# Version correcte avec confirmation explicite
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --non-interactive `
+  role create local_super `
+  --superuser `
+  --confirm-target local_super
+```
+
+Niveaux de confirmation :
 
 ```text
-LOW        → aucune confirmation
-MEDIUM     → confirmation simple
-HIGH       → confirmation explicite
-CRITICAL   → confirmation TYPE_TARGET
+LOW      → aucune confirmation
+MEDIUM   → confirmation simple (--yes suffit)
+HIGH     → confirmation explicite
+CRITICAL → confirmation TYPE_TARGET (--confirm-target <nom>)
 ```
 
 ---
 
 # 16. Audit des mutations
 
-Les mutations Security passent par le pipeline :
+Pipeline de toute mutation Security :
 
 ```text
-Command
-  ↓
-OperationPlan
-  ↓
-Risk classification
-  ↓
-Policy
-  ↓
-Confirmation
-  ↓
-Execution
-  ↓
-Audit
+Command → OperationPlan → Risk classification → Policy → Confirmation → Execution → Audit
 ```
 
-Les événements d’audit incluent notamment :
-
-- opération ;
-- target ;
-- environnement ;
-- niveau de risque ;
-- résultat ;
-- correlation ID ;
-- timestamp.
-
-Les secrets et mots de passe ne doivent jamais être écrits dans le journal.
+Les événements d'audit incluent : opération, target, environnement, niveau de risque, résultat, correlation ID, timestamp. Les secrets et mots de passe ne sont jamais écrits dans le journal.
 
 ---
 
 # 17. Supprimer les objets de démonstration
 
-Retirer les rôles :
-
 ```bash
+# Linux / macOS
 pydbadmin \
   --connection local \
   --config ./config.toml \
   --yes \
   role drop test_user
-```
 
-```bash
 pydbadmin \
   --connection local \
   --config ./config.toml \
@@ -830,20 +1110,25 @@ pydbadmin \
   role drop reader
 ```
 
-Pour une opération de suppression classifiée critique, utiliser si nécessaire la preuve exacte :
+```powershell
+# Windows PowerShell
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  role drop test_user
 
-```bash
-pydbadmin \
-  --connection local \
-  --config ./config.toml \
-  --non-interactive \
-  role drop some_role \
-  --confirm-target some_role
+python -m pydbadminkit `
+  --connection local `
+  --config ./config.toml `
+  --yes `
+  role drop reader
 ```
 
-Puis nettoyer les objets SQL de démonstration :
+Nettoyer les objets SQL :
 
 ```sql
+-- Identique sur toutes les plateformes
 DROP VIEW IF EXISTS public.active_customers;
 DROP TABLE IF EXISTS public.customers;
 ```
@@ -873,30 +1158,31 @@ mypy src/pydbadminkit
 ## Unit Tests + couverture
 
 ```bash
+# Linux / macOS & Windows
 pytest -m unit \
   --cov=pydbadminkit \
   --cov-report=term-missing
 ```
 
-Le seuil projet est :
-
-```text
-coverage >= 85 %
+```powershell
+# Windows PowerShell (une ligne)
+pytest -m unit --cov=pydbadminkit --cov-report=term-missing
 ```
+
+Seuil projet : `coverage >= 85 %`
 
 ## Intégration PostgreSQL
 
-Avec le conteneur PostgreSQL lancé :
+Avec le conteneur Docker ou le PostgreSQL local démarré :
 
 ```bash
+# Linux / macOS & Windows
 pytest -m "integration and postgresql"
 ```
 
 ---
 
 # 19. Parcours de smoke-test recommandé
-
-Le parcours manuel recommandé pour tester `0.3.0` est :
 
 ```text
 01. pydbadmin --version
@@ -942,10 +1228,6 @@ Le parcours manuel recommandé pour tester `0.3.0` est :
 
 # 20. État fonctionnel actuel
 
-À `0.3.0`, PyDBAdminKit n’est plus seulement un squelette architectural.
-
-Il sait déjà :
-
 ```text
 PostgreSQL
 │
@@ -976,32 +1258,15 @@ PostgreSQL
     └── Audit
 ```
 
-On peut donc déjà le considérer comme un **outil CLI d’administration PostgreSQL utilisable localement**, avec une architecture Python réutilisable et des sorties machine adaptées à l’automatisation.
-
 ---
 
 # 21. Suite de la roadmap
-
-La prochaine ligne est :
 
 ```text
 0.4.x — Runtime Administration
 ```
 
-avec notamment :
-
-- `pg_stat_activity` ;
-- sessions ;
-- requêtes actives ;
-- transactions ;
-- waits ;
-- locks ;
-- blocking relations ;
-- blocking chains ;
-- cancel query ;
-- terminate session ;
-- protections contre self-termination et backends protégés ;
-- dry-run et guardrails réutilisant le moteur Safety de `0.3.0`.
+avec notamment : `pg_stat_activity`, sessions, requêtes actives, transactions, waits, locks, blocking relations, blocking chains, cancel query, terminate session, protections contre self-termination et backends protégés, dry-run et guardrails réutilisant le moteur Safety de `0.3.0`.
 
 ---
 
@@ -1009,9 +1274,9 @@ avec notamment :
 
 Pour les premiers essais, utiliser uniquement :
 
-- PostgreSQL Docker local ;
-- une base disposable ;
-- `environment = "testing"` ;
+- PostgreSQL Docker local **ou** PostgreSQL installé localement ;
+- une base disposable (`pydbadmin_dev`) ;
+- `environment = "development"` ou `"testing"` ;
 - `--dry-run` avant les mutations ;
 - `--yes` uniquement après validation du plan ;
 - `--confirm-target` pour les opérations critiques.

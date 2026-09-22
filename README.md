@@ -35,6 +35,7 @@ PostgreSQL Server
 Representative commands:
 
 ```bash
+# Linux / macOS
 pydbadmin --connection local server info
 pydbadmin --connection local database list
 pydbadmin --connection local schema list
@@ -42,6 +43,20 @@ pydbadmin --connection local table describe public.customers
 pydbadmin --connection local view list --schema public
 pydbadmin --connection local index list --schema public --table customers
 ```
+
+```powershell
+# Windows PowerShell
+python -m pydbadminkit --connection local server info
+python -m pydbadminkit --connection local database list
+python -m pydbadminkit --connection local schema list
+python -m pydbadminkit --connection local table describe public.customers
+python -m pydbadminkit --connection local view list --schema public
+python -m pydbadminkit --connection local index list --schema public --table customers
+```
+
+> **Windows note:** if the `pydbadmin` alias is set up in your PowerShell profile
+> (see [Development setup](#development-setup)), use `pydbadmin` directly instead of
+> `python -m pydbadminkit`.
 
 ### Machine-readable interface
 
@@ -91,6 +106,7 @@ Safety controls:
 Examples:
 
 ```bash
+# Linux / macOS
 pydbadmin --connection local role list
 pydbadmin --connection local role describe app
 
@@ -108,28 +124,94 @@ pydbadmin --connection local --yes \
   --access SELECT
 ```
 
+```powershell
+# Windows PowerShell (use backtick ` for line continuation, not \)
+python -m pydbadminkit --connection local role list
+python -m pydbadminkit --connection local role describe app
+
+python -m pydbadminkit --connection local access list --role app
+python -m pydbadminkit --connection local effective-access list --role app
+python -m pydbadminkit --connection local ownership list --owner app
+
+python -m pydbadminkit --connection local --dry-run role create app --login
+python -m pydbadminkit --connection local --yes role create app --login
+
+python -m pydbadminkit --connection local --yes `
+  access grant `
+  --role app `
+  --object public.customers `
+  --access SELECT
+```
+
 Critical operations require an exact target proof, for example:
 
 ```bash
+# Linux / macOS
 pydbadmin --connection local --non-interactive \
   role create privileged_admin \
   --superuser \
   --confirm-target privileged_admin
 ```
 
+```powershell
+# Windows PowerShell
+python -m pydbadminkit --connection local --non-interactive `
+  role create privileged_admin `
+  --superuser `
+  --confirm-target privileged_admin
+```
+
 ## Development setup
 
+### Linux / macOS
+
 ```bash
+git clone https://github.com/tawounfouet/pydbadminkit.git
+cd pydbadminkit
+
 python -m venv .venv
 source .venv/bin/activate
+
 python -m pip install --upgrade pip
 pip install -e ".[dev,binary]"
 ```
 
+### Windows PowerShell
+
+```powershell
+git clone https://github.com/tawounfouet/pydbadminkit.git
+cd pydbadminkit
+
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+pip install -e ".[dev,binary]"
+```
+
+> **Windows — `pydbadmin` command:** pip installs a `pydbadmin.exe` launcher that may
+> be blocked by some environments (sandboxes, corporate policies). If you get an
+> "Access Denied" error, add this function to your PowerShell `$PROFILE`:
+> ```powershell
+> function pydbadmin { python -m pydbadminkit @args }
+> ```
+> After reloading (`. $PROFILE`), `pydbadmin` will work like on Linux.
+
 Run the quality gates:
 
 ```bash
+# Linux / macOS
 pydbadmin --version
+ruff format --check .
+ruff check .
+mypy src/pydbadminkit
+pytest -m unit --cov=pydbadminkit
+pytest -m "integration and postgresql"
+```
+
+```powershell
+# Windows PowerShell
+python -m pydbadminkit --version
 ruff format --check .
 ruff check .
 mypy src/pydbadminkit
@@ -139,11 +221,108 @@ pytest -m "integration and postgresql"
 
 ## Local PostgreSQL
 
+Two options are available: **Docker** (recommended, version-pinned) or a **locally installed PostgreSQL**.
+
+### Option A — Docker (PostgreSQL 18)
+
 ```bash
+# Linux / macOS & Windows (same command)
 docker compose up -d postgres
+docker compose ps
 ```
 
-The development and CI integration target is PostgreSQL 18.
+> **Windows note for postgres:18+:** the volume must be mounted at `/var/lib/postgresql`
+> (not `/var/lib/postgresql/data`). The provided `docker-compose.yml` is already correct.
+> If you get a startup error after upgrading the image, run `docker compose down -v` to
+> reset the volume, then restart.
+
+Connection profile for Docker:
+
+```toml
+[connections.local]
+engine = "postgresql"
+host = "localhost"
+port = 5432
+database = "pydbadmin_dev"
+username = "postgres"
+environment = "development"
+read_only = false
+ssl_mode = "disable"
+connect_timeout_seconds = 10
+
+[connections.local.secret]
+provider = "env"
+reference = "PYDBADMIN_LOCAL_PASSWORD"
+```
+
+Set the password:
+
+```bash
+# Linux / macOS
+export PYDBADMIN_LOCAL_PASSWORD="postgres"
+```
+
+```powershell
+# Windows PowerShell
+$env:PYDBADMIN_LOCAL_PASSWORD = "postgres"
+```
+
+### Option B — Locally installed PostgreSQL (any version)
+
+If PostgreSQL is already installed on your machine (e.g., PostgreSQL 17 on Windows):
+
+```powershell
+# Windows — check the service
+Get-Service -Name "*postgres*"
+
+# Create the dev database (first time only)
+$env:PGPASSWORD = "your_password"
+& "C:\Program Files\PostgreSQL\17\bin\psql.exe" -U postgres -c "CREATE DATABASE pydbadmin_dev;"
+```
+
+```bash
+# Linux / macOS — check the service
+pg_isready
+psql -U postgres -c "CREATE DATABASE pydbadmin_dev;"
+```
+
+Connection profile for local PostgreSQL:
+
+```toml
+[connections.local-native]
+engine = "postgresql"
+host = "localhost"
+port = 5432
+database = "pydbadmin_dev"
+username = "postgres"
+environment = "development"
+read_only = false
+ssl_mode = "disable"
+connect_timeout_seconds = 10
+
+[connections.local-native.secret]
+provider = "env"
+reference = "PYDBADMIN_NATIVE_PASSWORD"
+```
+
+Set the password:
+
+```bash
+# Linux / macOS
+export PYDBADMIN_NATIVE_PASSWORD="your_password"
+```
+
+```powershell
+# Windows PowerShell
+$env:PYDBADMIN_NATIVE_PASSWORD = "your_password"
+```
+
+### Connection profiles summary
+
+| Profile | Target | Password env var | Notes |
+|---------|--------|-----------------|-------|
+| `local` | Docker postgres:18 | `PYDBADMIN_LOCAL_PASSWORD` | Requires Docker running |
+| `local-native` | Locally installed PG | `PYDBADMIN_NATIVE_PASSWORD` | Requires local service running |
 
 ## Architecture
 
