@@ -324,6 +324,16 @@ $env:PYDBADMIN_NATIVE_PASSWORD = "your_password"
 | `local` | Docker postgres:18 | `PYDBADMIN_LOCAL_PASSWORD` | Requires Docker running |
 | `local-native` | Locally installed PG | `PYDBADMIN_NATIVE_PASSWORD` | Requires local service running |
 
+## Python API and notebooks
+
+The repository also includes executable examples for experimenting with the public Python API and CLI:
+
+- `scripts/pydbadminkit_example.py`: end-to-end Python API demonstration aligned with the current 0.3.0 contracts;
+- `notebooks/00 - Setup.ipynb`: Python API lab for incremental exploration of domain objects and services;
+- `notebooks/pydbadminkit_demo.ipynb`: CLI-oriented lab, including JSON/YAML output examples.
+
+Both notebooks are committed without execution outputs or embedded secrets. Real mutations are opt-in and should only be enabled against a disposable development/testing database.
+
 ## Architecture
 
 ```text

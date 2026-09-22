@@ -27,3 +27,5 @@ backups/
 *.dump
 *.backup
 *.sql.partial
+
+.ipynb_checkpoints/
