@@ -695,7 +695,6 @@ def render_backup_validation(validation: BackupValidation) -> str:
     return "\n".join(lines)
 
 
-
 def render_restore_operation(operation: RestoreOperation) -> str:
     """Render one completed logical restore."""
 

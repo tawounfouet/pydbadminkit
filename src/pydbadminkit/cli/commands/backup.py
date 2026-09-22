@@ -131,7 +131,6 @@ def validate_backup(
     emit_output(ctx, validation, render_backup_validation(validation))
 
 
-
 @backup_app.command("restore")
 def restore_backup(
     ctx: typer.Context,

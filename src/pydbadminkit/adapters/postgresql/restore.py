@@ -93,10 +93,7 @@ class PostgreSQLRestoreAdapter:
             errors.append("Parallel restore jobs are supported only for custom-format backups.")
 
         server_version = self._server_port.get_info().version
-        if (
-            backup.engine_version is not None
-            and backup.engine_version.major > server_version.major
-        ):
+        if backup.engine_version is not None and backup.engine_version.major > server_version.major:
             errors.append(
                 "Backup was created from PostgreSQL major "
                 f"{backup.engine_version.major}, newer than target server major "
@@ -113,13 +110,9 @@ class PostgreSQLRestoreAdapter:
             )
 
         if command.clean:
-            warnings.append(
-                "Restore --clean drops archive-owned objects before recreating them."
-            )
+            warnings.append("Restore --clean drops archive-owned objects before recreating them.")
         if command.create:
-            warnings.append(
-                "A new target database will be created before restore execution."
-            )
+            warnings.append("A new target database will be created before restore execution.")
 
         return RestoreValidation(
             valid=not errors,

@@ -67,17 +67,13 @@ class RestoreService:
 
         warnings = list(validation.warnings)
         if validation.target_exists:
-            warnings.append(
-                f"Target database '{command.target_database}' already exists."
-            )
+            warnings.append(f"Target database '{command.target_database}' already exists.")
         if command.create:
             warnings.append(
                 "If restore fails after target creation, the partial target database is retained."
             )
         if self._config.environment is EnvironmentName.PRODUCTION:
-            warnings.append(
-                "Production restore requires exact typed-target confirmation."
-            )
+            warnings.append("Production restore requires exact typed-target confirmation.")
 
         return OperationPlan(
             operation="backup.restore",

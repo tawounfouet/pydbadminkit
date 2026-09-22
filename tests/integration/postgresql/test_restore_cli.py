@@ -97,9 +97,7 @@ def _drop_database(name: str) -> None:
             """,
             (name,),
         )
-        cursor.execute(
-            sql.SQL("DROP DATABASE IF EXISTS {}").format(sql.Identifier(name))
-        )
+        cursor.execute(sql.SQL("DROP DATABASE IF EXISTS {}").format(sql.Identifier(name)))
 
 
 def _create_database(name: str) -> None:
@@ -119,16 +117,12 @@ def _seed_source() -> None:
             )
             """
         )
-        cursor.execute(
-            "INSERT INTO public.restore_probe (id, payload) VALUES (42, 'restored')"
-        )
+        cursor.execute("INSERT INTO public.restore_probe (id, payload) VALUES (42, 'restored')")
 
 
 def _assert_probe(database: str) -> None:
     with _connect(database) as connection, connection.cursor() as cursor:
-        cursor.execute(
-            "SELECT id, payload FROM public.restore_probe ORDER BY id"
-        )
+        cursor.execute("SELECT id, payload FROM public.restore_probe ORDER BY id")
         assert cursor.fetchall() == [(42, "restored")]
 
 

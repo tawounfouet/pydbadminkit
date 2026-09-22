@@ -416,7 +416,6 @@ def test_backup_create_capability_reports_missing_pg_dump() -> None:
     assert status.reason == "Required tool 'pg_dump' was not found."
 
 
-
 def test_backup_restore_capability_reports_missing_native_tools() -> None:
     class PartialToolResolver:
         def resolve(self, name: str) -> ExternalTool:

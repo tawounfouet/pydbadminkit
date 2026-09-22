@@ -192,9 +192,7 @@ def test_restore_requires_approval_and_audits_success() -> None:
 
 
 def test_production_restore_is_critical_and_requires_typed_target() -> None:
-    service, _restore_port, _audit = _service(
-        _config(EnvironmentName.PRODUCTION)
-    )
+    service, _restore_port, _audit = _service(_config(EnvironmentName.PRODUCTION))
     command = RestoreBackupCommand("/tmp/source.dump", "prod_target", create=True)
     plan = service.plan_restore(command)
 
