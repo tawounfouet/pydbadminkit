@@ -400,7 +400,6 @@ def _map_progress(
     )
 
 
-
 def _required_int(value: object, field: str) -> int:
     if isinstance(value, bool):
         raise TypeError(f"maintenance progress {field} must be an integer")
