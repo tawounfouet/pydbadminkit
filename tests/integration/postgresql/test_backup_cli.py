@@ -206,7 +206,5 @@ def test_force_backup_replaces_existing_artifact(
 
     assert result.exit_code == 0, result.output
     assert target.read_bytes() != b"stale"
-    metadata = json.loads(
-        Path(f"{target}.metadata.json").read_text(encoding="utf-8")
-    )
+    metadata = json.loads(Path(f"{target}.metadata.json").read_text(encoding="utf-8"))
     assert metadata["database"] == _database()

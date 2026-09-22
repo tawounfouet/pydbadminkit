@@ -44,9 +44,7 @@ class BackupService:
                 "Backup output may contain production-sensitive data and must be protected."
             )
         if command.force:
-            warnings.append(
-                "Existing backup artifact and metadata may be replaced."
-            )
+            warnings.append("Existing backup artifact and metadata may be replaced.")
 
         return OperationPlan(
             operation="backup.create",
@@ -55,8 +53,7 @@ class BackupService:
             risk=risk,
             confirmation=_confirmation_for_risk(risk),
             effects=(
-                f"Create a {command.format.value} logical backup of database "
-                f"'{command.database}'.",
+                f"Create a {command.format.value} logical backup of database '{command.database}'.",
                 f"Write backup artifact to '{command.output_path}'.",
             ),
             warnings=tuple(warnings),

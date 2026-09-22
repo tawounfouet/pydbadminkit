@@ -35,30 +35,20 @@ class LocalBackupFileStore:
         parent = final_path.parent
 
         if not parent.exists() or not parent.is_dir():
-            raise UnsafePathError(
-                f"Backup parent directory does not exist: '{parent}'."
-            )
+            raise UnsafePathError(f"Backup parent directory does not exist: '{parent}'.")
         if not os.access(parent, os.W_OK):
-            raise UnsafePathError(
-                f"Backup parent directory is not writable: '{parent}'."
-            )
+            raise UnsafePathError(f"Backup parent directory is not writable: '{parent}'.")
         if final_path.exists() and final_path.is_dir():
-            raise UnsafePathError(
-                f"Backup output path is a directory: '{final_path}'."
-            )
+            raise UnsafePathError(f"Backup output path is a directory: '{final_path}'.")
 
         metadata_path = _metadata_path(final_path)
         temporary_path = Path(f"{final_path}.partial")
         metadata_temporary_path = Path(f"{metadata_path}.partial")
 
         if not force and final_path.exists():
-            raise FileCollisionError(
-                f"Backup output already exists: '{final_path}'."
-            )
+            raise FileCollisionError(f"Backup output already exists: '{final_path}'.")
         if not force and metadata_path.exists():
-            raise FileCollisionError(
-                f"Backup metadata already exists: '{metadata_path}'."
-            )
+            raise FileCollisionError(f"Backup metadata already exists: '{metadata_path}'.")
         if temporary_path.exists():
             raise FileCollisionError(
                 f"Backup temporary artifact already exists: '{temporary_path}'."
@@ -152,9 +142,7 @@ class LocalBackupFileStore:
                 final_path.unlink(missing_ok=True)
             if metadata_link_created:
                 metadata_path.unlink(missing_ok=True)
-            raise UnsafePathError(
-                "Backup artifact could not be atomically finalized."
-            ) from error
+            raise UnsafePathError("Backup artifact could not be atomically finalized.") from error
 
         temporary_path.unlink()
         metadata_temporary_path.unlink()
@@ -170,9 +158,7 @@ class LocalBackupFileStore:
 
         metadata_path = _metadata_path(artifact)
         if not metadata_path.exists() or not metadata_path.is_file():
-            raise BackupValidationError(
-                f"Backup metadata sidecar not found: '{metadata_path}'."
-            )
+            raise BackupValidationError(f"Backup metadata sidecar not found: '{metadata_path}'.")
 
         try:
             raw = json.loads(metadata_path.read_text(encoding="utf-8"))
@@ -208,9 +194,7 @@ class LocalBackupFileStore:
             "created_at": metadata.created_at.isoformat(),
             "engine": metadata.engine.value,
             "engine_version": (
-                str(metadata.engine_version)
-                if metadata.engine_version is not None
-                else None
+                str(metadata.engine_version) if metadata.engine_version is not None else None
             ),
             "tool_version": metadata.tool_version,
             "size_bytes": metadata.size_bytes,
@@ -228,9 +212,7 @@ class LocalBackupFileStore:
                 json.dump(payload, stream, ensure_ascii=False, indent=2)
                 stream.write("\n")
         except OSError as error:
-            raise UnsafePathError(
-                f"Backup metadata could not be written: '{path}'."
-            ) from error
+            raise UnsafePathError(f"Backup metadata could not be written: '{path}'.") from error
 
     @staticmethod
     def _replace_with_rollback(
@@ -262,9 +244,7 @@ class LocalBackupFileStore:
                 os.replace(artifact_rollback, final_path)
             if moved_metadata and metadata_rollback.exists():
                 os.replace(metadata_rollback, metadata_path)
-            raise UnsafePathError(
-                "Backup overwrite could not be atomically finalized."
-            ) from error
+            raise UnsafePathError("Backup overwrite could not be atomically finalized.") from error
         else:
             artifact_rollback.unlink(missing_ok=True)
             metadata_rollback.unlink(missing_ok=True)
@@ -280,9 +260,7 @@ def _metadata_from_dict(raw: object) -> BackupMetadata:
 
     engine_version_raw = raw.get("engine_version")
     engine_version = (
-        _parse_database_version(engine_version_raw)
-        if engine_version_raw is not None
-        else None
+        _parse_database_version(engine_version_raw) if engine_version_raw is not None else None
     )
 
     return BackupMetadata(

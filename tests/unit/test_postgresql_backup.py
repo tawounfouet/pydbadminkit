@@ -68,9 +68,7 @@ class FakeToolResolver:
 
 class FakeRunner:
     def __init__(self) -> None:
-        self.calls: list[
-            tuple[list[str], Mapping[str, str] | None, float | None]
-        ] = []
+        self.calls: list[tuple[list[str], Mapping[str, str] | None, float | None]] = []
         self.return_code = 0
         self.stderr = ""
 

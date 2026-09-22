@@ -97,11 +97,7 @@ class PostgreSQLBackupAdapter:
                     "pg_dump completed without producing a readable non-empty artifact."
                 )
 
-            checksum = (
-                self._file_store.sha256(paths.temporary_path)
-                if command.checksum
-                else None
-            )
+            checksum = self._file_store.sha256(paths.temporary_path) if command.checksum else None
             created_at = datetime.now(UTC)
             backup_id = _backup_id(command.database, created_at)
             metadata = BackupMetadata(
@@ -163,9 +159,7 @@ class PostgreSQLBackupAdapter:
             and backup.size_bytes is not None
             and artifact.size_bytes != backup.size_bytes
         ):
-            errors.append(
-                "Backup artifact size does not match its metadata sidecar."
-            )
+            errors.append("Backup artifact size does not match its metadata sidecar.")
 
         if not errors and backup.checksum is not None:
             current_checksum = self._file_store.sha256(backup.path)
@@ -295,9 +289,7 @@ def parse_postgresql_tool_version(tool: ExternalTool) -> DatabaseVersion:
     """Parse PostgreSQL native-tool version output."""
 
     if tool.version is None:
-        raise ToolVersionMismatchError(
-            f"Required tool '{tool.name}' did not report a version."
-        )
+        raise ToolVersionMismatchError(f"Required tool '{tool.name}' did not report a version.")
     match = _TOOL_VERSION_PATTERN.search(tool.version)
     if match is None:
         raise ToolVersionMismatchError(

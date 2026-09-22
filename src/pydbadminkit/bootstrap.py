@@ -179,6 +179,4 @@ def build_capability_service() -> CapabilityService:
     """Build PostgreSQL capability discovery for the current release."""
 
     runner = SubprocessRunner()
-    return CapabilityService(
-        PostgreSQLCapabilityAdapter(tool_resolver=PathToolResolver(runner))
-    )
+    return CapabilityService(PostgreSQLCapabilityAdapter(tool_resolver=PathToolResolver(runner)))

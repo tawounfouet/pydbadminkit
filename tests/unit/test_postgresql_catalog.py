@@ -395,7 +395,6 @@ def test_postgresql_capability_adapter() -> None:
     )
 
 
-
 def test_backup_create_capability_reports_missing_pg_dump() -> None:
     class MissingToolResolver:
         def resolve(self, name: str) -> ExternalTool:

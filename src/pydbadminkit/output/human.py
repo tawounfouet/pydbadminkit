@@ -655,7 +655,6 @@ def _relation_value(schema: str | None, name: str | None) -> str:
     return f"{schema}.{name}"
 
 
-
 def render_backup(backup: Backup) -> str:
     """Render one completed logical backup."""
 
