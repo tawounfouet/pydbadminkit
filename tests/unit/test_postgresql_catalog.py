@@ -21,6 +21,7 @@ from pydbadminkit.domain.common import (
     CapabilityAvailability,
     QualifiedName,
 )
+from pydbadminkit.domain.operations import ExternalTool
 from pydbadminkit.errors import (
     CapabilityNotAvailableError,
     InternalError,

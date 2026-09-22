@@ -17,8 +17,8 @@ from pydbadminkit.domain.common import (
 from pydbadminkit.domain.connection import (
     ConnectionProfileName,
     ResolvedConnectionConfig,
-    SSLConfig,
     SecretValue,
+    SSLConfig,
     TimeoutConfig,
 )
 from pydbadminkit.domain.operations import (
@@ -38,8 +38,8 @@ pytestmark = [pytest.mark.unit, pytest.mark.postgresql, pytest.mark.backup]
 
 
 class FakeServerPort:
-    def __init__(self, version: DatabaseVersion = DatabaseVersion(18)) -> None:
-        self.version = version
+    def __init__(self, version: DatabaseVersion | None = None) -> None:
+        self.version = version or DatabaseVersion(18)
 
     def get_info(self) -> ServerInfo:
         return ServerInfo(
@@ -112,9 +112,10 @@ def _adapter(
     runner: FakeRunner | None = None,
     dump_version: str = "pg_dump (PostgreSQL) 18.1",
     restore_version: str = "pg_restore (PostgreSQL) 18.1",
-    server_version: DatabaseVersion = DatabaseVersion(18),
+    server_version: DatabaseVersion | None = None,
 ) -> tuple[PostgreSQLBackupAdapter, FakeRunner]:
     effective_runner = runner or FakeRunner()
+    effective_server_version = server_version or DatabaseVersion(18)
     return (
         PostgreSQLBackupAdapter(
             runner=effective_runner,
@@ -126,7 +127,7 @@ def _adapter(
             ),
             file_store=LocalBackupFileStore(),
             config=_config(),
-            server_port=FakeServerPort(server_version),
+            server_port=FakeServerPort(effective_server_version),
         ),
         effective_runner,
     )

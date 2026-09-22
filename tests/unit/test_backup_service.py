@@ -1,8 +1,6 @@
 """Unit tests for backup application services."""
 
 from datetime import UTC, datetime
-from pathlib import Path
-
 import pytest
 
 from pydbadminkit.application.operations import BackupService, BackupValidationService

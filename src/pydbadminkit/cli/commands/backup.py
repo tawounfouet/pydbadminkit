@@ -14,12 +14,7 @@ from pydbadminkit.cli.errors import fail_with_error
 from pydbadminkit.cli.mutations import emit_mutation_outcome
 from pydbadminkit.cli.output import emit_output
 from pydbadminkit.cli.safety import mutation_options
-from pydbadminkit.domain.operations import (
-    Backup,
-    BackupFormat,
-    BackupValidation,
-    CreateBackupCommand,
-)
+from pydbadminkit.domain.operations import BackupFormat, CreateBackupCommand
 from pydbadminkit.domain.safety import OperationPlan
 from pydbadminkit.errors import PyDBAdminError
 from pydbadminkit.output.human import render_backup, render_backup_validation

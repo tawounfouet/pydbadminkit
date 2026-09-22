@@ -41,11 +41,11 @@ from pydbadminkit.errors.tools import (
 )
 
 __all__ = [
-    "BackupError",
-    "BackupValidationError",
     "AuditUnavailableError",
     "AuthenticationError",
     "AuthorizationError",
+    "BackupError",
+    "BackupValidationError",
     "CapabilityNotAvailableError",
     "ChecksumMismatchError",
     "ConfigurationError",
@@ -63,10 +63,10 @@ __all__ = [
     "ResourceAlreadyExistsError",
     "ResourceNotFoundError",
     "SafetyPolicyError",
+    "SecretResolutionError",
     "ToolExecutionError",
     "ToolNotFoundError",
     "ToolVersionMismatchError",
-    "SecretResolutionError",
     "UnsafePathError",
     "ValidationError",
 ]

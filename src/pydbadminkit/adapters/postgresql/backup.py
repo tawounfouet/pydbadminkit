@@ -2,7 +2,6 @@
 
 import re
 from datetime import UTC, datetime
-from pathlib import Path
 from uuid import uuid4
 
 from pydbadminkit.domain.common import DatabaseVersion, OperationStatus
