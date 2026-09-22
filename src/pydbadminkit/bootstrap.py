@@ -18,7 +18,7 @@ from pydbadminkit.adapters.postgresql import (
 from pydbadminkit.application.capability import CapabilityService
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.connection import ConnectionConfigResolver, ConnectionService
-from pydbadminkit.application.runtime import RuntimeService
+from pydbadminkit.application.runtime import RuntimeMutationService, RuntimeService
 from pydbadminkit.application.security import SecurityMutationService, SecurityService
 from pydbadminkit.application.server import ServerService
 from pydbadminkit.domain.connection import ResolvedConnectionConfig
@@ -87,6 +87,21 @@ def build_runtime_service(
     config = resolve_connection(profile_name, config_path)
     executor = PostgreSQLExecutor(PostgreSQLConnectionFactory(), config)
     return RuntimeService(PostgreSQLRuntimeAdapter(executor))
+
+
+def build_runtime_mutation_service(
+    profile_name: str,
+    config_path: Path | None = None,
+) -> RuntimeMutationService:
+    """Build guarded PostgreSQL runtime mutation orchestration."""
+
+    config = resolve_connection(profile_name, config_path)
+    executor = PostgreSQLExecutor(PostgreSQLConnectionFactory(), config)
+    return RuntimeMutationService(
+        mutation_port=PostgreSQLRuntimeAdapter(executor),
+        audit_port=JsonlAuditSink(default_audit_path()),
+        config=config,
+    )
 
 
 def build_security_service(

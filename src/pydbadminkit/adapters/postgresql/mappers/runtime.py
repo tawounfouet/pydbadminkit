@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from datetime import datetime
 
 from pydbadminkit.domain.runtime import (
+    BackendSignalResult,
     BlockingRelation,
     LockInfo,
     QueryInfo,
@@ -232,3 +233,20 @@ def _optional_str(value: object) -> str | None:
     if value is None:
         return None
     return str(value)
+
+
+def map_backend_signal_result(row: Mapping[str, object]) -> BackendSignalResult:
+    """Map one guarded PostgreSQL backend-signal result."""
+
+    try:
+        return BackendSignalResult(
+            pid=_required_int(row["pid"]),
+            target_exists=_required_bool(row["target_exists"]),
+            self_target=_required_bool(row["self_target"]),
+            client_backend=_required_bool(row["client_backend"]),
+            changed=_required_bool(row["changed"]),
+            backend_type=_optional_str(row.get("backend_type")),
+            active_query=_optional_bool(row.get("active_query")),
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise InternalError("PostgreSQL backend-signal mapping failed.") from error

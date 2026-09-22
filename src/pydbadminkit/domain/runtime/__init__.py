@@ -9,13 +9,21 @@ from pydbadminkit.domain.runtime.models import (
     TransactionInfo,
     WaitInfo,
 )
+from pydbadminkit.domain.runtime.mutations import (
+    BackendSignalResult,
+    CancelQueryCommand,
+    TerminateSessionCommand,
+)
 
 __all__ = [
+    "BackendSignalResult",
     "BlockingRelation",
+    "CancelQueryCommand",
     "LockInfo",
     "QueryInfo",
     "SessionInfo",
     "SessionState",
+    "TerminateSessionCommand",
     "TransactionInfo",
     "WaitInfo",
 ]

@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.4.0a2` — Runtime Waits, Locks and Blocking Chains.
+> **Current release:** `0.4.0b1` — Guarded Runtime Mutations.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -162,40 +162,41 @@ python -m pydbadminkit --connection local --non-interactive `
 ```
 
 
-### Runtime Administration — 0.4.0a2
+### Runtime Administration — 0.4.0b1
 
-Runtime Administration remains read-only and now combines PostgreSQL
-`pg_stat_activity`, `pg_locks` and `pg_blocking_pids()`.
+Runtime Administration now combines read-only diagnostics with guarded backend signaling.
 
-Implemented inspection surfaces:
+Inspection surfaces:
 
-- live sessions with database, user, application, client, state and wait information;
-- currently active queries with query identifier, elapsed time and wait information;
-- open transactions with start time, elapsed time and transaction identifiers;
-- current wait events with optional wait-event type filtering;
-- backend locks, including granted and waiting locks;
-- recursive blocking chains with root PID and depth;
-- PostgreSQL PID `0` preserved for prepared-transaction blockers;
-- normalized runtime models exposed through the public Python API;
-- table, JSON and YAML CLI output;
-- self-inspection excluded by default and available explicitly with `--include-self`.
+- live sessions, active queries and open transactions;
+- current wait events and backend locks;
+- recursive blocking chains;
+- table, JSON and YAML output.
+
+Guarded mutations:
+
+- `query cancel <pid>` uses PostgreSQL `pg_cancel_backend()`;
+- `session terminate <pid>` uses PostgreSQL `pg_terminate_backend()`;
+- dry-run planning through the shared `OperationPlan` model;
+- environment-aware risk escalation;
+- read-only and unknown-environment fail-closed policies;
+- current execution backend protection;
+- non-client PostgreSQL backends protected from runtime signals;
+- JSONL audit lifecycle with correlation IDs.
 
 Examples:
 
 ```bash
-pydbadmin --connection local session list
 pydbadmin --connection local query list
-pydbadmin --connection local transaction list
+pydbadmin --connection local --dry-run query cancel 12345
+pydbadmin --connection local --yes query cancel 12345
 
-pydbadmin --connection local wait list --type Lock
-pydbadmin --connection local lock list --waiting-only
-pydbadmin --connection local blocking list
-
-pydbadmin --connection local --output json blocking list
+pydbadmin --connection local --dry-run session terminate 12345
+pydbadmin --connection local --yes session terminate 12345
 ```
 
-The alpha intentionally contains **no runtime mutations**. Guarded query cancellation and
-session termination are the next Runtime Administration milestone.
+In production, session termination escalates to critical risk and requires an exact typed
+target such as `--confirm-target pid:12345`; `--yes` does not bypass that proof.
 
 ## Development setup
 
@@ -392,10 +393,10 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.1.x  Foundation                  ✅
 0.2.x  Object Explorer            ✅
 0.3.x  Security Administration    ✅
-0.4.x  Runtime Administration     🚧 in progress (`0.4.0a2`)
+0.4.x  Runtime Administration     🚧 in qualification (`0.4.0b1`)
 0.5.x  Operations
 0.6.x  Observability
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.4.0a2` implements sessions, queries, transactions, waits, locks and recursive blocking chains. The next Runtime slice introduces guarded cancel/terminate operations.
+`0.4.0b1` adds guarded query cancellation and session termination. The remaining `0.4.x` work is transverse qualification and promotion to `0.4.0` stable.

@@ -6,6 +6,8 @@ LIST_TRANSACTIONS_QUERY_ID = "PG_RUNTIME_LIST_TRANSACTIONS"
 LIST_WAITS_QUERY_ID = "PG_RUNTIME_LIST_WAITS"
 LIST_LOCKS_QUERY_ID = "PG_RUNTIME_LIST_LOCKS"
 LIST_BLOCKING_QUERY_ID = "PG_RUNTIME_LIST_BLOCKING"
+CANCEL_QUERY_QUERY_ID = "PG_RUNTIME_CANCEL_QUERY"
+TERMINATE_SESSION_QUERY_ID = "PG_RUNTIME_TERMINATE_SESSION"
 
 LIST_SESSIONS = """
 SELECT
@@ -168,4 +170,70 @@ LEFT JOIN pg_catalog.pg_stat_activity AS blocked
 LEFT JOIN pg_catalog.pg_stat_activity AS blocking
     ON blocking.pid = chain.blocking_pid
 ORDER BY chain.root_pid, chain.depth, chain.blocked_pid, chain.blocking_pid
+"""
+
+
+CANCEL_QUERY = """
+WITH args AS (
+    SELECT %s::integer AS target_pid
+),
+target AS (
+    SELECT activity.pid, activity.backend_type, activity.state
+    FROM pg_catalog.pg_stat_activity AS activity
+    CROSS JOIN args
+    WHERE activity.pid = args.target_pid
+)
+SELECT
+    args.target_pid AS pid,
+    EXISTS(SELECT 1 FROM target) AS target_exists,
+    args.target_pid = pg_catalog.pg_backend_pid() AS self_target,
+    COALESCE(
+        (SELECT backend_type = 'client backend' FROM target),
+        false
+    ) AS client_backend,
+    (SELECT backend_type FROM target) AS backend_type,
+    COALESCE((SELECT state = 'active' FROM target), false) AS active_query,
+    CASE
+        WHEN args.target_pid = pg_catalog.pg_backend_pid() THEN false
+        WHEN NOT EXISTS(SELECT 1 FROM target) THEN false
+        WHEN NOT COALESCE(
+            (SELECT backend_type = 'client backend' FROM target),
+            false
+        ) THEN false
+        WHEN NOT COALESCE((SELECT state = 'active' FROM target), false) THEN false
+        ELSE pg_catalog.pg_cancel_backend(args.target_pid)
+    END AS changed
+FROM args
+"""
+
+TERMINATE_SESSION = """
+WITH args AS (
+    SELECT %s::integer AS target_pid
+),
+target AS (
+    SELECT activity.pid, activity.backend_type
+    FROM pg_catalog.pg_stat_activity AS activity
+    CROSS JOIN args
+    WHERE activity.pid = args.target_pid
+)
+SELECT
+    args.target_pid AS pid,
+    EXISTS(SELECT 1 FROM target) AS target_exists,
+    args.target_pid = pg_catalog.pg_backend_pid() AS self_target,
+    COALESCE(
+        (SELECT backend_type = 'client backend' FROM target),
+        false
+    ) AS client_backend,
+    (SELECT backend_type FROM target) AS backend_type,
+    NULL::boolean AS active_query,
+    CASE
+        WHEN args.target_pid = pg_catalog.pg_backend_pid() THEN false
+        WHEN NOT EXISTS(SELECT 1 FROM target) THEN false
+        WHEN NOT COALESCE(
+            (SELECT backend_type = 'client backend' FROM target),
+            false
+        ) THEN false
+        ELSE pg_catalog.pg_terminate_backend(args.target_pid)
+    END AS changed
+FROM args
 """

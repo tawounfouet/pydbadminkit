@@ -39,15 +39,12 @@ class PostgreSQLCapabilityAdapter:
             "runtime.wait.list",
             "runtime.lock.list",
             "runtime.blocking.list",
-        }
-    )
-
-    _PLANNED = frozenset(
-        {
             "runtime.query.cancel",
             "runtime.session.terminate",
         }
     )
+
+    _PLANNED: frozenset[str] = frozenset()
 
     def get_capability(self, name: str) -> CapabilityStatus:
         if name in self._IMPLEMENTED:

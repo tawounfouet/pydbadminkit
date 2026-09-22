@@ -374,7 +374,8 @@ def test_postgresql_capability_adapter() -> None:
     runtime_wait = adapter.get_capability("runtime.wait.list")
     runtime_lock = adapter.get_capability("runtime.lock.list")
     runtime_blocking = adapter.get_capability("runtime.blocking.list")
-    planned = adapter.get_capability("runtime.query.cancel")
+    runtime_cancel = adapter.get_capability("runtime.query.cancel")
+    runtime_terminate = adapter.get_capability("runtime.session.terminate")
     unknown = adapter.get_capability("future.unknown")
 
     assert database.availability is CapabilityAvailability.AVAILABLE
@@ -386,8 +387,8 @@ def test_postgresql_capability_adapter() -> None:
     assert runtime_wait.availability is CapabilityAvailability.AVAILABLE
     assert runtime_lock.availability is CapabilityAvailability.AVAILABLE
     assert runtime_blocking.availability is CapabilityAvailability.AVAILABLE
-    assert planned.availability is CapabilityAvailability.UNKNOWN
-    assert planned.reason is not None
+    assert runtime_cancel.availability is CapabilityAvailability.AVAILABLE
+    assert runtime_terminate.availability is CapabilityAvailability.AVAILABLE
     assert unknown.availability is CapabilityAvailability.UNKNOWN
     assert [item.name for item in adapter.list_capabilities()] == sorted(
         item.name for item in adapter.list_capabilities()

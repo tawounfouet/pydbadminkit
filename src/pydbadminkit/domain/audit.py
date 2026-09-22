@@ -8,7 +8,7 @@ from pydbadminkit.domain.common import EnvironmentName, OperationStatus, RiskLev
 
 
 class AuditEventType(StrEnum):
-    """Security audit lifecycle event types."""
+    """Administrative audit lifecycle event types."""
 
     STARTED = "started"
     SUCCEEDED = "succeeded"

@@ -2,6 +2,58 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.4.0b1] — Guarded Runtime Mutations
+
+### Runtime mutation domain
+
+- Immutable `CancelQueryCommand` and `TerminateSessionCommand`.
+- Atomic `BackendSignalResult` returned by engine adapters.
+- Dedicated `RuntimeMutationPort` and `RuntimeMutationService`.
+
+### Guarded PostgreSQL signaling
+
+- Query cancellation through `pg_cancel_backend(pid)`.
+- Client-session termination through `pg_terminate_backend(pid)`.
+- Atomic guards ensure the target exists, is not the PyDBAdminKit execution backend,
+  and is a PostgreSQL `client backend` before a signal can be sent.
+- PostgreSQL background and auxiliary workers remain protected in this milestone.
+- A false PostgreSQL signal result is surfaced as an operation failure rather than success.
+
+### Safety model
+
+- Query cancellation is medium risk outside production and high risk in production.
+- Session termination is high risk outside production and critical risk in production.
+- Critical termination requires exact typed-target confirmation such as `pid:12345`.
+- `--yes` never bypasses typed-target confirmation.
+- Read-only profiles and unknown environments fail closed.
+- Dry-run returns an `OperationPlan` without signaling or writing audit events.
+
+### Audit and result semantics
+
+- Started, blocked, failed and succeeded lifecycle events reuse the existing JSONL audit sink.
+- Runtime operations carry correlation IDs and stable operation identifiers.
+- Successful results include target PID, backend type and risk metadata.
+
+### CLI
+
+- `query cancel <pid>`.
+- `session terminate <pid>`.
+- `--confirm-target` support for critical runtime mutations.
+- Human, JSON and YAML mutation plan/result output through the shared output pipeline.
+
+### Quality
+
+- Runtime mutation domain and service unit tests.
+- PostgreSQL signal mapper and adapter unit tests.
+- CLI mutation tests.
+- PostgreSQL integration tests use real sleeping client backends to verify query
+  cancellation and session termination end to end.
+
+### Next
+
+Qualify the complete `0.4.x` Runtime Administration line and promote it to stable `0.4.0`.
+
+
 ## [0.4.0a2] — Runtime Waits, Locks and Blocking Chains
 
 ### Runtime domain

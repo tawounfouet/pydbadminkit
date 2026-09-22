@@ -2,6 +2,7 @@
 
 from pydbadminkit.adapters.postgresql.executor import PostgreSQLExecutor
 from pydbadminkit.adapters.postgresql.mappers.runtime import (
+    map_backend_signal_result,
     map_blocking_relation,
     map_lock_info,
     map_query_info,
@@ -11,6 +12,8 @@ from pydbadminkit.adapters.postgresql.mappers.runtime import (
     postgresql_state_filter,
 )
 from pydbadminkit.adapters.postgresql.queries.runtime import (
+    CANCEL_QUERY,
+    CANCEL_QUERY_QUERY_ID,
     LIST_BLOCKING,
     LIST_BLOCKING_QUERY_ID,
     LIST_LOCKS,
@@ -23,16 +26,22 @@ from pydbadminkit.adapters.postgresql.queries.runtime import (
     LIST_TRANSACTIONS_QUERY_ID,
     LIST_WAITS,
     LIST_WAITS_QUERY_ID,
+    TERMINATE_SESSION,
+    TERMINATE_SESSION_QUERY_ID,
 )
 from pydbadminkit.domain.runtime import (
+    BackendSignalResult,
     BlockingRelation,
+    CancelQueryCommand,
     LockInfo,
     QueryInfo,
     SessionInfo,
     SessionState,
     TransactionInfo,
+    TerminateSessionCommand,
     WaitInfo,
 )
+from pydbadminkit.errors import InternalError
 
 
 class PostgreSQLRuntimeAdapter:
@@ -170,3 +179,30 @@ class PostgreSQLRuntimeAdapter:
             query_id=LIST_BLOCKING_QUERY_ID,
         )
         return tuple(map_blocking_relation(row) for row in rows)
+
+    def cancel_query(self, command: CancelQueryCommand) -> BackendSignalResult:
+        """Request cancellation of one client backend query."""
+
+        row = self._executor.fetch_one(
+            CANCEL_QUERY,
+            (command.pid,),
+            query_id=CANCEL_QUERY_QUERY_ID,
+        )
+        if row is None:
+            raise InternalError("PostgreSQL cancel-query guard returned no row.")
+        return map_backend_signal_result(row)
+
+    def terminate_session(
+        self,
+        command: TerminateSessionCommand,
+    ) -> BackendSignalResult:
+        """Request termination of one client backend session."""
+
+        row = self._executor.fetch_one(
+            TERMINATE_SESSION,
+            (command.pid,),
+            query_id=TERMINATE_SESSION_QUERY_ID,
+        )
+        if row is None:
+            raise InternalError("PostgreSQL terminate-session guard returned no row.")
+        return map_backend_signal_result(row)
