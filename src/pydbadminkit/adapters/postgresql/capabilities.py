@@ -1,6 +1,7 @@
 """PostgreSQL capability discovery."""
 
 from pydbadminkit.domain.common import CapabilityAvailability, CapabilityStatus
+from pydbadminkit.ports.tools import ToolResolverPort
 
 
 class PostgreSQLCapabilityAdapter:
@@ -41,12 +42,33 @@ class PostgreSQLCapabilityAdapter:
             "runtime.blocking.list",
             "runtime.query.cancel",
             "runtime.session.terminate",
+            "backup.create",
+            "backup.validate",
         }
     )
 
-    _PLANNED: frozenset[str] = frozenset()
+    _PLANNED = frozenset(
+        {
+            "backup.restore",
+            "maintenance.vacuum",
+            "maintenance.analyze",
+            "maintenance.reindex",
+        }
+    )
+
+    def __init__(self, tool_resolver: ToolResolverPort | None = None) -> None:
+        self._tool_resolver = tool_resolver
 
     def get_capability(self, name: str) -> CapabilityStatus:
+        if name == "backup.create" and self._tool_resolver is not None:
+            tool = self._tool_resolver.resolve("pg_dump")
+            if not tool.available:
+                return CapabilityStatus(
+                    name=name,
+                    availability=CapabilityAvailability.UNAVAILABLE_TOOL,
+                    reason="Required tool 'pg_dump' was not found.",
+                )
+
         if name in self._IMPLEMENTED:
             return CapabilityStatus(
                 name=name,

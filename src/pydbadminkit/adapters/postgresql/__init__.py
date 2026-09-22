@@ -1,5 +1,6 @@
 """PostgreSQL adapter implementation."""
 
+from pydbadminkit.adapters.postgresql.backup import PostgreSQLBackupAdapter
 from pydbadminkit.adapters.postgresql.capabilities import PostgreSQLCapabilityAdapter
 from pydbadminkit.adapters.postgresql.catalog import PostgreSQLCatalogAdapter
 from pydbadminkit.adapters.postgresql.connection import (
@@ -12,6 +13,7 @@ from pydbadminkit.adapters.postgresql.security import PostgreSQLSecurityAdapter
 from pydbadminkit.adapters.postgresql.server import PostgreSQLServerAdapter
 
 __all__ = [
+    "PostgreSQLBackupAdapter",
     "PostgreSQLCapabilityAdapter",
     "PostgreSQLCatalogAdapter",
     "PostgreSQLConnectionFactory",

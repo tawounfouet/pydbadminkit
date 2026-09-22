@@ -11,6 +11,9 @@ from pydbadminkit.errors import (
     ConfigurationError,
     DatabaseConnectionError,
     DatabaseConnectionTimeoutError,
+    ExternalToolError,
+    OperationTimeoutError,
+    BackupError,
     PyDBAdminError,
     ResourceNotFoundError,
     SafetyPolicyError,
@@ -22,7 +25,7 @@ def exit_code_for_error(error: PyDBAdminError) -> int:
 
     if isinstance(error, ConfigurationError):
         return 2
-    if isinstance(error, DatabaseConnectionTimeoutError):
+    if isinstance(error, (DatabaseConnectionTimeoutError, OperationTimeoutError)):
         return 9
     if isinstance(error, (AuthenticationError, AuthorizationError)):
         return 4
@@ -34,6 +37,8 @@ def exit_code_for_error(error: PyDBAdminError) -> int:
         return 6
     if isinstance(error, SafetyPolicyError):
         return 7
+    if isinstance(error, (ExternalToolError, BackupError)):
+        return 8
     return 1
 
 

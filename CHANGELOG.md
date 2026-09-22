@@ -2,6 +2,72 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.5.0a1] — Backup Foundation
+
+### Backup domain
+
+- `Backup`, `BackupMetadata`, `BackupFormat`, `CreateBackupCommand` and
+  `BackupValidation`.
+- External-tool and process result models.
+- Engine-neutral backup, process, tool-resolution and backup-filesystem ports.
+
+### PostgreSQL logical backup
+
+- Custom-format backup through `pg_dump --format=custom`.
+- Plain-SQL backup through `pg_dump --format=plain`.
+- PostgreSQL tool-version parsing isolated in the adapter.
+- Backup creation rejects a `pg_dump` major version older than the server major.
+- Cross-major supported dumps add `--quote-all-identifiers`.
+- Directory/tar and parallel jobs remain deferred.
+
+### Backup artifact safety
+
+- Destination validation before process launch.
+- No overwrite without explicit `--force`.
+- Temporary `.partial` artifacts.
+- Atomic finalization of artifact and metadata sidecar.
+- Restrictive local file permissions where supported.
+- SHA-256 checksums enabled by default.
+- Secret-safe `.metadata.json` sidecar generation.
+- Failed native-tool runs clean temporary artifacts.
+
+### Native tool execution
+
+- `PathToolResolver` resolves `pg_dump` and `pg_restore` from PATH.
+- `SubprocessRunner` always uses argument arrays with `shell=False`.
+- Passwords are supplied only through the child `PGPASSWORD` environment.
+- Explicit process timeouts map to `OperationTimeoutError`.
+- Tool failures use dedicated public tool errors and CLI exit code 8.
+
+### Validation
+
+- Artifact existence/readability/size checks.
+- SHA-256 verification against metadata.
+- Custom archives are validated with `pg_restore --list`.
+- Plain SQL validation explicitly warns that a real restore test is required for
+  full logical validation.
+
+### CLI and safety
+
+- `backup create <database>`.
+- `backup validate <path>`.
+- `--format`, `--output-path`, `--checksum/--no-checksum`, `--timeout`
+  and guarded `--force`.
+- Backup creation supports the shared global `--dry-run` plan.
+- Forced overwrite requires approval and escalates to high risk in production.
+- Backup creation lifecycle is written to the shared JSONL audit sink.
+
+### Quality
+
+- Unit coverage for models, tool resolution, process timeout, filesystem finalization,
+  PostgreSQL adapter, application service and CLI.
+- PostgreSQL integration installs PostgreSQL 18 client utilities and exercises real
+  `pg_dump` / `pg_restore` against the PostgreSQL 18 service.
+
+### Next
+
+`0.5.0a2` introduces Restore.
+
 ## [0.4.0] — Runtime Administration
 
 ### Stable Runtime surface

@@ -393,3 +393,22 @@ def test_postgresql_capability_adapter() -> None:
     assert [item.name for item in adapter.list_capabilities()] == sorted(
         item.name for item in adapter.list_capabilities()
     )
+
+
+
+def test_backup_create_capability_reports_missing_pg_dump() -> None:
+    class MissingToolResolver:
+        def resolve(self, name: str) -> ExternalTool:
+            return ExternalTool(
+                name=name,
+                path=None,
+                version=None,
+                available=False,
+            )
+
+    adapter = PostgreSQLCapabilityAdapter(tool_resolver=MissingToolResolver())
+
+    status = adapter.get_capability("backup.create")
+
+    assert status.availability is CapabilityAvailability.UNAVAILABLE_TOOL
+    assert status.reason == "Required tool 'pg_dump' was not found."

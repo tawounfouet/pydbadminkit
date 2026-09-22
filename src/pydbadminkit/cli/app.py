@@ -6,6 +6,7 @@ from typing import Annotated
 import typer
 
 from pydbadminkit.cli.commands.access import access_app
+from pydbadminkit.cli.commands.backup import backup_app
 from pydbadminkit.cli.commands.blocking import blocking_app
 from pydbadminkit.cli.commands.capability import capability_app
 from pydbadminkit.cli.commands.connection import connection_app
@@ -33,6 +34,7 @@ app = typer.Typer(
     help="CLI-first, Python-first database administration toolkit.",
 )
 app.add_typer(connection_app, name="connection")
+app.add_typer(backup_app, name="backup")
 app.add_typer(server_app, name="server")
 app.add_typer(database_app, name="database")
 app.add_typer(schema_app, name="schema")

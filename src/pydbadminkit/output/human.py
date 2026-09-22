@@ -13,6 +13,7 @@ from pydbadminkit.domain.catalog import (
 )
 from pydbadminkit.domain.common import CapabilityStatus, OperationResult
 from pydbadminkit.domain.connection import ConnectionTestResult
+from pydbadminkit.domain.operations import Backup, BackupValidation
 from pydbadminkit.domain.runtime import (
     BlockingRelation,
     LockInfo,
@@ -652,3 +653,40 @@ def _relation_value(schema: str | None, name: str | None) -> str:
     if schema is None:
         return name
     return f"{schema}.{name}"
+
+
+
+def render_backup(backup: Backup) -> str:
+    """Render one completed logical backup."""
+
+    return "\n".join(
+        (
+            f"Backup ID: {backup.id}",
+            f"Database: {backup.database}",
+            f"Format: {backup.format.value}",
+            f"Path: {backup.path}",
+            f"Status: {backup.status.value}",
+            f"Created at: {backup.created_at.isoformat()}",
+            f"Size: {backup.size_bytes if backup.size_bytes is not None else '-'} bytes",
+            f"Checksum: {backup.checksum or '-'}",
+            f"Engine: {backup.engine.value}",
+            f"Engine version: {backup.engine_version or '-'}",
+            f"Tool version: {backup.tool_version or '-'}",
+        )
+    )
+
+
+def render_backup_validation(validation: BackupValidation) -> str:
+    """Render one backup validation result."""
+
+    lines = [
+        f"Valid: {'yes' if validation.valid else 'no'}",
+        f"Level: {validation.level}",
+    ]
+    if validation.warnings:
+        lines.extend(("", "WARNINGS"))
+        lines.extend(f"- {warning}" for warning in validation.warnings)
+    if validation.errors:
+        lines.extend(("", "ERRORS"))
+        lines.extend(f"- {error}" for error in validation.errors)
+    return "\n".join(lines)

@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.4.0` — Runtime Administration.
+> **Current release:** `0.5.0a1` — Backup Foundation.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -197,6 +197,40 @@ pydbadmin --connection local --yes session terminate 12345
 
 In production, session termination escalates to critical risk and requires an exact typed
 target such as `--confirm-target pid:12345`; `--yes` does not bypass that proof.
+
+### Operations — Backup Foundation 0.5.0a1
+
+The first Operations slice adds logical PostgreSQL backups on top of native tools.
+
+Implemented:
+
+- `backup create` for PostgreSQL custom and plain-SQL formats;
+- `backup validate` with artifact, checksum and custom-archive validation;
+- `pg_dump` / `pg_restore` discovery and version inspection;
+- PostgreSQL server/tool major-version compatibility checks;
+- password injection through child-process environment only;
+- `shell=False` process execution with explicit timeout handling;
+- temporary `.partial` artifacts followed by atomic finalization;
+- SHA-256 checksum metadata;
+- secret-safe `.metadata.json` sidecars;
+- collision protection by default and guarded `--force` overwrite;
+- JSONL audit lifecycle for backup creation.
+
+Examples:
+
+```bash
+pydbadmin --connection local backup create accounting
+pydbadmin --connection local backup create accounting \
+  --format custom \
+  --output-path ./accounting.dump
+
+pydbadmin --connection local --dry-run backup create accounting \
+  --output-path ./accounting.dump
+
+pydbadmin backup validate ./accounting.dump
+```
+
+`directory`, `tar`, Restore and Maintenance remain outside this first alpha.
 
 ## Development setup
 
@@ -394,9 +428,9 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.2.x  Object Explorer            ✅
 0.3.x  Security Administration    ✅
 0.4.x  Runtime Administration     ✅ `0.4.0`
-0.5.x  Operations
+0.5.x  Operations                     🚧 `0.5.0a1`
 0.6.x  Observability
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.4.0` stabilizes the complete Runtime Administration surface: sessions, queries, transactions, waits, locks, blocking chains, guarded query cancellation and guarded session termination. The next roadmap line is `0.5.x` Operations.
+`0.5.0a1` opens the Operations line with Backup Foundation. The next milestone is Restore, followed by Maintenance before promotion to stable `0.5.0`.
