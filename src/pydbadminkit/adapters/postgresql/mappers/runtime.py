@@ -3,7 +3,15 @@
 from collections.abc import Mapping
 from datetime import datetime
 
-from pydbadminkit.domain.runtime import QueryInfo, SessionInfo, SessionState, TransactionInfo
+from pydbadminkit.domain.runtime import (
+    BlockingRelation,
+    LockInfo,
+    QueryInfo,
+    SessionInfo,
+    SessionState,
+    TransactionInfo,
+    WaitInfo,
+)
 from pydbadminkit.errors import InternalError
 
 _STATE_BY_POSTGRESQL = {
@@ -78,6 +86,71 @@ def map_transaction_info(row: Mapping[str, object]) -> TransactionInfo:
         raise InternalError("PostgreSQL transaction row mapping failed.") from error
 
 
+def map_wait_info(row: Mapping[str, object]) -> WaitInfo:
+    """Map one PostgreSQL wait-event row."""
+
+    try:
+        return WaitInfo(
+            pid=_required_int(row["pid"]),
+            database=_optional_str(row.get("database_name")),
+            username=_optional_str(row.get("username")),
+            state=_optional_state(row.get("state")),
+            state_changed_at=_optional_datetime(row.get("state_change")),
+            wait_event_type=_required_str(row["wait_event_type"]),
+            wait_event=_required_str(row["wait_event"]),
+            query_text=_optional_str(row.get("query")),
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise InternalError("PostgreSQL wait row mapping failed.") from error
+
+
+def map_lock_info(row: Mapping[str, object]) -> LockInfo:
+    """Map one PostgreSQL pg_locks row."""
+
+    try:
+        return LockInfo(
+            pid=_required_int(row["pid"]),
+            database=_optional_str(row.get("database_name")),
+            username=_optional_str(row.get("username")),
+            lock_type=_required_str(row["locktype"]),
+            mode=_required_str(row["mode"]),
+            granted=_required_bool(row["granted"]),
+            relation_schema=_optional_str(row.get("relation_schema")),
+            relation_name=_optional_str(row.get("relation_name")),
+            transaction_id=_optional_str(row.get("transaction_id")),
+            virtual_transaction_id=_optional_str(
+                row.get("virtual_transaction_id")
+            ),
+            virtual_transaction=_optional_str(row.get("virtualtransaction")),
+            page=_optional_int(row.get("page")),
+            tuple_id=_optional_int(row.get("tuple_id")),
+            fastpath=_optional_bool(row.get("fastpath")),
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise InternalError("PostgreSQL lock row mapping failed.") from error
+
+
+def map_blocking_relation(row: Mapping[str, object]) -> BlockingRelation:
+    """Map one edge from a recursive PostgreSQL blocking chain."""
+
+    try:
+        return BlockingRelation(
+            root_pid=_required_int(row["root_pid"]),
+            blocked_pid=_required_int(row["blocked_pid"]),
+            blocking_pid=_required_int(row["blocking_pid"]),
+            depth=_required_int(row["depth"]),
+            database=_optional_str(row.get("database_name")),
+            blocked_username=_optional_str(row.get("blocked_username")),
+            blocking_username=_optional_str(row.get("blocking_username")),
+            wait_event_type=_optional_str(row.get("wait_event_type")),
+            wait_event=_optional_str(row.get("wait_event")),
+            blocked_query_text=_optional_str(row.get("blocked_query")),
+            blocking_query_text=_optional_str(row.get("blocking_query")),
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise InternalError("PostgreSQL blocking row mapping failed.") from error
+
+
 def postgresql_state_filter(state: SessionState | None) -> str | None:
     """Translate one normalized state back to PostgreSQL's pg_stat_activity value."""
 
@@ -125,6 +198,18 @@ def _optional_float(value: object) -> float | None:
     return _required_float(value)
 
 
+def _required_bool(value: object) -> bool:
+    if not isinstance(value, bool):
+        raise TypeError("boolean value is required")
+    return value
+
+
+def _optional_bool(value: object) -> bool | None:
+    if value is None:
+        return None
+    return _required_bool(value)
+
+
 def _required_datetime(value: object) -> datetime:
     if not isinstance(value, datetime):
         raise TypeError("datetime value is required")
@@ -135,6 +220,12 @@ def _optional_datetime(value: object) -> datetime | None:
     if value is None:
         return None
     return _required_datetime(value)
+
+
+def _required_str(value: object) -> str:
+    if not isinstance(value, str) or not value or value.isspace():
+        raise TypeError("non-blank string value is required")
+    return value
 
 
 def _optional_str(value: object) -> str | None:

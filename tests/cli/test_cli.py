@@ -21,7 +21,7 @@ def test_cli_help() -> None:
 def test_cli_version() -> None:
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert result.stdout.strip() == "pydbadminkit 0.4.0a1"
+    assert result.stdout.strip() == "pydbadminkit 0.4.0a2"
 
 
 def test_connection_test_requires_selected_profile() -> None:

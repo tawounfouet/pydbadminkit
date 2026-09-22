@@ -371,7 +371,10 @@ def test_postgresql_capability_adapter() -> None:
     index = adapter.get_capability("catalog.index.list")
     runtime_session = adapter.get_capability("runtime.session.list")
     runtime_transaction = adapter.get_capability("runtime.transaction.list")
-    planned = adapter.get_capability("runtime.lock.list")
+    runtime_wait = adapter.get_capability("runtime.wait.list")
+    runtime_lock = adapter.get_capability("runtime.lock.list")
+    runtime_blocking = adapter.get_capability("runtime.blocking.list")
+    planned = adapter.get_capability("runtime.query.cancel")
     unknown = adapter.get_capability("future.unknown")
 
     assert database.availability is CapabilityAvailability.AVAILABLE
@@ -380,6 +383,9 @@ def test_postgresql_capability_adapter() -> None:
     assert index.availability is CapabilityAvailability.AVAILABLE
     assert runtime_session.availability is CapabilityAvailability.AVAILABLE
     assert runtime_transaction.availability is CapabilityAvailability.AVAILABLE
+    assert runtime_wait.availability is CapabilityAvailability.AVAILABLE
+    assert runtime_lock.availability is CapabilityAvailability.AVAILABLE
+    assert runtime_blocking.availability is CapabilityAvailability.AVAILABLE
     assert planned.availability is CapabilityAvailability.UNKNOWN
     assert planned.reason is not None
     assert unknown.availability is CapabilityAvailability.UNKNOWN

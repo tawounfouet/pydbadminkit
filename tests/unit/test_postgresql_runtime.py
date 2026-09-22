@@ -7,9 +7,12 @@ from typing import Any
 import pytest
 
 from pydbadminkit.adapters.postgresql.mappers.runtime import (
+    map_blocking_relation,
+    map_lock_info,
     map_query_info,
     map_session_info,
     map_transaction_info,
+    map_wait_info,
 )
 from pydbadminkit.adapters.postgresql.runtime import PostgreSQLRuntimeAdapter
 from pydbadminkit.domain.runtime import SessionState
@@ -83,10 +86,61 @@ def _transaction_row() -> dict[str, Any]:
     }
 
 
+def _wait_row() -> dict[str, Any]:
+    return {
+        "pid": 104,
+        "database_name": "analytics",
+        "username": "app",
+        "state": "active",
+        "state_change": datetime(2026, 9, 22, 15, 59, tzinfo=UTC),
+        "wait_event_type": "Lock",
+        "wait_event": "transactionid",
+        "query": "UPDATE orders SET status = 'paid'",
+    }
+
+
+def _lock_row() -> dict[str, Any]:
+    return {
+        "pid": 105,
+        "database_name": "analytics",
+        "username": "app",
+        "locktype": "relation",
+        "mode": "RowExclusiveLock",
+        "granted": False,
+        "fastpath": False,
+        "relation_schema": "public",
+        "relation_name": "orders",
+        "transaction_id": "735",
+        "virtual_transaction_id": "4/21",
+        "virtualtransaction": "4/21",
+        "page": 3,
+        "tuple_id": 7,
+    }
+
+
+def _blocking_row() -> dict[str, Any]:
+    return {
+        "root_pid": 106,
+        "blocked_pid": 106,
+        "blocking_pid": 107,
+        "depth": 1,
+        "database_name": "analytics",
+        "blocked_username": "app",
+        "blocking_username": "worker",
+        "wait_event_type": "Lock",
+        "wait_event": "transactionid",
+        "blocked_query": "UPDATE orders SET status = 'paid'",
+        "blocking_query": "UPDATE orders SET status = 'processing'",
+    }
+
+
 def test_runtime_mappers_build_domain_models() -> None:
     session = map_session_info(_session_row())
     query = map_query_info(_query_row())
     transaction = map_transaction_info(_transaction_row())
+    wait = map_wait_info(_wait_row())
+    lock = map_lock_info(_lock_row())
+    blocking = map_blocking_relation(_blocking_row())
 
     assert session.state is SessionState.IDLE_IN_TRANSACTION
     assert session.wait_event == "ClientRead"
@@ -94,6 +148,11 @@ def test_runtime_mappers_build_domain_models() -> None:
     assert query.elapsed_ms == 250.5
     assert transaction.backend_xid == "735"
     assert transaction.elapsed_ms == 120000.0
+    assert wait.wait_event_type == "Lock"
+    assert lock.relation_name == "orders"
+    assert lock.granted is False
+    assert blocking.blocking_pid == 107
+    assert blocking.depth == 1
 
 
 def test_runtime_mapper_preserves_unknown_postgresql_state() -> None:
@@ -114,6 +173,32 @@ def test_runtime_mapper_preserves_unknown_postgresql_state() -> None:
                 "pid": 1,
                 "xact_start": "not-a-datetime",
                 "elapsed_ms": 1.0,
+            },
+        ),
+        (
+            map_wait_info,
+            {
+                "pid": 1,
+                "wait_event_type": None,
+                "wait_event": "ClientRead",
+            },
+        ),
+        (
+            map_lock_info,
+            {
+                "pid": 1,
+                "locktype": "relation",
+                "mode": "AccessShareLock",
+                "granted": "yes",
+            },
+        ),
+        (
+            map_blocking_relation,
+            {
+                "root_pid": 1,
+                "blocked_pid": 1,
+                "blocking_pid": 2,
+                "depth": 0,
             },
         ),
     ],
@@ -164,3 +249,58 @@ def test_runtime_adapter_lists_queries_and_transactions() -> None:
     assert transactions[0].backend_xmin == "734"
     assert executor.calls[0][2] == "PG_RUNTIME_LIST_QUERIES"
     assert executor.calls[1][2] == "PG_RUNTIME_LIST_TRANSACTIONS"
+
+
+def test_runtime_adapter_lists_waits_locks_and_blocking() -> None:
+    executor = FakeExecutor(
+        many_by_id={
+            "PG_RUNTIME_LIST_WAITS": (_wait_row(),),
+            "PG_RUNTIME_LIST_LOCKS": (_lock_row(),),
+            "PG_RUNTIME_LIST_BLOCKING": (_blocking_row(),),
+        }
+    )
+    adapter = PostgreSQLRuntimeAdapter(executor)  # type: ignore[arg-type]
+
+    waits = adapter.list_waits(
+        database="analytics",
+        username="app",
+        wait_event_type="Lock",
+    )
+    locks = adapter.list_locks(
+        database="analytics",
+        username="app",
+        granted=False,
+    )
+    blocking = adapter.list_blocking(
+        database="analytics",
+        username="app",
+    )
+
+    assert waits[0].wait_event == "transactionid"
+    assert locks[0].mode == "RowExclusiveLock"
+    assert blocking[0].root_pid == 106
+    assert executor.calls[0][1] == (
+        "analytics",
+        "analytics",
+        "app",
+        "app",
+        "Lock",
+        "Lock",
+        False,
+    )
+    assert executor.calls[1][1] == (
+        "analytics",
+        "analytics",
+        "app",
+        "app",
+        False,
+        False,
+        False,
+    )
+    assert executor.calls[2][1] == (
+        "analytics",
+        "analytics",
+        "app",
+        "app",
+        False,
+    )

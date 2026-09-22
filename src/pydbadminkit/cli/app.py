@@ -6,11 +6,13 @@ from typing import Annotated
 import typer
 
 from pydbadminkit.cli.commands.access import access_app
+from pydbadminkit.cli.commands.blocking import blocking_app
 from pydbadminkit.cli.commands.capability import capability_app
 from pydbadminkit.cli.commands.connection import connection_app
 from pydbadminkit.cli.commands.database import database_app
 from pydbadminkit.cli.commands.effective_access import effective_access_app
 from pydbadminkit.cli.commands.index import index_app
+from pydbadminkit.cli.commands.lock import lock_app
 from pydbadminkit.cli.commands.ownership import ownership_app
 from pydbadminkit.cli.commands.query import query_app
 from pydbadminkit.cli.commands.role import role_app
@@ -20,6 +22,7 @@ from pydbadminkit.cli.commands.session import session_app
 from pydbadminkit.cli.commands.table import table_app
 from pydbadminkit.cli.commands.transaction import transaction_app
 from pydbadminkit.cli.commands.view import view_app
+from pydbadminkit.cli.commands.wait import wait_app
 from pydbadminkit.cli.context import CLIContext
 from pydbadminkit.output.format import OutputFormat
 from pydbadminkit.version import __version__
@@ -43,6 +46,9 @@ app.add_typer(ownership_app, name="ownership")
 app.add_typer(session_app, name="session")
 app.add_typer(query_app, name="query")
 app.add_typer(transaction_app, name="transaction")
+app.add_typer(wait_app, name="wait")
+app.add_typer(lock_app, name="lock")
+app.add_typer(blocking_app, name="blocking")
 app.add_typer(capability_app, name="capability")
 
 

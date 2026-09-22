@@ -4,11 +4,22 @@ from datetime import UTC, datetime
 
 import pytest
 
-from pydbadminkit.domain.runtime import QueryInfo, SessionInfo, SessionState, TransactionInfo
+from pydbadminkit.domain.runtime import (
+    BlockingRelation,
+    LockInfo,
+    QueryInfo,
+    SessionInfo,
+    SessionState,
+    TransactionInfo,
+    WaitInfo,
+)
 from pydbadminkit.output.human import (
+    render_blocking_list,
+    render_lock_list,
     render_query_list,
     render_session_list,
     render_transaction_list,
+    render_wait_list,
 )
 
 pytestmark = [pytest.mark.unit, pytest.mark.runtime]
@@ -65,3 +76,57 @@ def test_render_transaction_list() -> None:
 
     assert "XID" in rendered
     assert "735" in rendered
+
+
+def test_render_wait_list() -> None:
+    rendered = render_wait_list(
+        (
+            WaitInfo(
+                pid=104,
+                database="analytics",
+                username="app",
+                wait_event_type="Lock",
+                wait_event="transactionid",
+            ),
+        )
+    )
+
+    assert "WAIT_TYPE\tWAIT_EVENT" in rendered
+    assert "Lock\ttransactionid" in rendered
+
+
+def test_render_lock_list() -> None:
+    rendered = render_lock_list(
+        (
+            LockInfo(
+                pid=105,
+                database="analytics",
+                username="app",
+                lock_type="relation",
+                mode="RowExclusiveLock",
+                granted=True,
+                relation_schema="public",
+                relation_name="orders",
+            ),
+        )
+    )
+
+    assert "LOCK_TYPE\tMODE\tGRANTED" in rendered
+    assert "public.orders" in rendered
+
+
+def test_render_blocking_list() -> None:
+    rendered = render_blocking_list(
+        (
+            BlockingRelation(
+                root_pid=106,
+                blocked_pid=106,
+                blocking_pid=107,
+                depth=1,
+                database="analytics",
+            ),
+        )
+    )
+
+    assert "ROOT_PID\tDEPTH\tBLOCKED_PID\tBLOCKING_PID" in rendered
+    assert "106\t1\t106\t107" in rendered

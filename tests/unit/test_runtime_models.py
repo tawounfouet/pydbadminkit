@@ -5,7 +5,15 @@ from datetime import UTC, datetime
 
 import pytest
 
-from pydbadminkit.domain.runtime import QueryInfo, SessionInfo, SessionState, TransactionInfo
+from pydbadminkit.domain.runtime import (
+    BlockingRelation,
+    LockInfo,
+    QueryInfo,
+    SessionInfo,
+    SessionState,
+    TransactionInfo,
+    WaitInfo,
+)
 
 pytestmark = [pytest.mark.unit, pytest.mark.runtime]
 
@@ -21,10 +29,30 @@ def test_runtime_models_accept_valid_values() -> None:
         elapsed_ms=50.0,
         state=SessionState.IDLE_IN_TRANSACTION,
     )
+    wait = WaitInfo(
+        pid=104,
+        wait_event_type="Lock",
+        wait_event="transactionid",
+    )
+    lock = LockInfo(
+        pid=105,
+        lock_type="relation",
+        mode="AccessShareLock",
+        granted=True,
+    )
+    blocking = BlockingRelation(
+        root_pid=106,
+        blocked_pid=106,
+        blocking_pid=107,
+        depth=1,
+    )
 
     assert session.pid == 101
     assert query.elapsed_ms == 12.5
     assert transaction.transaction_started_at == started_at
+    assert wait.wait_event_type == "Lock"
+    assert lock.granted is True
+    assert blocking.blocking_pid == 107
 
 
 @pytest.mark.parametrize(
@@ -40,6 +68,29 @@ def test_runtime_models_accept_valid_values() -> None:
                 elapsed_ms=-1.0,
             ),
             "transaction elapsed_ms",
+        ),
+        (
+            lambda: WaitInfo(pid=1, wait_event_type="", wait_event="ClientRead"),
+            "wait_event_type",
+        ),
+        (
+            lambda: LockInfo(
+                pid=1,
+                lock_type="relation",
+                mode="AccessShareLock",
+                granted=True,
+                page=-1,
+            ),
+            "lock page",
+        ),
+        (
+            lambda: BlockingRelation(
+                root_pid=1,
+                blocked_pid=1,
+                blocking_pid=2,
+                depth=0,
+            ),
+            "blocking depth",
         ),
     ],
 )

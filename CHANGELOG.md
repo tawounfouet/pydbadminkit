@@ -2,6 +2,48 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.4.0a2] — Runtime Waits, Locks and Blocking Chains
+
+### Runtime domain
+
+- Immutable `WaitInfo`, `LockInfo` and `BlockingRelation` read models.
+- `RuntimePort` and `RuntimeService` extended without changing the 0.4.0a1 API.
+- Recursive blocking relations expose `root_pid`, `blocked_pid`, `blocking_pid`
+  and chain `depth`.
+
+### PostgreSQL runtime inspection
+
+- Wait-event inspection from `pg_stat_activity`.
+- Backend lock inspection from `pg_locks`.
+- Relation, transaction and virtual transaction lock metadata.
+- Waiting-only lock filtering.
+- Recursive blocking-chain discovery through `pg_blocking_pids()`.
+- Cycle-safe recursive traversal using a visited PID path.
+
+### CLI and machine interface
+
+- `wait list`, including optional `--type` filtering.
+- `lock list`, including `--waiting-only`.
+- `blocking list` for recursive blocker relationships.
+- Table, JSON and YAML output for all new runtime models.
+
+### Quality
+
+- Domain, service, mapper, adapter and human-output tests extended for 0.4.0a2.
+- PostgreSQL integration tests create a real advisory-lock contention.
+- The same contention is verified through waits, waiting locks and blocking relations.
+- Runtime wait, lock and blocking capabilities are now reported as available.
+
+### Safety boundary
+
+`0.4.0a2` remains read-only. No backend cancellation or termination operation is exposed.
+
+### Next
+
+The next Runtime Administration milestone introduces guarded query cancellation and session
+termination using the existing `OperationPlan`, risk, confirmation and audit model.
+
+
 ## [0.4.0a1] — Runtime Inspection Foundations
 
 ### Runtime domain

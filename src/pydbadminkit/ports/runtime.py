@@ -2,7 +2,15 @@
 
 from typing import Protocol
 
-from pydbadminkit.domain.runtime import QueryInfo, SessionInfo, SessionState, TransactionInfo
+from pydbadminkit.domain.runtime import (
+    BlockingRelation,
+    LockInfo,
+    QueryInfo,
+    SessionInfo,
+    SessionState,
+    TransactionInfo,
+    WaitInfo,
+)
 
 
 class RuntimePort(Protocol):
@@ -37,4 +45,36 @@ class RuntimePort(Protocol):
         include_self: bool = False,
     ) -> tuple[TransactionInfo, ...]:
         """List open transactions."""
+        ...
+
+    def list_waits(
+        self,
+        *,
+        database: str | None = None,
+        username: str | None = None,
+        wait_event_type: str | None = None,
+        include_self: bool = False,
+    ) -> tuple[WaitInfo, ...]:
+        """List backends currently reporting a wait event."""
+        ...
+
+    def list_locks(
+        self,
+        *,
+        database: str | None = None,
+        username: str | None = None,
+        granted: bool | None = None,
+        include_self: bool = False,
+    ) -> tuple[LockInfo, ...]:
+        """List backend locks."""
+        ...
+
+    def list_blocking(
+        self,
+        *,
+        database: str | None = None,
+        username: str | None = None,
+        include_self: bool = False,
+    ) -> tuple[BlockingRelation, ...]:
+        """List recursive blocking-chain edges."""
         ...

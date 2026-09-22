@@ -13,7 +13,14 @@ from pydbadminkit.domain.catalog import (
 )
 from pydbadminkit.domain.common import CapabilityStatus, OperationResult
 from pydbadminkit.domain.connection import ConnectionTestResult
-from pydbadminkit.domain.runtime import QueryInfo, SessionInfo, TransactionInfo
+from pydbadminkit.domain.runtime import (
+    BlockingRelation,
+    LockInfo,
+    QueryInfo,
+    SessionInfo,
+    TransactionInfo,
+    WaitInfo,
+)
 from pydbadminkit.domain.safety import OperationPlan
 from pydbadminkit.domain.security import (
     DirectAccess,
@@ -569,3 +576,93 @@ def _query_preview(value: str | None, limit: int = 160) -> str:
     if len(single_line) <= limit:
         return single_line
     return single_line[: limit - 1] + "…"
+
+
+
+def render_wait_list(waits: tuple[WaitInfo, ...]) -> str:
+    """Render current backend waits."""
+
+    lines = ["PID\tDATABASE\tUSER\tSTATE\tWAIT_TYPE\tWAIT_EVENT\tQUERY"]
+    for wait in waits:
+        lines.append(
+            "\t".join(
+                (
+                    str(wait.pid),
+                    wait.database or "-",
+                    wait.username or "-",
+                    wait.state.value if wait.state else "-",
+                    wait.wait_event_type,
+                    wait.wait_event,
+                    _query_preview(wait.query_text),
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_lock_list(locks: tuple[LockInfo, ...]) -> str:
+    """Render backend locks."""
+
+    lines = [
+        (
+            "PID\tDATABASE\tUSER\tLOCK_TYPE\tMODE\tGRANTED\tRELATION"
+            "\tTXID\tVIRTUAL_XID\tPAGE\tTUPLE"
+        )
+    ]
+    for lock in locks:
+        relation = _relation_value(lock.relation_schema, lock.relation_name)
+        lines.append(
+            "\t".join(
+                (
+                    str(lock.pid),
+                    lock.database or "-",
+                    lock.username or "-",
+                    lock.lock_type,
+                    lock.mode,
+                    "yes" if lock.granted else "no",
+                    relation,
+                    lock.transaction_id or "-",
+                    lock.virtual_transaction_id or "-",
+                    _optional_int(lock.page),
+                    _optional_int(lock.tuple_id),
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_blocking_list(relations: tuple[BlockingRelation, ...]) -> str:
+    """Render recursive blocking-chain edges."""
+
+    lines = [
+        (
+            "ROOT_PID\tDEPTH\tBLOCKED_PID\tBLOCKING_PID\tDATABASE"
+            "\tBLOCKED_USER\tBLOCKING_USER\tWAIT\tBLOCKED_QUERY\tBLOCKING_QUERY"
+        )
+    ]
+    for relation in relations:
+        lines.append(
+            "\t".join(
+                (
+                    str(relation.root_pid),
+                    str(relation.depth),
+                    str(relation.blocked_pid),
+                    str(relation.blocking_pid),
+                    relation.database or "-",
+                    relation.blocked_username or "-",
+                    relation.blocking_username or "-",
+                    _wait_value(relation.wait_event_type, relation.wait_event),
+                    _query_preview(relation.blocked_query_text),
+                    _query_preview(relation.blocking_query_text),
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def _relation_value(schema: str | None, name: str | None) -> str:
+    if name is None:
+        return "-"
+    if schema is None:
+        return name
+    return f"{schema}.{name}"

@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.4.0a1` — Runtime Inspection Foundations.
+> **Current release:** `0.4.0a2` — Runtime Waits, Locks and Blocking Chains.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -162,17 +162,20 @@ python -m pydbadminkit --connection local --non-interactive `
 ```
 
 
-### Runtime Administration — 0.4.0a1
+### Runtime Administration — 0.4.0a2
 
-The first Runtime Administration slice is read-only and backed by PostgreSQL
-`pg_stat_activity`.
+Runtime Administration remains read-only and now combines PostgreSQL
+`pg_stat_activity`, `pg_locks` and `pg_blocking_pids()`.
 
 Implemented inspection surfaces:
 
 - live sessions with database, user, application, client, state and wait information;
 - currently active queries with query identifier, elapsed time and wait information;
 - open transactions with start time, elapsed time and transaction identifiers;
-- normalized session states across the public Python API;
+- current wait events with optional wait-event type filtering;
+- backend locks, including granted and waiting locks;
+- recursive blocking chains with root PID and depth;
+- normalized runtime models exposed through the public Python API;
 - table, JSON and YAML CLI output;
 - self-inspection excluded by default and available explicitly with `--include-self`.
 
@@ -180,14 +183,18 @@ Examples:
 
 ```bash
 pydbadmin --connection local session list
-pydbadmin --connection local session list --state idle_in_transaction
 pydbadmin --connection local query list
 pydbadmin --connection local transaction list
-pydbadmin --connection local --output json query list
+
+pydbadmin --connection local wait list --type Lock
+pydbadmin --connection local lock list --waiting-only
+pydbadmin --connection local blocking list
+
+pydbadmin --connection local --output json blocking list
 ```
 
 The alpha intentionally contains **no runtime mutations**. Guarded query cancellation and
-session termination remain later milestones in the `0.4.x` line.
+session termination are the next Runtime Administration milestone.
 
 ## Development setup
 
@@ -356,7 +363,7 @@ $env:PYDBADMIN_NATIVE_PASSWORD = "your_password"
 
 The repository also includes executable examples for experimenting with the public Python API and CLI:
 
-- `scripts/pydbadminkit_example.py`: end-to-end Python API demonstration aligned with the current 0.3.0 contracts;
+- `scripts/pydbadminkit_example.py`: end-to-end Python API demonstration aligned with the public framework contracts;
 - `notebooks/00 - Setup.ipynb`: Python API lab for incremental exploration of domain objects and services;
 - `notebooks/pydbadminkit_demo.ipynb`: CLI-oriented lab, including JSON/YAML output examples.
 
@@ -384,10 +391,10 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.1.x  Foundation                  ✅
 0.2.x  Object Explorer            ✅
 0.3.x  Security Administration    ✅
-0.4.x  Runtime Administration     🚧 in progress (`0.4.0a1`)
+0.4.x  Runtime Administration     🚧 in progress (`0.4.0a2`)
 0.5.x  Operations
 0.6.x  Observability
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.4.0a1` implements sessions, active queries and open transactions. The next Runtime slice adds waits, locks and blocking chains before guarded cancel/terminate operations.
+`0.4.0a2` implements sessions, queries, transactions, waits, locks and recursive blocking chains. The next Runtime slice introduces guarded cancel/terminate operations.

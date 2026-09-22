@@ -79,3 +79,84 @@ class TransactionInfo:
             raise ValueError("transaction pid must be > 0")
         if self.elapsed_ms < 0:
             raise ValueError("transaction elapsed_ms must be >= 0")
+
+
+@dataclass(frozen=True, slots=True)
+class WaitInfo:
+    """Read-only description of one backend currently waiting."""
+
+    pid: int
+    wait_event_type: str
+    wait_event: str
+    database: str | None = None
+    username: str | None = None
+    state: SessionState | None = None
+    state_changed_at: datetime | None = None
+    query_text: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.pid <= 0:
+            raise ValueError("wait pid must be > 0")
+        if not self.wait_event_type or self.wait_event_type.isspace():
+            raise ValueError("wait_event_type must not be blank")
+        if not self.wait_event or self.wait_event.isspace():
+            raise ValueError("wait_event must not be blank")
+
+
+@dataclass(frozen=True, slots=True)
+class LockInfo:
+    """Read-only description of one backend lock."""
+
+    pid: int
+    lock_type: str
+    mode: str
+    granted: bool
+    database: str | None = None
+    username: str | None = None
+    relation_schema: str | None = None
+    relation_name: str | None = None
+    transaction_id: str | None = None
+    virtual_transaction_id: str | None = None
+    virtual_transaction: str | None = None
+    page: int | None = None
+    tuple_id: int | None = None
+    fastpath: bool | None = None
+
+    def __post_init__(self) -> None:
+        if self.pid <= 0:
+            raise ValueError("lock pid must be > 0")
+        if not self.lock_type or self.lock_type.isspace():
+            raise ValueError("lock_type must not be blank")
+        if not self.mode or self.mode.isspace():
+            raise ValueError("lock mode must not be blank")
+        if self.page is not None and self.page < 0:
+            raise ValueError("lock page must be >= 0")
+        if self.tuple_id is not None and self.tuple_id < 0:
+            raise ValueError("lock tuple_id must be >= 0")
+
+
+@dataclass(frozen=True, slots=True)
+class BlockingRelation:
+    """One edge in a blocking chain rooted at a waiting backend."""
+
+    root_pid: int
+    blocked_pid: int
+    blocking_pid: int
+    depth: int
+    database: str | None = None
+    blocked_username: str | None = None
+    blocking_username: str | None = None
+    wait_event_type: str | None = None
+    wait_event: str | None = None
+    blocked_query_text: str | None = None
+    blocking_query_text: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.root_pid <= 0:
+            raise ValueError("blocking root_pid must be > 0")
+        if self.blocked_pid <= 0:
+            raise ValueError("blocked_pid must be > 0")
+        if self.blocking_pid < 0:
+            raise ValueError("blocking_pid must be >= 0")
+        if self.depth <= 0:
+            raise ValueError("blocking depth must be > 0")
