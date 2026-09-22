@@ -119,9 +119,7 @@ def map_lock_info(row: Mapping[str, object]) -> LockInfo:
             relation_schema=_optional_str(row.get("relation_schema")),
             relation_name=_optional_str(row.get("relation_name")),
             transaction_id=_optional_str(row.get("transaction_id")),
-            virtual_transaction_id=_optional_str(
-                row.get("virtual_transaction_id")
-            ),
+            virtual_transaction_id=_optional_str(row.get("virtual_transaction_id")),
             virtual_transaction=_optional_str(row.get("virtualtransaction")),
             page=_optional_int(row.get("page")),
             tuple_id=_optional_int(row.get("tuple_id")),

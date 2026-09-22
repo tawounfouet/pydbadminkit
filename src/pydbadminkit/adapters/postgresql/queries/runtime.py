@@ -23,10 +23,10 @@ SELECT
     wait_event_type,
     wait_event
 FROM pg_catalog.pg_stat_activity
-WHERE (%s IS NULL OR datname = %s)
-  AND (%s IS NULL OR usename = %s)
-  AND (%s IS NULL OR state = %s)
-  AND (%s OR pid <> pg_backend_pid())
+WHERE (%s::name IS NULL OR datname = %s::name)
+  AND (%s::name IS NULL OR usename = %s::name)
+  AND (%s::text IS NULL OR state = %s::text)
+  AND (%s::boolean OR pid <> pg_backend_pid())
 ORDER BY pid
 """
 
@@ -46,9 +46,9 @@ SELECT
 FROM pg_catalog.pg_stat_activity
 WHERE state = 'active'
   AND query_start IS NOT NULL
-  AND (%s IS NULL OR datname = %s)
-  AND (%s IS NULL OR usename = %s)
-  AND (%s OR pid <> pg_backend_pid())
+  AND (%s::name IS NULL OR datname = %s::name)
+  AND (%s::name IS NULL OR usename = %s::name)
+  AND (%s::boolean OR pid <> pg_backend_pid())
 ORDER BY query_start, pid
 """
 
@@ -66,9 +66,9 @@ SELECT
     query
 FROM pg_catalog.pg_stat_activity
 WHERE xact_start IS NOT NULL
-  AND (%s IS NULL OR datname = %s)
-  AND (%s IS NULL OR usename = %s)
-  AND (%s OR pid <> pg_backend_pid())
+  AND (%s::name IS NULL OR datname = %s::name)
+  AND (%s::name IS NULL OR usename = %s::name)
+  AND (%s::boolean OR pid <> pg_backend_pid())
 ORDER BY xact_start, pid
 """
 
@@ -84,10 +84,10 @@ SELECT
     query
 FROM pg_catalog.pg_stat_activity
 WHERE wait_event IS NOT NULL
-  AND (%s IS NULL OR datname = %s)
-  AND (%s IS NULL OR usename = %s)
-  AND (%s IS NULL OR wait_event_type = %s)
-  AND (%s OR pid <> pg_backend_pid())
+  AND (%s::name IS NULL OR datname = %s::name)
+  AND (%s::name IS NULL OR usename = %s::name)
+  AND (%s::text IS NULL OR wait_event_type = %s::text)
+  AND (%s::boolean OR pid <> pg_backend_pid())
 ORDER BY wait_event_type, wait_event, pid
 """
 
@@ -115,10 +115,10 @@ LEFT JOIN pg_catalog.pg_class AS relation
 LEFT JOIN pg_catalog.pg_namespace AS namespace
     ON namespace.oid = relation.relnamespace
 WHERE locks.pid IS NOT NULL
-  AND (%s IS NULL OR activity.datname = %s)
-  AND (%s IS NULL OR activity.usename = %s)
-  AND (%s IS NULL OR locks.granted = %s)
-  AND (%s OR locks.pid <> pg_backend_pid())
+  AND (%s::name IS NULL OR activity.datname = %s::name)
+  AND (%s::name IS NULL OR activity.usename = %s::name)
+  AND (%s::boolean IS NULL OR locks.granted = %s::boolean)
+  AND (%s::boolean OR locks.pid <> pg_backend_pid())
 ORDER BY locks.granted, locks.pid, locks.locktype, locks.mode
 """
 
@@ -133,9 +133,9 @@ WITH RECURSIVE blocking_chain AS (
     FROM pg_catalog.pg_stat_activity AS activity
     CROSS JOIN LATERAL
         unnest(pg_catalog.pg_blocking_pids(activity.pid)) AS blocker(pid)
-    WHERE (%s IS NULL OR activity.datname = %s)
-      AND (%s IS NULL OR activity.usename = %s)
-      AND (%s OR activity.pid <> pg_backend_pid())
+    WHERE (%s::name IS NULL OR activity.datname = %s::name)
+      AND (%s::name IS NULL OR activity.usename = %s::name)
+      AND (%s::boolean OR activity.pid <> pg_backend_pid())
 
     UNION
 

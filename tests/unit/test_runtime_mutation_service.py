@@ -154,9 +154,7 @@ def test_terminate_session_is_high_risk_and_critical_in_production() -> None:
     assert plan.risk is RiskLevel.HIGH
     assert plan.confirmation is ConfirmationLevel.EXPLICIT
 
-    production, _mutation2, _audit2 = _service(
-        environment=EnvironmentName.PRODUCTION
-    )
+    production, _mutation2, _audit2 = _service(environment=EnvironmentName.PRODUCTION)
     critical = production.plan_terminate_session(command)
 
     assert critical.risk is RiskLevel.CRITICAL
@@ -190,9 +188,7 @@ def test_runtime_mutations_fail_closed_for_profile_policy() -> None:
         )
     assert audit.events[-1].event_type is AuditEventType.BLOCKED
 
-    unknown, _mutation2, _audit2 = _service(
-        environment=EnvironmentName.UNKNOWN
-    )
+    unknown, _mutation2, _audit2 = _service(environment=EnvironmentName.UNKNOWN)
     plan2 = unknown.plan_cancel_query(command)
     with pytest.raises(PolicyDeniedError):
         unknown.cancel_query(

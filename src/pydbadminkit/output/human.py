@@ -476,10 +476,7 @@ def render_session_list(sessions: tuple[SessionInfo, ...]) -> str:
     """Render live database sessions."""
 
     lines = [
-        (
-            "PID\tDATABASE\tUSER\tAPPLICATION\tCLIENT\tSTATE\tWAIT"
-            "\tBACKEND_TYPE\tBACKEND_STARTED"
-        )
+        ("PID\tDATABASE\tUSER\tAPPLICATION\tCLIENT\tSTATE\tWAIT\tBACKEND_TYPE\tBACKEND_STARTED")
     ]
     for session in sessions:
         wait = _wait_value(session.wait_event_type, session.wait_event)
@@ -494,9 +491,7 @@ def render_session_list(sessions: tuple[SessionInfo, ...]) -> str:
                     session.state.value if session.state else "-",
                     wait,
                     session.backend_type or "-",
-                    session.backend_started_at.isoformat()
-                    if session.backend_started_at
-                    else "-",
+                    session.backend_started_at.isoformat() if session.backend_started_at else "-",
                 )
             )
         )
@@ -528,12 +523,7 @@ def render_query_list(queries: tuple[QueryInfo, ...]) -> str:
 def render_transaction_list(transactions: tuple[TransactionInfo, ...]) -> str:
     """Render open transactions."""
 
-    lines = [
-        (
-            "PID\tDATABASE\tUSER\tSTATE\tELAPSED_MS\tXID\tXMIN"
-            "\tSTARTED_AT\tQUERY"
-        )
-    ]
+    lines = [("PID\tDATABASE\tUSER\tSTATE\tELAPSED_MS\tXID\tXMIN\tSTARTED_AT\tQUERY")]
     for transaction in transactions:
         lines.append(
             "\t".join(
@@ -604,10 +594,7 @@ def render_lock_list(locks: tuple[LockInfo, ...]) -> str:
     """Render backend locks."""
 
     lines = [
-        (
-            "PID\tDATABASE\tUSER\tLOCK_TYPE\tMODE\tGRANTED\tRELATION"
-            "\tTXID\tVIRTUAL_XID\tPAGE\tTUPLE"
-        )
+        ("PID\tDATABASE\tUSER\tLOCK_TYPE\tMODE\tGRANTED\tRELATION\tTXID\tVIRTUAL_XID\tPAGE\tTUPLE")
     ]
     for lock in locks:
         relation = _relation_value(lock.relation_schema, lock.relation_name)

@@ -688,7 +688,7 @@ capability
 Le groupe CLI est configuré avec :
 
 ```python
-no_args_is_help=True
+no_args_is_help = True
 ```
 
 La commande d'inspection attendue est :

@@ -442,6 +442,8 @@ def test_capability_cli() -> None:
     assert "catalog.table.list\tavailable" in listing.stdout
     assert "catalog.view.list\tavailable" in listing.stdout
     assert "catalog.index.list\tavailable" in listing.stdout
-    assert "runtime.session.list\tunknown" in listing.stdout
+    assert "runtime.session.list\tavailable" in listing.stdout
+    assert "runtime.query.cancel\tavailable" in listing.stdout
+    assert "runtime.session.terminate\tavailable" in listing.stdout
     assert detail.exit_code == 0
     assert "Available: yes" in detail.stdout

@@ -57,11 +57,7 @@ def subsection(title: str) -> None:
 
 
 def _password_env_var(profile: str) -> str:
-    return (
-        "PYDBADMIN_NATIVE_PASSWORD"
-        if profile == "local-native"
-        else "PYDBADMIN_LOCAL_PASSWORD"
-    )
+    return "PYDBADMIN_NATIVE_PASSWORD" if profile == "local-native" else "PYDBADMIN_LOCAL_PASSWORD"
 
 
 def _check_environment() -> bool:
@@ -122,10 +118,7 @@ def main() -> int:
     subsection("Bases de données")
     databases = catalog_svc.list_databases()
     for database in databases:
-        print(
-            f"  - {database.name} | owner={database.owner} "
-            f"| encoding={database.encoding}"
-        )
+        print(f"  - {database.name} | owner={database.owner} | encoding={database.encoding}")
 
     subsection("Schémas utilisateur")
     schemas = catalog_svc.list_schemas(include_system=False)
@@ -151,10 +144,7 @@ def main() -> int:
             default = f" DEFAULT {column.default}" if column.default else ""
             print(f"    - {column.name:<24} {column.data_type} {nullable}{default}")
         for constraint in description.constraints:
-            print(
-                f"    - contrainte {constraint.constraint_type.value}: "
-                f"{constraint.name}"
-            )
+            print(f"    - contrainte {constraint.constraint_type.value}: {constraint.name}")
 
     subsection("Vues dans public")
     views = catalog_svc.list_views(schema="public")
@@ -225,10 +215,7 @@ def main() -> int:
         object_type=DatabaseObjectType.TABLE,
     )
     for ownership in ownerships:
-        print(
-            f"  - {ownership.object.name} "
-            f"| type={ownership.object.object_type.value}"
-        )
+        print(f"  - {ownership.object.name} | type={ownership.object.object_type.value}")
     if not ownerships:
         print("  (aucune table possédée)")
 

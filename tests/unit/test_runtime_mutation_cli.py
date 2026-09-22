@@ -164,7 +164,7 @@ def test_query_cancel_dry_run_outputs_machine_plan_without_execute(
     "command",
     [
         ["--yes", "query", "cancel", "0"],
-        ["--yes", "session", "terminate", "-1"],
+        ["--yes", "session", "terminate", "--", "-1"],
     ],
 )
 def test_runtime_mutation_pid_validation_is_usage_exit(
