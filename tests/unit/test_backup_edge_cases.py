@@ -297,9 +297,7 @@ def test_validate_backup_detects_artifact_and_checksum_errors(tmp_path: Path) ->
     missing_adapter = PostgreSQLBackupAdapter(
         runner=NoopRunner(),  # type: ignore[arg-type]
         tool_resolver=MissingToolResolver(),
-        file_store=ValidationStore(
-            BackupArtifactInfo(False, False, None)
-        ),  # type: ignore[arg-type]
+        file_store=ValidationStore(BackupArtifactInfo(False, False, None)),  # type: ignore[arg-type]
     )
     missing = missing_adapter.validate_backup(_backup(tmp_path / "db.dump"))
     assert missing.valid is False
@@ -308,9 +306,7 @@ def test_validate_backup_detects_artifact_and_checksum_errors(tmp_path: Path) ->
     size_adapter = PostgreSQLBackupAdapter(
         runner=NoopRunner(),  # type: ignore[arg-type]
         tool_resolver=MissingToolResolver(),
-        file_store=ValidationStore(
-            BackupArtifactInfo(True, True, 8)
-        ),  # type: ignore[arg-type]
+        file_store=ValidationStore(BackupArtifactInfo(True, True, 8)),  # type: ignore[arg-type]
     )
     size = size_adapter.validate_backup(_backup(tmp_path / "db.dump", size_bytes=4))
     assert size.valid is False
@@ -324,9 +320,7 @@ def test_validate_backup_detects_artifact_and_checksum_errors(tmp_path: Path) ->
             checksum="actual",
         ),  # type: ignore[arg-type]
     )
-    checksum = checksum_adapter.validate_backup(
-        _backup(tmp_path / "db.dump", checksum="expected")
-    )
+    checksum = checksum_adapter.validate_backup(_backup(tmp_path / "db.dump", checksum="expected"))
     assert checksum.valid is False
     assert "checksum does not match" in checksum.errors[0]
 
