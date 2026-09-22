@@ -712,7 +712,6 @@ def render_restore_operation(operation: RestoreOperation) -> str:
     )
 
 
-
 def render_maintenance_progress(entries: tuple[MaintenanceProgress, ...]) -> str:
     """Render maintenance progress rows."""
 

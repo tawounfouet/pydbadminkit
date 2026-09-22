@@ -63,9 +63,7 @@ class PostgreSQLMaintenanceAdapter:
     def validate_reindex(self, command: ReindexCommand) -> None:
         self._ensure_local_name(command.target)
         expected = (
-            _INDEX_RELKINDS
-            if command.target_type is ReindexTargetType.INDEX
-            else _TABLE_RELKINDS
+            _INDEX_RELKINDS if command.target_type is ReindexTargetType.INDEX else _TABLE_RELKINDS
         )
         self._require_relation(
             command.target,
@@ -147,10 +145,7 @@ class PostgreSQLMaintenanceAdapter:
             """,
             operation="maintenance.vacuum.progress",
         )
-        return tuple(
-            _map_progress(row, MaintenanceOperationType.VACUUM)
-            for row in rows
-        )
+        return tuple(_map_progress(row, MaintenanceOperationType.VACUUM) for row in rows)
 
     def list_reindex_progress(self) -> tuple[MaintenanceProgress, ...]:
         rows = self._fetch_progress(
@@ -176,10 +171,7 @@ class PostgreSQLMaintenanceAdapter:
             """,
             operation="maintenance.reindex.progress",
         )
-        return tuple(
-            _map_progress(row, MaintenanceOperationType.REINDEX)
-            for row in rows
-        )
+        return tuple(_map_progress(row, MaintenanceOperationType.REINDEX) for row in rows)
 
     def _execute(
         self,
@@ -373,10 +365,7 @@ def _apply_timeout(
 
 def _is_timeout_error(error: psycopg.Error) -> bool:
     message = str(error).casefold()
-    return (
-        error.sqlstate in {"57014", "55P03"}
-        and "timeout" in message
-    )
+    return error.sqlstate in {"57014", "55P03"} and "timeout" in message
 
 
 def _map_progress(

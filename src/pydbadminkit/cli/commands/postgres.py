@@ -210,11 +210,7 @@ def reindex(
             raise ValueError("REINDEX target is required.")
 
         command = ReindexCommand(
-            target_type=(
-                ReindexTargetType.INDEX
-                if index is not None
-                else ReindexTargetType.TABLE
-            ),
+            target_type=(ReindexTargetType.INDEX if index is not None else ReindexTargetType.TABLE),
             target=parse_qualified_name(raw_target),
             concurrently=concurrently,
             statement_timeout_seconds=statement_timeout,

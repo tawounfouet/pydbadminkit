@@ -213,7 +213,6 @@ def test_capability_renderers() -> None:
     assert "Available: yes" in detail
 
 
-
 def test_maintenance_progress_renderer() -> None:
     rendered = render_maintenance_progress(
         (

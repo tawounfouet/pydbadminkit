@@ -91,19 +91,13 @@ class MaintenanceService:
         target = self._target(command.table)
         effects = [f"ANALYZE target '{target}'."]
         if command.columns:
-            effects.append(
-                "Refresh statistics for columns: "
-                + ", ".join(command.columns)
-                + "."
-            )
+            effects.append("Refresh statistics for columns: " + ", ".join(command.columns) + ".")
         return self._plan(
             operation="maintenance.analyze",
             target=target,
             risk=risk,
             effects=tuple(effects),
-            warnings=(
-                "ANALYZE samples table data and can consume CPU and I/O resources.",
-            ),
+            warnings=("ANALYZE samples table data and can consume CPU and I/O resources.",),
         )
 
     def analyze(
@@ -124,9 +118,7 @@ class MaintenanceService:
         self._maintenance_port.validate_reindex(command)
         risk = self._escalate_for_environment(RiskLevel.HIGH)
         target = f"{command.target_type.value}:{command.target}"
-        effects = (
-            f"Rebuild {command.target_type.value} '{command.target}'.",
-        )
+        effects = (f"Rebuild {command.target_type.value} '{command.target}'.",)
         warnings = [
             "REINDEX can be I/O intensive and may affect application latency.",
         ]
@@ -136,9 +128,7 @@ class MaintenanceService:
                 "and can take longer."
             )
         else:
-            warnings.append(
-                "Non-concurrent REINDEX can block writes on the affected relation."
-            )
+            warnings.append("Non-concurrent REINDEX can block writes on the affected relation.")
         return self._plan(
             operation="maintenance.reindex",
             target=target,
@@ -236,9 +226,7 @@ class MaintenanceService:
 
     def _enforce_profile_policy(self) -> None:
         if self._config.read_only:
-            raise PolicyDeniedError(
-                "Maintenance is blocked by the read-only connection profile."
-            )
+            raise PolicyDeniedError("Maintenance is blocked by the read-only connection profile.")
         if self._config.environment is EnvironmentName.UNKNOWN:
             raise PolicyDeniedError(
                 "Maintenance is blocked when the connection environment is unknown."

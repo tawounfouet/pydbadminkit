@@ -144,9 +144,7 @@ def _service(
 
 def test_vacuum_dry_run_preflights_without_execution() -> None:
     service, port, audit = _service()
-    command = VacuumCommand(
-        table=QualifiedName(schema="public", name="events")
-    )
+    command = VacuumCommand(table=QualifiedName(schema="public", name="events"))
     plan = service.plan_vacuum(command)
 
     outcome = service.vacuum(

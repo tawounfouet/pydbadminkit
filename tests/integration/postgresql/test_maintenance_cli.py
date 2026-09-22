@@ -105,12 +105,8 @@ def maintenance_objects(
             f'INSERT INTO public."{_TABLE}" (id, payload) VALUES (%s, %s)',
             [(index, f"value-{index % 10}") for index in range(1, 501)],
         )
-        cursor.execute(
-            f'CREATE INDEX "{_INDEX}" ON public."{_TABLE}" (payload)'
-        )
-        cursor.execute(
-            f'DELETE FROM public."{_TABLE}" WHERE id % 5 = 0'
-        )
+        cursor.execute(f'CREATE INDEX "{_INDEX}" ON public."{_TABLE}" (payload)')
+        cursor.execute(f'DELETE FROM public."{_TABLE}" WHERE id % 5 = 0')
 
     yield _config(tmp_path), audit_path
 
@@ -202,8 +198,7 @@ def test_vacuum_analyze_and_reindex_execute_with_autocommit(
     succeeded = [
         event
         for event in events
-        if event["event_type"] == "succeeded"
-        and event["operation"].startswith("maintenance.")
+        if event["event_type"] == "succeeded" and event["operation"].startswith("maintenance.")
     ]
     assert len(succeeded) == 4
 

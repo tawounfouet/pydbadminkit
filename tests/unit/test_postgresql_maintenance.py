@@ -150,17 +150,13 @@ def test_missing_or_wrong_relation_type_is_rejected() -> None:
     missing = _adapter(FakeFactory(CursorSpec(one=None)))
     with pytest.raises(ResourceNotFoundError):
         missing.validate_analyze(
-            AnalyzeCommand(
-                table=QualifiedName(schema="public", name="missing")
-            )
+            AnalyzeCommand(table=QualifiedName(schema="public", name="missing"))
         )
 
     wrong_type = _adapter(FakeFactory(CursorSpec(one=("i",))))
     with pytest.raises(ResourceNotFoundError):
         wrong_type.validate_vacuum(
-            VacuumCommand(
-                table=QualifiedName(schema="public", name="events_idx")
-            )
+            VacuumCommand(table=QualifiedName(schema="public", name="events_idx"))
         )
 
 
@@ -230,9 +226,7 @@ def test_maintenance_progress_maps_reliable_counters() -> None:
     assert vacuum[1].percent is None
 
     reindex_factory = FakeFactory(
-        CursorSpec(
-            many=((201, "public", "events_idx", "building index", 9, 10),)
-        )
+        CursorSpec(many=((201, "public", "events_idx", "building index", 9, 10),))
     )
     reindex = _adapter(reindex_factory).list_reindex_progress()
 
