@@ -94,9 +94,7 @@ def find_config_path() -> Path:
     for candidate in candidates:
         if candidate.exists():
             return candidate.resolve()
-    raise FileNotFoundError(
-        "config.toml introuvable. Définissez PYDBADMIN_CONFIG si nécessaire."
-    )
+    raise FileNotFoundError("config.toml introuvable. Définissez PYDBADMIN_CONFIG si nécessaire.")
 
 
 def mutation_allowed(config: object) -> bool:
@@ -140,10 +138,7 @@ def main() -> int:
     for capability in capabilities:
         if capability.name.startswith(prefixes):
             reason = f" — {capability.reason}" if capability.reason else ""
-            print(
-                f"  {capability.name:<36} "
-                f"{capability.availability.value}{reason}"
-            )
+            print(f"  {capability.name:<36} {capability.availability.value}{reason}")
 
     section("3. Cibles de maintenance disponibles")
     catalog = build_catalog_service(CONNECTION_PROFILE, config_path)
@@ -268,9 +263,7 @@ def main() -> int:
         print("  SHA-256     :", outcome.checksum)
 
     if backup_available:
-        validation = build_backup_validation_service().validate_backup(
-            str(backup_path)
-        )
+        validation = build_backup_validation_service().validate_backup(str(backup_path))
         print("  Validation  :", validation.valid)
         print("  Level       :", validation.level)
         for warning in validation.warnings:
