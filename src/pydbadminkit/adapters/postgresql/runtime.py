@@ -37,8 +37,8 @@ from pydbadminkit.domain.runtime import (
     QueryInfo,
     SessionInfo,
     SessionState,
-    TransactionInfo,
     TerminateSessionCommand,
+    TransactionInfo,
     WaitInfo,
 )
 from pydbadminkit.errors import InternalError
