@@ -60,8 +60,7 @@ def test_runtime_040_capabilities_are_available() -> None:
 
     assert set(statuses) == names
     assert all(
-        status.availability is CapabilityAvailability.AVAILABLE
-        for status in statuses.values()
+        status.availability is CapabilityAvailability.AVAILABLE for status in statuses.values()
     )
 
 
