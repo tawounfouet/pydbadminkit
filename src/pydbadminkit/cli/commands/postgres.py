@@ -17,7 +17,6 @@ from pydbadminkit.domain.operations import (
     ReindexTargetType,
     VacuumCommand,
 )
-from pydbadminkit.domain.safety import OperationPlan
 from pydbadminkit.errors import PyDBAdminError
 from pydbadminkit.output.human import render_maintenance_progress
 

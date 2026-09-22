@@ -28,6 +28,7 @@ from pydbadminkit.domain.operations.restore import (
 )
 
 __all__ = [
+    "AnalyzeCommand",
     "Backup",
     "BackupArtifactInfo",
     "BackupFormat",
@@ -35,7 +36,6 @@ __all__ = [
     "BackupPaths",
     "BackupToolResult",
     "BackupValidation",
-    "AnalyzeCommand",
     "CreateBackupCommand",
     "ExternalTool",
     "MaintenanceOperation",
