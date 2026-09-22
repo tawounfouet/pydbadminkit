@@ -2,6 +2,47 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.4.0a1] — Runtime Inspection Foundations
+
+### Runtime domain
+
+- Immutable `SessionInfo`, `QueryInfo` and `TransactionInfo` read models.
+- Normalized `SessionState` values for public API consumers.
+- Engine-neutral `RuntimePort` and `RuntimeService`.
+
+### PostgreSQL runtime inspection
+
+- `pg_stat_activity` session inspection.
+- Currently active query inspection with elapsed time and wait metadata.
+- Open transaction inspection with transaction age and XID/XMIN metadata.
+- Database and user filtering.
+- Optional session-state filtering.
+- PyDBAdminKit's own inspection backend excluded by default.
+
+### CLI and machine interface
+
+- `session list`.
+- `query list`.
+- `transaction list`.
+- `--include-self` for explicit self-inspection.
+- Runtime objects supported by table, JSON and YAML output.
+
+### Quality
+
+- Runtime domain, service, mapper and PostgreSQL adapter unit tests.
+- Human-output tests.
+- PostgreSQL CLI integration tests for sessions, active queries and transactions.
+- Runtime capabilities promoted from roadmap placeholders to available capabilities.
+
+### Safety boundary
+
+This alpha is intentionally read-only. It does not implement query cancellation or session
+termination.
+
+### Next
+
+`0.4.0a2` extends Runtime Administration with waits, locks and blocking chains.
+
 ## [0.3.0] — Security Administration
 
 ### Foundation

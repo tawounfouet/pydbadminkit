@@ -7,6 +7,7 @@ from pydbadminkit.adapters.postgresql.connection import (
     PostgreSQLConnectionTester,
 )
 from pydbadminkit.adapters.postgresql.executor import PostgreSQLExecutor
+from pydbadminkit.adapters.postgresql.runtime import PostgreSQLRuntimeAdapter
 from pydbadminkit.adapters.postgresql.security import PostgreSQLSecurityAdapter
 from pydbadminkit.adapters.postgresql.server import PostgreSQLServerAdapter
 
@@ -16,6 +17,7 @@ __all__ = [
     "PostgreSQLConnectionFactory",
     "PostgreSQLConnectionTester",
     "PostgreSQLExecutor",
+    "PostgreSQLRuntimeAdapter",
     "PostgreSQLSecurityAdapter",
     "PostgreSQLServerAdapter",
 ]

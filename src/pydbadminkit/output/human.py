@@ -13,6 +13,7 @@ from pydbadminkit.domain.catalog import (
 )
 from pydbadminkit.domain.common import CapabilityStatus, OperationResult
 from pydbadminkit.domain.connection import ConnectionTestResult
+from pydbadminkit.domain.runtime import QueryInfo, SessionInfo, TransactionInfo
 from pydbadminkit.domain.safety import OperationPlan
 from pydbadminkit.domain.security import (
     DirectAccess,
@@ -462,3 +463,109 @@ def _optional_int(value: int | None) -> str:
     if value is None:
         return "-"
     return str(value)
+
+
+def render_session_list(sessions: tuple[SessionInfo, ...]) -> str:
+    """Render live database sessions."""
+
+    lines = [
+        (
+            "PID\tDATABASE\tUSER\tAPPLICATION\tCLIENT\tSTATE\tWAIT"
+            "\tBACKEND_TYPE\tBACKEND_STARTED"
+        )
+    ]
+    for session in sessions:
+        wait = _wait_value(session.wait_event_type, session.wait_event)
+        lines.append(
+            "\t".join(
+                (
+                    str(session.pid),
+                    session.database or "-",
+                    session.username or "-",
+                    session.application_name or "-",
+                    session.client_address or "-",
+                    session.state.value if session.state else "-",
+                    wait,
+                    session.backend_type or "-",
+                    session.backend_started_at.isoformat()
+                    if session.backend_started_at
+                    else "-",
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_query_list(queries: tuple[QueryInfo, ...]) -> str:
+    """Render currently active queries."""
+
+    lines = ["PID\tDATABASE\tUSER\tQUERY_ID\tSTATE\tELAPSED_MS\tWAIT\tQUERY"]
+    for query in queries:
+        lines.append(
+            "\t".join(
+                (
+                    str(query.pid),
+                    query.database or "-",
+                    query.username or "-",
+                    _optional_int(query.query_id),
+                    query.state.value if query.state else "-",
+                    _optional_float(query.elapsed_ms),
+                    _wait_value(query.wait_event_type, query.wait_event),
+                    _query_preview(query.query_text),
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def render_transaction_list(transactions: tuple[TransactionInfo, ...]) -> str:
+    """Render open transactions."""
+
+    lines = [
+        (
+            "PID\tDATABASE\tUSER\tSTATE\tELAPSED_MS\tXID\tXMIN"
+            "\tSTARTED_AT\tQUERY"
+        )
+    ]
+    for transaction in transactions:
+        lines.append(
+            "\t".join(
+                (
+                    str(transaction.pid),
+                    transaction.database or "-",
+                    transaction.username or "-",
+                    transaction.state.value if transaction.state else "-",
+                    _optional_float(transaction.elapsed_ms),
+                    transaction.backend_xid or "-",
+                    transaction.backend_xmin or "-",
+                    transaction.transaction_started_at.isoformat(),
+                    _query_preview(transaction.query_text),
+                )
+            )
+        )
+    return "\n".join(lines)
+
+
+def _wait_value(wait_event_type: str | None, wait_event: str | None) -> str:
+    if wait_event_type is None and wait_event is None:
+        return "-"
+    if wait_event_type is None:
+        return wait_event or "-"
+    if wait_event is None:
+        return wait_event_type
+    return f"{wait_event_type}:{wait_event}"
+
+
+def _optional_float(value: float | None) -> str:
+    if value is None:
+        return "-"
+    return f"{value:.2f}"
+
+
+def _query_preview(value: str | None, limit: int = 160) -> str:
+    if value is None:
+        return "-"
+    single_line = " ".join(value.split())
+    if len(single_line) <= limit:
+        return single_line
+    return single_line[: limit - 1] + "…"

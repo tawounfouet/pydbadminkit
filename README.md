@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.3.0` — PostgreSQL Foundation, Object Explorer and Security Administration.
+> **Current release:** `0.4.0a1` — Runtime Inspection Foundations.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -160,6 +160,34 @@ python -m pydbadminkit --connection local --non-interactive `
   --superuser `
   --confirm-target privileged_admin
 ```
+
+
+### Runtime Administration — 0.4.0a1
+
+The first Runtime Administration slice is read-only and backed by PostgreSQL
+`pg_stat_activity`.
+
+Implemented inspection surfaces:
+
+- live sessions with database, user, application, client, state and wait information;
+- currently active queries with query identifier, elapsed time and wait information;
+- open transactions with start time, elapsed time and transaction identifiers;
+- normalized session states across the public Python API;
+- table, JSON and YAML CLI output;
+- self-inspection excluded by default and available explicitly with `--include-self`.
+
+Examples:
+
+```bash
+pydbadmin --connection local session list
+pydbadmin --connection local session list --state idle_in_transaction
+pydbadmin --connection local query list
+pydbadmin --connection local transaction list
+pydbadmin --connection local --output json query list
+```
+
+The alpha intentionally contains **no runtime mutations**. Guarded query cancellation and
+session termination remain later milestones in the `0.4.x` line.
 
 ## Development setup
 
@@ -356,10 +384,10 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.1.x  Foundation                  ✅
 0.2.x  Object Explorer            ✅
 0.3.x  Security Administration    ✅
-0.4.x  Runtime Administration     next
+0.4.x  Runtime Administration     🚧 in progress (`0.4.0a1`)
 0.5.x  Operations
 0.6.x  Observability
 1.0.0  Stable PostgreSQL API
 ```
 
-The next implementation line is `0.4.x — Runtime Administration`: sessions, queries, transactions, locks, blocking chains and guarded cancel/terminate operations.
+`0.4.0a1` implements sessions, active queries and open transactions. The next Runtime slice adds waits, locks and blocking chains before guarded cancel/terminate operations.

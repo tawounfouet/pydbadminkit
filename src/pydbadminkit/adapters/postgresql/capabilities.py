@@ -33,14 +33,19 @@ class PostgreSQLCapabilityAdapter:
             "security.membership.remove",
             "security.access.grant",
             "security.access.revoke",
+            "runtime.session.list",
+            "runtime.query.list",
+            "runtime.transaction.list",
         }
     )
 
     _PLANNED = frozenset(
         {
-            "runtime.session.list",
-            "runtime.query.list",
+            "runtime.wait.list",
             "runtime.lock.list",
+            "runtime.blocking.list",
+            "runtime.query.cancel",
+            "runtime.session.terminate",
         }
     )
 
