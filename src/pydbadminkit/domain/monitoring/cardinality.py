@@ -29,9 +29,7 @@ class MetricCardinalityPolicy:
             raise ValueError("max_labels must be greater than or equal to zero")
         overlap = self.allowed_labels & self.forbidden_labels
         if overlap:
-            raise ValueError(
-                f"allowed and forbidden labels overlap: {', '.join(sorted(overlap))}"
-            )
+            raise ValueError(f"allowed and forbidden labels overlap: {', '.join(sorted(overlap))}")
 
     def validate(self, metric: Metric) -> None:
         """Reject labels that would make the default exporter surface unsafe."""

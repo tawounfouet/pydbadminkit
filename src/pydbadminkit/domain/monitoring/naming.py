@@ -13,8 +13,7 @@ def validate_metric_name(name: str) -> None:
 
     if not _METRIC_NAME_PATTERN.fullmatch(name):
         raise ValueError(
-            "metric name must use lowercase dotted segments "
-            "(for example 'connections.total')"
+            "metric name must use lowercase dotted segments (for example 'connections.total')"
         )
 
 
