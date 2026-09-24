@@ -314,3 +314,19 @@ def test_custom_restore_terminates_options_before_archive_path() -> None:
 
     args = runner.calls[-1][0]
     assert args[-2:] == ["--", hostile_path]
+
+
+def test_restore_tool_failure_redacts_password_from_stderr() -> None:
+    runner = FakeRunner()
+    runner.return_code = 1
+    runner.stderr = "pg_restore failed with password=super-secret"
+    adapter, _runner, _target = _adapter(exists=False, runner=runner)
+
+    with pytest.raises(RestoreError) as captured:
+        adapter.restore_backup(
+            RestoreBackupCommand("/tmp/source.dump", "target", create=True),
+            _backup(),
+        )
+
+    assert "super-secret" not in str(captured.value)
+    assert "<redacted>" in str(captured.value)

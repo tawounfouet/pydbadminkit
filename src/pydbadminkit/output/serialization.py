@@ -10,6 +10,7 @@ from typing import TypeAlias
 import yaml
 
 from pydbadminkit.domain.common import RiskLevel
+from pydbadminkit.domain.connection import SecretValue
 
 MachineValue: TypeAlias = (
     bool | int | float | str | list["MachineValue"] | dict[str, "MachineValue"] | None
@@ -21,6 +22,9 @@ def to_machine_value(value: object) -> MachineValue:
 
     if isinstance(value, RiskLevel):
         return value.label
+
+    if isinstance(value, SecretValue):
+        return "<redacted>"
 
     if isinstance(value, Enum):
         enum_value = value.value

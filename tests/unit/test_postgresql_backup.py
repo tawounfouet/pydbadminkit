@@ -290,3 +290,22 @@ def test_backup_database_name_cannot_be_reinterpreted_as_tool_option(tmp_path: P
     assert args[dbname_index + 1] == database
     assert args[-1] == database
     assert database not in args[:dbname_index]
+
+
+def test_backup_tool_failure_redacts_password_from_stderr(tmp_path: Path) -> None:
+    runner = FakeRunner()
+    runner.return_code = 1
+    runner.stderr = "pg_dump failed with password=super-secret"
+    adapter, _runner = _adapter(tmp_path, runner=runner)
+
+    with pytest.raises(ToolExecutionError) as captured:
+        adapter.create_backup(
+            CreateBackupCommand(
+                database="accounting",
+                format=BackupFormat.CUSTOM,
+                output_path=str(tmp_path / "redacted.dump"),
+            )
+        )
+
+    assert "super-secret" not in str(captured.value)
+    assert "<redacted>" in str(captured.value)

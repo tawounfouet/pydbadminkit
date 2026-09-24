@@ -8,7 +8,7 @@ from pydbadminkit.adapters.postgresql.backup import (
     postgres_child_env,
 )
 from pydbadminkit.domain.common import DatabaseEngine, DatabaseVersion, OperationStatus
-from pydbadminkit.domain.connection import ResolvedConnectionConfig
+from pydbadminkit.domain.connection import ResolvedConnectionConfig, SecretValue
 from pydbadminkit.domain.operations import (
     Backup,
     BackupFormat,
@@ -24,6 +24,7 @@ from pydbadminkit.errors import (
     ToolNotFoundError,
     ToolVersionMismatchError,
 )
+from pydbadminkit.infrastructure.redaction import redact_secret
 from pydbadminkit.ports.process import ProcessRunnerPort
 from pydbadminkit.ports.restore_database import RestoreDatabasePort
 from pydbadminkit.ports.server import ServerPort
@@ -154,7 +155,7 @@ class PostgreSQLRestoreAdapter:
         if result.return_code != 0:
             raise RestoreError(
                 f"{tool.name} exited with code {result.return_code}: "
-                f"{_safe_stderr_excerpt(result.stderr)}"
+                f"{_safe_stderr_excerpt(result.stderr, self._config.password)}"
             )
 
         verification_passed = self._target_port.verify_target(command.target_database)
@@ -259,8 +260,12 @@ def _tool_name_for(backup_format: BackupFormat) -> str:
     )
 
 
-def _safe_stderr_excerpt(value: str, limit: int = 500) -> str:
-    single_line = " ".join(value.split())
+def _safe_stderr_excerpt(
+    value: str,
+    secret: SecretValue | None,
+    limit: int = 500,
+) -> str:
+    single_line = " ".join(redact_secret(value, secret).split())
     if not single_line:
         return "<no stderr>"
     if len(single_line) <= limit:

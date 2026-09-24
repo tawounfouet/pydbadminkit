@@ -11,6 +11,7 @@ from pydbadminkit.domain.catalog import (
     TableInfo,
 )
 from pydbadminkit.domain.common import QualifiedName
+from pydbadminkit.domain.connection import SecretValue
 from pydbadminkit.output.serialization import (
     render_json,
     render_yaml,
@@ -82,3 +83,11 @@ def test_tuple_serializes_as_machine_array() -> None:
 def test_unsupported_machine_type_fails_explicitly() -> None:
     with pytest.raises(TypeError):
         to_machine_value(object())
+
+
+def test_machine_output_redacts_secret_values() -> None:
+    secret = SecretValue("machine-output-secret")
+
+    assert to_machine_value(secret) == "<redacted>"
+    assert "machine-output-secret" not in render_json({"password": secret})
+    assert "machine-output-secret" not in render_yaml({"password": secret})

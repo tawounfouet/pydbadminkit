@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 from pydbadminkit.domain.common import DatabaseVersion, OperationStatus
-from pydbadminkit.domain.connection import ResolvedConnectionConfig
+from pydbadminkit.domain.connection import ResolvedConnectionConfig, SecretValue
 from pydbadminkit.domain.operations import (
     Backup,
     BackupFormat,
@@ -22,6 +22,7 @@ from pydbadminkit.errors import (
     ToolNotFoundError,
     ToolVersionMismatchError,
 )
+from pydbadminkit.infrastructure.redaction import redact_secret
 from pydbadminkit.ports.backup_files import BackupFileStorePort
 from pydbadminkit.ports.process import ProcessRunnerPort
 from pydbadminkit.ports.server import ServerPort
@@ -82,7 +83,7 @@ class PostgreSQLBackupAdapter:
                 timeout_seconds=command.timeout_seconds,
             )
             tool_result = BackupToolResult(tool=tool, process=process)
-            _raise_for_process_failure(tool_result)
+            _raise_for_process_failure(tool_result, config.password)
 
             self._file_store.secure_artifact(paths.temporary_path)
             artifact = self._file_store.inspect(paths.temporary_path)
@@ -175,7 +176,7 @@ class PostgreSQLBackupAdapter:
             if result.return_code != 0:
                 errors.append(
                     "pg_restore could not list the custom backup archive: "
-                    f"{_safe_stderr_excerpt(result.stderr)}"
+                    f"{_safe_stderr_excerpt(result.stderr, self._config.password if self._config else None)}"
                 )
         elif not errors and backup.format is BackupFormat.PLAIN_SQL:
             warnings.append(
@@ -319,17 +320,24 @@ def postgres_child_env(config: ResolvedConnectionConfig) -> dict[str, str]:
     return env
 
 
-def _raise_for_process_failure(result: BackupToolResult) -> None:
+def _raise_for_process_failure(
+    result: BackupToolResult,
+    secret: SecretValue | None,
+) -> None:
     if result.process.return_code == 0:
         return
     raise ToolExecutionError(
         f"{result.tool.name} exited with code {result.process.return_code}: "
-        f"{_safe_stderr_excerpt(result.process.stderr)}"
+        f"{_safe_stderr_excerpt(result.process.stderr, secret)}"
     )
 
 
-def _safe_stderr_excerpt(value: str, limit: int = 500) -> str:
-    single_line = " ".join(value.split())
+def _safe_stderr_excerpt(
+    value: str,
+    secret: SecretValue | None,
+    limit: int = 500,
+) -> str:
+    single_line = " ".join(redact_secret(value, secret).split())
     if not single_line:
         return "<no stderr>"
     if len(single_line) <= limit:
