@@ -71,3 +71,29 @@ def test_collect_metrics_builds_low_cardinality_snapshot() -> None:
         "postgres",
     ]
     assert all(metric.captured_at.tzinfo is not None for metric in metrics)
+
+
+def test_collect_metrics_has_constant_port_call_budget() -> None:
+    class CountingMonitoringPort(FakeMonitoringPort):
+        def __init__(self) -> None:
+            self.connection_calls = 0
+            self.database_size_calls = 0
+
+        def get_connection_statistics(self) -> ConnectionStatistics:
+            self.connection_calls += 1
+            return super().get_connection_statistics()
+
+        def get_database_sizes(self) -> tuple[DatabaseSizeMetric, ...]:
+            self.database_size_calls += 1
+            return tuple(
+                DatabaseSizeMetric(f"db_{index}", index)
+                for index in range(100)
+            )
+
+    port = CountingMonitoringPort()
+
+    metrics = MonitoringService(port).collect_metrics()
+
+    assert port.connection_calls == 1
+    assert port.database_size_calls == 1
+    assert len([metric for metric in metrics if metric.name == "database.size_bytes"]) == 100
