@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.6.0a2` — Health Checks.
+> **Current release:** `0.6.0b1` — Observability Foundations.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -18,7 +18,7 @@ PyDBAdminKit provides a safe, typed administration core for database servers fro
 - capability discovery;
 - package, quality, unit and PostgreSQL integration CI gates.
 
-### Monitoring & Health — 0.6.0a2
+### Monitoring, Health & Observability Foundations — 0.6.0b1
 
 The first Monitoring slice is read-only and point-in-time. It exposes:
 
@@ -69,6 +69,34 @@ Default thresholds are conservative starting points and every threshold can be o
 from the health command. Critical health fails with exit code 1; warnings remain exit code 0
 unless `--fail-on-warning` is selected. Check-specific operational failures are isolated as
 `UNKNOWN`, while connectivity failure is `CRITICAL`.
+
+LOT-19 prepares external observability without adding a daemon or vendor SDK dependency:
+
+- public `MetricExporterPort` boundary;
+- `MetricDescriptor` and `MetricType` (`gauge / counter / state`);
+- stable dotted metric naming and deterministic future Prometheus mapping;
+- reserved `pydbadmin.` namespace for framework self-observability;
+- default low-cardinality exporter policy;
+- `MonitoringSnapshot` DTO and `MonitoringSnapshotService`;
+- `MetricExportService` validation before exporter delegation;
+- Prometheus and OpenTelemetry design spikes under `docs/design/`.
+
+Python snapshot example:
+
+```python
+from pathlib import Path
+
+from pydbadminkit.bootstrap import build_monitoring_snapshot_service
+
+snapshot_service = build_monitoring_snapshot_service("local", Path("config.toml"))
+snapshot = snapshot_service.capture()
+
+print(snapshot.health_report.overall_status)
+print(len(snapshot.metrics))
+```
+
+Prometheus and OpenTelemetry exporters remain adapter work for a later release; the Core is
+now prepared for them without depending on either ecosystem.
 
 ### Object Explorer
 
@@ -536,8 +564,8 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.3.x  Security Administration    ✅
 0.4.x  Runtime Administration     ✅ `0.4.0`
 0.5.x  Operations                     ✅ `0.5.0`
-0.6.x  Monitoring / Observability       🚧 `0.6.0a2`
+0.6.x  Monitoring / Observability       🚧 `0.6.0b1`
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.6.0a2` completes LOT-18 — Health Checks. LOT-19 — Observability Foundations is the final planned implementation lot before promotion of the complete `0.6.x` line.
+`0.6.0b1` completes LOT-19 — Observability Foundations and therefore the planned M6 implementation scope. The next step is qualification and promotion of the complete `0.6.x` line to stable `0.6.0`, before LOT-20 hardening.

@@ -2,6 +2,61 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.6.0b1] — Observability Foundations
+
+### Exporter boundary
+
+- Public engine-neutral `MetricExporterPort` exports already-collected metric batches.
+- `MetricExportService` validates cardinality policy before crossing the exporter boundary.
+- No Prometheus or OpenTelemetry runtime dependency is introduced.
+- No permanent HTTP metrics daemon is introduced.
+
+### Metric metadata and naming
+
+- `MetricType` distinguishes `gauge`, `counter` and `state` semantics.
+- `MetricDescriptor` captures name, unit, semantic type, description and label names.
+- Core descriptors cover the LOT-17 connection and database-size metric families.
+- Metric names now enforce lowercase dotted segments.
+- Future Prometheus names map deterministically to the `pydbadmin_` namespace.
+- PyDBAdminKit self-observability reserves the dotted `pydbadmin.` namespace.
+
+### Cardinality policy
+
+- Default exporter labels are limited to `profile`, `environment`, `database` and
+  `status`.
+- High-cardinality or sensitive labels such as PID, query text and client address are
+  rejected before export.
+- Exporter-specific policies may explicitly relax the default boundary later.
+
+### Snapshot composition
+
+- `MonitoringSnapshot` combines one metric batch, one `HealthReport` and an
+  execution-window timestamp.
+- `MonitoringSnapshotService` composes Monitoring Core and Health Checks without claiming
+  atomic database consistency.
+- Bootstrap wiring exposes `build_monitoring_snapshot_service()`.
+
+### Design spikes
+
+- Prometheus design spike documents naming, types, cardinality and future adapter ownership.
+- OpenTelemetry design spike documents Meter mapping, resource attributes, tracing boundary
+  and self-observability naming.
+- Both integrations remain optional adapters and are intentionally deferred beyond the
+  `0.6.x` Core.
+
+### Qualification
+
+- LOT-19 unit tests cover naming, descriptors, registry metadata, cardinality rejection,
+  exporter delegation and snapshot composition.
+- Qualification reached 348 unit tests and 44 PostgreSQL integration tests with the
+  project coverage gate above 85%.
+- Ruff format/check, Mypy strict, package build and PostgreSQL integration are green.
+
+### Next
+
+Qualify the complete Monitoring / Observability line and promote `0.6.0b1` to stable
+`0.6.0`. LOT-20 hardening follows the stable `0.6.x` feature line.
+
 ## [0.6.0a2] — Health Checks
 
 ### Default health suite
