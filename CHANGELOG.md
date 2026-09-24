@@ -1,5 +1,38 @@
 # Changelog
 
+## [Unreleased] — 1.0 Hardening
+
+### LOT-20 complete
+
+- Froze public API, CLI, JSON, error-code, exit-code, configuration, capability-name and
+  guarded operation-name contracts.
+- Completed security, SQL-injection, command-injection and secret-redaction reviews.
+- Hardened JSONL audit file permissions to `0600`, including pre-existing files.
+- Replaced enum-derived dynamic SQL fragments with explicit PostgreSQL keyword whitelists.
+- Hardened native-tool argv construction against option injection and retained
+  `shell=False` execution.
+- Redacted resolved secrets from native-tool diagnostic errors and machine serialization.
+- Reviewed query budgets and added a constant-call monitoring regression contract.
+- Expanded PostgreSQL integration CI from PostgreSQL 18 only to PostgreSQL 14–18.
+- Hardened package metadata with Python 3.11–3.14 classifiers and canonical project URLs.
+
+### LOT-20 qualification
+
+- Unit: 419 passed, 44 deselected.
+- Unit coverage: 86.15% with the required 85% gate.
+- PostgreSQL integration: 44 tests passed independently on PostgreSQL 14, 15, 16, 17 and 18.
+- Quality: Ruff format/check and Mypy strict green.
+- Package: build, Twine validation, clean-wheel install and CLI smoke tests green.
+
+### Open 1.0 policy decision
+
+- The repository has no declared license. LOT-20 deliberately does not invent a legal
+  license choice; the owner must choose the license policy before the 1.0 publication gate.
+
+### Next
+
+LOT-21 — Qualification / Documentation.
+
 All notable PyDBAdminKit milestones are documented here.
 
 ## [0.6.0] — Monitoring / Observability

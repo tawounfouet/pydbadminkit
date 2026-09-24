@@ -565,7 +565,13 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.4.x  Runtime Administration     ✅ `0.4.0`
 0.5.x  Operations                     ✅ `0.5.0`
 0.6.x  Monitoring / Observability       ✅ `0.6.0`
+LOT-20 Hardening                        ✅
+LOT-21 Qualification / Documentation    ← CURRENT
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.6.0` closes the complete Monitoring / Observability feature line: LOT-17 Monitoring Core, LOT-18 Health Checks and LOT-19 Observability Foundations. The roadmap now moves to LOT-20 — Hardening in preparation for `1.0.0`.
+LOT-20 is complete: public/CLI/machine contracts are inventoried, error/exit/config/capability/
+operation identifiers are frozen, security/injection/redaction/performance reviews are closed,
+package metadata is hardened, and PostgreSQL 14–18 now runs as a real integration matrix.
+The roadmap now moves to LOT-21 — Qualification / Documentation before the `1.0.0`
+release-candidate gate.
