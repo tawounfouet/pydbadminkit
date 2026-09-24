@@ -49,6 +49,7 @@ class JsonlAuditSink:
                 os.O_APPEND | os.O_CREAT | os.O_WRONLY,
                 0o600,
             )
+            os.fchmod(descriptor, 0o600)
             with os.fdopen(descriptor, "a", encoding="utf-8") as stream:
                 stream.write(json.dumps(payload, ensure_ascii=False))
                 stream.write("\n")
