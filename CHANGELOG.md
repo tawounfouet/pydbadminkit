@@ -2,6 +2,32 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.6.0] — Monitoring / Observability
+
+### Stable promotion
+
+- Promotes the complete Monitoring / Observability feature line to stable `0.6.0`.
+- LOT-17 Monitoring Core, LOT-18 Health Checks and LOT-19 Observability Foundations are
+  complete.
+- Health aggregation, UNKNOWN semantics, threshold defaults and the machine health-report
+  shape are frozen by dedicated release-contract tests.
+- The public observability boundary is frozen around `MetricExporterPort`,
+  `MetricDescriptor`, `MetricType` and `MonitoringSnapshot`.
+- Prometheus and OpenTelemetry runtime adapters remain optional future adapter work.
+
+### Qualification
+
+- Stable contract qualification: 352 unit tests passed.
+- PostgreSQL 18 integration qualification: 44 tests passed.
+- Unit coverage: 85.66%, above the required 85% gate.
+- Ruff format/check, Mypy strict, package build, wheel installation and CLI smoke tests are
+  green.
+- Qualification evidence is documented in `docs/releases/0.6.0_QUALIFICATION.md`.
+
+### Next
+
+LOT-20 — Hardening prepares the full framework for the `1.0.0` stability contract.
+
 ## [0.6.0b1] — Observability Foundations
 
 ### Exporter boundary

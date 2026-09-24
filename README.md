@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.6.0b1` — Observability Foundations.
+> **Current release:** `0.6.0` — Monitoring / Observability.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -18,7 +18,7 @@ PyDBAdminKit provides a safe, typed administration core for database servers fro
 - capability discovery;
 - package, quality, unit and PostgreSQL integration CI gates.
 
-### Monitoring, Health & Observability Foundations — 0.6.0b1
+### Monitoring / Observability — 0.6.0
 
 The first Monitoring slice is read-only and point-in-time. It exposes:
 
@@ -564,8 +564,8 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.3.x  Security Administration    ✅
 0.4.x  Runtime Administration     ✅ `0.4.0`
 0.5.x  Operations                     ✅ `0.5.0`
-0.6.x  Monitoring / Observability       🚧 `0.6.0b1`
+0.6.x  Monitoring / Observability       ✅ `0.6.0`
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.6.0b1` completes LOT-19 — Observability Foundations and therefore the planned M6 implementation scope. The next step is qualification and promotion of the complete `0.6.x` line to stable `0.6.0`, before LOT-20 hardening.
+`0.6.0` closes the complete Monitoring / Observability feature line: LOT-17 Monitoring Core, LOT-18 Health Checks and LOT-19 Observability Foundations. The roadmap now moves to LOT-20 — Hardening in preparation for `1.0.0`.
