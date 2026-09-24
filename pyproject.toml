@@ -7,6 +7,8 @@ name = "pydbadminkit"
 dynamic = ["version"]
 description = "CLI-first, Python-first database administration framework."
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 keywords = ["database", "administration", "postgresql", "cli", "dba"]
 classifiers = [

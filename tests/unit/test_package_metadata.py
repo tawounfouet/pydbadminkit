@@ -57,3 +57,11 @@ def test_runtime_dependency_major_bounds_are_explicit() -> None:
     assert "PyYAML>=6,<7" in dependencies
     assert "rich>=13,<15" in dependencies
     assert "typer>=0.12,<1" in dependencies
+
+
+def test_apache_2_license_is_declared_and_shipped() -> None:
+    project = _project()
+
+    assert project["license"] == "Apache-2.0"
+    assert project["license-files"] == ["LICENSE"]
+    assert (Path(__file__).parents[2] / "LICENSE").is_file()
