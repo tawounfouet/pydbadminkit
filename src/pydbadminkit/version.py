@@ -1,3 +1,3 @@
 """PyDBAdminKit package version."""
 
-__version__ = "0.6.0a1"
+__version__ = "0.6.0a2"

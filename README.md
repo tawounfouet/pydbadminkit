@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.6.0a1` — Monitoring Core.
+> **Current release:** `0.6.0a2` — Health Checks.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -18,7 +18,7 @@ PyDBAdminKit provides a safe, typed administration core for database servers fro
 - capability discovery;
 - package, quality, unit and PostgreSQL integration CI gates.
 
-### Monitoring Core — 0.6.0a1
+### Monitoring & Health — 0.6.0a2
 
 The first Monitoring slice is read-only and point-in-time. It exposes:
 
@@ -46,7 +46,29 @@ table_stats = monitoring.get_table_statistics(QualifiedName(schema="public", nam
 metrics = monitoring.collect_metrics()
 ```
 
-The `health check` CLI belongs to LOT-18 and is the next vertical slice.
+The default health suite composes Monitoring Core and Runtime facts:
+
+```text
+connectivity
+connection usage
+long-running queries
+long transactions
+idle transactions
+waiting locks
+```
+
+Run it from the CLI:
+
+```bash
+pydbadmin --connection local health check
+pydbadmin --connection local --output json health check
+pydbadmin --connection local health check --fail-on-warning
+```
+
+Default thresholds are conservative starting points and every threshold can be overridden
+from the health command. Critical health fails with exit code 1; warnings remain exit code 0
+unless `--fail-on-warning` is selected. Check-specific operational failures are isolated as
+`UNKNOWN`, while connectivity failure is `CRITICAL`.
 
 ### Object Explorer
 
@@ -514,8 +536,8 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.3.x  Security Administration    ✅
 0.4.x  Runtime Administration     ✅ `0.4.0`
 0.5.x  Operations                     ✅ `0.5.0`
-0.6.x  Monitoring / Observability       🚧 `0.6.0a1`
+0.6.x  Monitoring / Observability       🚧 `0.6.0a2`
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.6.0a1` completes LOT-17 — Monitoring Core. The next implementation milestone is LOT-18 — Health Checks, followed by LOT-19 — Observability Foundations before promotion of the complete `0.6.x` line.
+`0.6.0a2` completes LOT-18 — Health Checks. LOT-19 — Observability Foundations is the final planned implementation lot before promotion of the complete `0.6.x` line.

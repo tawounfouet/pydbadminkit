@@ -2,6 +2,56 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.6.0a2] — Health Checks
+
+### Default health suite
+
+- `ConnectivityCheck` verifies that the configured PostgreSQL server responds and exposes
+  safe latency/version evidence.
+- `ConnectionUsageCheck` evaluates current connection utilization.
+- `LongQueryCheck` evaluates active-query duration without exposing SQL text.
+- `LongTransactionCheck` evaluates open-transaction duration.
+- `IdleTransactionCheck` isolates idle and aborted-idle transactions.
+- `WaitingLockCheck` evaluates waiting sessions, blocked sessions and root blockers.
+- `HealthCheckRunner` isolates check-specific operational failures and aggregates the
+  resulting `HealthReport`.
+- Connectivity failure is CRITICAL; non-connectivity operational failures become UNKNOWN.
+
+### Thresholds and evidence
+
+- Connection defaults: warning 80%, critical 95%.
+- Long-query defaults: warning 30s, critical 300s.
+- Long-transaction defaults: warning 60s, critical 600s.
+- Idle-transaction defaults: warning 60s, critical 300s.
+- Waiting-lock defaults: warning 1 session, critical 10 sessions.
+- Every default threshold is overridable from `pydbadmin health check`.
+- Health results expose raw observed values and warning/critical evidence.
+
+### CLI and machine contract
+
+- New vertical slice: `pydbadmin health check`.
+- Human, JSON and YAML output use the shared output interface.
+- Stable JSON report contains `overall_status`, `checks` and `captured_at`.
+- CRITICAL exits non-zero by default.
+- `--fail-on-warning` makes WARNING exit non-zero for CI/CD use.
+- UNKNOWN remains non-failing by default; a future `--fail-on-unknown` policy is reserved.
+
+### Qualification
+
+- Threshold-boundary tests cover below/equal/between/equal-critical semantics.
+- Unit tests cover connectivity, connection usage, queries, transactions, idle transactions,
+  locks, aggregation, UNKNOWN isolation and CLI exit policy.
+- PostgreSQL 18 integration executes the complete JSON health vertical slice against a real
+  database.
+- Qualification reached 336 unit tests and 44 PostgreSQL integration tests with 85.67%
+  total unit coverage.
+- Ruff format/check, Mypy strict, package build and installed-wheel smoke tests are green.
+
+### Next
+
+LOT-19 adds Observability Foundations: exporter port, metric descriptors, cardinality rules,
+internal metric naming, monitoring snapshot DTO and Prometheus/OpenTelemetry design spikes.
+
 ## [0.6.0a1] — Monitoring Core
 
 ### Monitoring domain
