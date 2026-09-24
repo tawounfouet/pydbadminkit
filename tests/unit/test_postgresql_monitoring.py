@@ -127,9 +127,7 @@ def test_adapter_collects_monitoring_facts_and_filters() -> None:
             }
         },
         many_by_id={
-            "PG_MONITORING_DATABASE_SIZES": (
-                {"database": "postgres", "size_bytes": 4096},
-            ),
+            "PG_MONITORING_DATABASE_SIZES": ({"database": "postgres", "size_bytes": 4096},),
             "PG_MONITORING_TABLE_STATISTICS": (
                 {
                     "schema_name": "public",
@@ -169,7 +167,9 @@ def test_adapter_collects_monitoring_facts_and_filters() -> None:
     assert adapter.get_database_sizes()[0].size_bytes == 4096
     assert adapter.get_table_statistics(table)[0].table.name == "events"
     assert adapter.get_index_statistics(index)[0].index.name == "events_pkey"
-    assert ((("public", "public", "events", "events"), "PG_MONITORING_TABLE_STATISTICS")) in executor.calls
+    assert (
+        (("public", "public", "events", "events"), "PG_MONITORING_TABLE_STATISTICS")
+    ) in executor.calls
 
 
 def test_adapter_rejects_empty_connection_result_and_cross_database_filter() -> None:
