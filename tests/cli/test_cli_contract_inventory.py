@@ -1,6 +1,5 @@
 """Drift guard for the LOT-20 CLI contract inventory."""
 
-import click
 import pytest
 from typer.main import get_command
 
@@ -65,11 +64,12 @@ EXPECTED_ROOT_OPTIONS = {
 }
 
 
-def _leaf_command_paths(group: click.Group, prefix: tuple[str, ...] = ()) -> set[str]:
+def _leaf_command_paths(group: object, prefix: tuple[str, ...] = ()) -> set[str]:
     paths: set[str] = set()
-    for name, command in group.commands.items():
+    commands = getattr(group, "commands", {})
+    for name, command in commands.items():
         current = (*prefix, name)
-        if isinstance(command, click.Group):
+        if getattr(command, "commands", None) is not None:
             paths.update(_leaf_command_paths(command, current))
         else:
             paths.add(" ".join(current))
@@ -79,7 +79,6 @@ def _leaf_command_paths(group: click.Group, prefix: tuple[str, ...] = ()) -> set
 def test_cli_command_paths_match_inventory() -> None:
     command = get_command(app)
 
-    assert isinstance(command, click.Group)
     assert _leaf_command_paths(command) == EXPECTED_COMMAND_PATHS
 
 
@@ -88,7 +87,7 @@ def test_cli_root_options_match_inventory() -> None:
     explicit_options = {
         tuple(option.opts)
         for option in command.params
-        if isinstance(option, click.Option)
+        if getattr(option, "opts", None)
     }
 
     assert explicit_options == EXPECTED_ROOT_OPTIONS
