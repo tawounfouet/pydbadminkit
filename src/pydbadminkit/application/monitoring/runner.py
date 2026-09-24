@@ -26,11 +26,7 @@ class HealthCheckRunner:
         try:
             return check.run()
         except PyDBAdminError as error:
-            status = (
-                HealthStatus.CRITICAL
-                if check.name == "connectivity"
-                else HealthStatus.UNKNOWN
-            )
+            status = HealthStatus.CRITICAL if check.name == "connectivity" else HealthStatus.UNKNOWN
             return HealthCheckResult(
                 name=check.name,
                 status=status,

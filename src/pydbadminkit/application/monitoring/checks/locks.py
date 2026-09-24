@@ -28,7 +28,9 @@ class WaitingLockCheck:
         blocking = self._service.list_blocking()
         waiting_pids = {lock.pid for lock in locks}
         blocked_pids = {relation.blocked_pid for relation in blocking}
-        root_blockers = {relation.blocking_pid for relation in blocking if relation.blocking_pid > 0}
+        root_blockers = {
+            relation.blocking_pid for relation in blocking if relation.blocking_pid > 0
+        }
         waiting_sessions = len(waiting_pids | blocked_pids)
         status = status_for_threshold(waiting_sessions, self._threshold)
         return HealthCheckResult(

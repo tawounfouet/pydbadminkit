@@ -141,9 +141,7 @@ def test_connection_usage_is_unknown_without_capacity() -> None:
     ],
 )
 def test_long_query_threshold_boundaries(elapsed: float, expected: HealthStatus) -> None:
-    runtime = FakeRuntimeService(
-        queries=(QueryInfo(pid=101, elapsed_ms=elapsed * 1000),)
-    )
+    runtime = FakeRuntimeService(queries=(QueryInfo(pid=101, elapsed_ms=elapsed * 1000),))
     result = LongQueryCheck(runtime, Threshold(30, 300)).run()  # type: ignore[arg-type]
 
     assert result.status is expected
@@ -170,9 +168,7 @@ def test_transaction_checks_separate_general_and_idle_findings() -> None:
 
 def test_waiting_lock_check_counts_distinct_waiting_sessions() -> None:
     runtime = FakeRuntimeService(
-        locks=(
-            LockInfo(pid=301, lock_type="advisory", mode="ExclusiveLock", granted=False),
-        ),
+        locks=(LockInfo(pid=301, lock_type="advisory", mode="ExclusiveLock", granted=False),),
         blocking=(
             BlockingRelation(
                 root_pid=301,

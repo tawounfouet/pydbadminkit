@@ -41,13 +41,14 @@ class LongTransactionCheck:
             message=(
                 "no long-running transactions"
                 if not affected
-                else f"{len(affected)} long-running transaction"
-                f"{'' if len(affected) == 1 else 's'}"
+                else f"{len(affected)} long-running transaction{'' if len(affected) == 1 else 's'}"
             ),
             details={
                 "count": len(affected),
                 "oldest_duration_seconds": oldest,
-                "top_pids": [pid for pid, _ in sorted(affected, key=lambda item: item[1], reverse=True)[:5]],
+                "top_pids": [
+                    pid for pid, _ in sorted(affected, key=lambda item: item[1], reverse=True)[:5]
+                ],
             },
             captured_at=datetime.now(UTC),
             evidence=(
@@ -94,13 +95,14 @@ class IdleTransactionCheck:
             message=(
                 "no long idle transactions"
                 if not affected
-                else f"{len(affected)} long idle transaction"
-                f"{'' if len(affected) == 1 else 's'}"
+                else f"{len(affected)} long idle transaction{'' if len(affected) == 1 else 's'}"
             ),
             details={
                 "count": len(affected),
                 "oldest_duration_seconds": oldest,
-                "top_pids": [pid for pid, _ in sorted(affected, key=lambda item: item[1], reverse=True)[:5]],
+                "top_pids": [
+                    pid for pid, _ in sorted(affected, key=lambda item: item[1], reverse=True)[:5]
+                ],
             },
             captured_at=datetime.now(UTC),
             evidence=(

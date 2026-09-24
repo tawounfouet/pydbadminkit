@@ -49,7 +49,9 @@ class LongQueryCheck:
             details={
                 "count": len(affected),
                 "oldest_duration_seconds": oldest,
-                "top_pids": [pid for pid, _ in sorted(affected, key=lambda item: item[1], reverse=True)[:5]],
+                "top_pids": [
+                    pid for pid, _ in sorted(affected, key=lambda item: item[1], reverse=True)[:5]
+                ],
             },
             captured_at=datetime.now(UTC),
             evidence=(
