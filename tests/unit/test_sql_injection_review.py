@@ -101,7 +101,7 @@ def test_relation_and_principal_payloads_are_identifiers() -> None:
 
     rendered = _render(executor.queries[0])
     assert rendered == (
-        'GRANT SELECT ON TABLE '
+        "GRANT SELECT ON TABLE "
         '"public""; DROP SCHEMA public; --"."orders""; DROP TABLE orders; --" '
         'TO "reader""; DROP ROLE postgres; --"'
     )
@@ -139,9 +139,7 @@ def test_maintenance_relation_and_column_payloads_are_quoted() -> None:
         )
     )
 
-    quoted_relation = (
-        '"public""; DROP SCHEMA public; --"."events""; DROP TABLE events; --"'
-    )
+    quoted_relation = '"public""; DROP SCHEMA public; --"."events""; DROP TABLE events; --"'
     assert vacuum == f"VACUUM {quoted_relation}"
     assert analyze == f'ANALYZE {quoted_relation} ("payload""; DROP TABLE events; --")'
 
