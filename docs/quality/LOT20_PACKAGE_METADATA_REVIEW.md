@@ -6,7 +6,7 @@
 Ticket: T20-015
 Lot: LOT-20 — Hardening
 Baseline reviewed: 0.6.0
-Result: metadata hardened; one owner-policy item remains for 1.0 publication
+Result: PASS; owner license policy resolved during LOT-21
 ```
 
 ## Distribution identity
@@ -79,29 +79,18 @@ This remains the release artifact gate.
 - advertised Python versions;
 - major bounds for runtime dependencies.
 
-## Finding PKG-20-015-01 — license declaration
+## Finding PKG-20-015-01 — license declaration — RESOLVED
 
-No `LICENSE` file or explicit `project.license` decision currently exists in the
-repository.
-
-T20-015 deliberately does **not** invent a legal licensing choice. A public Git repository
-does not by itself establish which license the project owner intends to grant.
-
-This is therefore recorded as an explicit owner-policy decision for the 1.0 publication
-gate:
+During LOT-21 the project owner selected Apache License 2.0.
 
 ```text
-Choose license policy
-        ↓
-add LICENSE when applicable
-        ↓
-declare project.license / license-files metadata
-        ↓
-re-run build + twine qualification
+LICENSE                 present
+project.license         Apache-2.0
+project.license-files   ["LICENSE"]
 ```
 
-Until that decision is made, package metadata must not claim MIT, Apache, proprietary or
-another license.
+The Package matrix re-runs build, Twine validation and clean wheel/sdist installation on
+Python 3.11–3.14 as part of the RC qualification.
 
 ## LOT-20 result
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased] — 1.0 Hardening
+## [1.0.0rc1] — 1.0 Release Candidate
 
 ### LOT-20 complete
 
@@ -51,15 +51,18 @@
 - Wheel and source-distribution installation smoke tests pass on Python 3.11–3.14.
 - Quality, strict typing and package metadata validation are green.
 
-### Open 1.0 policy decision
+### License
 
-- The repository has no declared license. LOT-20 deliberately does not invent a legal
-  license choice; the owner must choose the license policy before the 1.0 publication gate.
+- The project owner selected Apache License 2.0 for the 1.0 line.
+- The canonical Apache-2.0 text is shipped in `LICENSE`.
+- Package metadata declares `Apache-2.0` and includes the license file in distribution
+  artifacts.
 
 ### Next
 
-Complete the package license decision, then promote the frozen source to `1.0.0rc1`.
-No new feature work is planned for the RC.
+Qualify `1.0.0rc1` with the complete Python/PostgreSQL/package gates. During RC, only
+bug fixes, documentation and qualification changes are permitted. Stable `1.0.0` follows
+only after the final RC is green with no release blocker.
 
 All notable PyDBAdminKit milestones are documented here.
 

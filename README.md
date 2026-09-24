@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.6.0` — Monitoring / Observability.
+> **Current release candidate:** `1.0.0rc1` — PostgreSQL Framework.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -76,8 +76,8 @@ PostgreSQL 17   Tier A matrix
 PostgreSQL 18   Tier A matrix
 ```
 
-The release remains `0.6.0` until the explicit 1.0 release-candidate promotion. The
-qualification phase does not silently change the installed package version.
+The qualified source is now promoted to `1.0.0rc1`. The RC is feature-frozen: only bug
+fixes, documentation and qualification changes are allowed before stable `1.0.0`.
 
 ## Current capabilities
 
@@ -648,3 +648,8 @@ operation identifiers are frozen, security/injection/redaction/performance revie
 package metadata is hardened, and PostgreSQL 14–18 now runs as a real integration matrix.
 The roadmap now moves to LOT-21 — Qualification / Documentation before the `1.0.0`
 release-candidate gate.
+
+
+## License
+
+PyDBAdminKit is licensed under the Apache License, Version 2.0. See `LICENSE`.
