@@ -85,9 +85,7 @@ def test_cli_command_paths_match_inventory() -> None:
 def test_cli_root_options_match_inventory() -> None:
     command = get_command(app)
     explicit_options = {
-        tuple(option.opts)
-        for option in command.params
-        if getattr(option, "opts", None)
+        tuple(option.opts) for option in command.params if getattr(option, "opts", None)
     }
 
     assert explicit_options == EXPECTED_ROOT_OPTIONS
