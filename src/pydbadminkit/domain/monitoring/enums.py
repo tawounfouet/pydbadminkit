@@ -25,3 +25,11 @@ class HealthCheckCategory(StrEnum):
     INDEXES = "indexes"
     BACKUP = "backup"
     REPLICATION = "replication"
+
+
+class MetricType(StrEnum):
+    """Stable semantic type for exporter-facing metrics."""
+
+    GAUGE = "gauge"
+    COUNTER = "counter"
+    STATE = "state"

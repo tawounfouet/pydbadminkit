@@ -23,7 +23,12 @@ from pydbadminkit.adapters.postgresql import (
 from pydbadminkit.application.capability import CapabilityService
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.connection import ConnectionConfigResolver, ConnectionService
-from pydbadminkit.application.monitoring import HealthCheckConfig, HealthService, MonitoringService
+from pydbadminkit.application.monitoring import (
+    HealthCheckConfig,
+    HealthService,
+    MonitoringService,
+    MonitoringSnapshotService,
+)
 from pydbadminkit.application.operations import (
     BackupService,
     BackupValidationService,
@@ -210,6 +215,27 @@ def build_health_service(
         runtime_service=RuntimeService(PostgreSQLRuntimeAdapter(executor)),
         config=config,
     )
+
+
+def build_monitoring_snapshot_service(
+    profile_name: str,
+    config_path: Path | None = None,
+    *,
+    health_config: HealthCheckConfig | None = None,
+) -> MonitoringSnapshotService:
+    """Build point-in-time PostgreSQL metrics plus health snapshot composition."""
+
+    resolved = resolve_connection(profile_name, config_path)
+    factory = PostgreSQLConnectionFactory()
+    executor = PostgreSQLExecutor(factory, resolved)
+    monitoring_service = MonitoringService(PostgreSQLMonitoringAdapter(executor))
+    health_service = HealthService(
+        connectivity_probe=lambda: PostgreSQLConnectionTester(factory).test(resolved),
+        monitoring_service=monitoring_service,
+        runtime_service=RuntimeService(PostgreSQLRuntimeAdapter(executor)),
+        config=health_config,
+    )
+    return MonitoringSnapshotService(monitoring_service, health_service)
 
 
 def build_monitoring_service(

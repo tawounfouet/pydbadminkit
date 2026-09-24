@@ -4,6 +4,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
 
+from pydbadminkit.domain.monitoring.naming import validate_metric_name
+
 
 @dataclass(frozen=True, slots=True)
 class Metric:
@@ -16,8 +18,7 @@ class Metric:
     captured_at: datetime
 
     def __post_init__(self) -> None:
-        if not self.name or self.name.isspace():
-            raise ValueError("metric name must not be blank")
+        validate_metric_name(self.name)
         if self.unit is not None and (not self.unit or self.unit.isspace()):
             raise ValueError("metric unit must not be blank")
         if self.captured_at.tzinfo is None or self.captured_at.utcoffset() is None:
