@@ -155,13 +155,13 @@ parse by key rather than position, deterministic order is intentionally retained
 
 ## Secrets and sensitive data
 
-Machine serialization does not itself perform redaction. Secret safety must therefore be
-guaranteed by the public DTOs and error/mutation boundaries before values reach the
-serializer.
+Following T20-012, machine serialization explicitly maps `SecretValue` to the literal
+`<redacted>`. Public DTO and error/mutation boundaries remain responsible for avoiding
+credential material, so serializer redaction is defense in depth rather than a substitute
+for safe DTO design.
 
-The dedicated redaction review remains T20-012. Query/runtime models may intentionally
-contain query text for runtime inspection; this is operational data, not credential data,
-and requires separate security review rather than silent serializer mutation.
+Query/runtime models may intentionally contain query text for runtime inspection; this is
+operational data, not credential data, and remains an explicit administrative surface.
 
 ## Compatibility policy for hardening
 
