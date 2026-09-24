@@ -13,6 +13,7 @@ from pydbadminkit.adapters.postgresql import (
     PostgreSQLConnectionTester,
     PostgreSQLExecutor,
     PostgreSQLMaintenanceAdapter,
+    PostgreSQLMonitoringAdapter,
     PostgreSQLRestoreAdapter,
     PostgreSQLRestoreDatabaseAdapter,
     PostgreSQLRuntimeAdapter,
@@ -22,6 +23,7 @@ from pydbadminkit.adapters.postgresql import (
 from pydbadminkit.application.capability import CapabilityService
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.connection import ConnectionConfigResolver, ConnectionService
+from pydbadminkit.application.monitoring import MonitoringService
 from pydbadminkit.application.operations import (
     BackupService,
     BackupValidationService,
@@ -189,6 +191,17 @@ def build_maintenance_service(
         audit_port=JsonlAuditSink(default_audit_path()),
         config=config,
     )
+
+
+def build_monitoring_service(
+    profile_name: str,
+    config_path: Path | None = None,
+) -> MonitoringService:
+    """Build point-in-time PostgreSQL monitoring services."""
+
+    config = resolve_connection(profile_name, config_path)
+    executor = PostgreSQLExecutor(PostgreSQLConnectionFactory(), config)
+    return MonitoringService(PostgreSQLMonitoringAdapter(executor))
 
 
 def build_runtime_service(

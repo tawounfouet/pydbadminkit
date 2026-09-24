@@ -8,6 +8,7 @@ from pydbadminkit.ports.catalog import CatalogPort
 from pydbadminkit.ports.config import ConfigRepositoryPort
 from pydbadminkit.ports.connection import ConnectionTesterPort
 from pydbadminkit.ports.maintenance import MaintenancePort
+from pydbadminkit.ports.monitoring import MonitoringPort
 from pydbadminkit.ports.process import ProcessRunnerPort
 from pydbadminkit.ports.restore import RestorePort
 from pydbadminkit.ports.restore_database import RestoreDatabasePort
@@ -28,6 +29,7 @@ __all__ = [
     "ConfigRepositoryPort",
     "ConnectionTesterPort",
     "MaintenancePort",
+    "MonitoringPort",
     "ProcessRunnerPort",
     "RestoreDatabasePort",
     "RestorePort",
