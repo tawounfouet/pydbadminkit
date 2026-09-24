@@ -8,6 +8,21 @@ dynamic = ["version"]
 description = "CLI-first, Python-first database administration framework."
 readme = "README.md"
 requires-python = ">=3.11"
+keywords = ["database", "administration", "postgresql", "cli", "dba"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: System Administrators",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Database",
+  "Topic :: System :: Systems Administration",
+  "Typing :: Typed",
+]
 authors = [
   { name = "Thomas Awounfouet" }
 ]
@@ -36,6 +51,12 @@ dev = [
 
 [project.scripts]
 pydbadmin = "pydbadminkit.cli.app:app"
+
+[project.urls]
+Homepage = "https://github.com/tawounfouet/pydbadminkit"
+Repository = "https://github.com/tawounfouet/pydbadminkit"
+Issues = "https://github.com/tawounfouet/pydbadminkit/issues"
+Changelog = "https://github.com/tawounfouet/pydbadminkit/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "src/pydbadminkit/version.py"
