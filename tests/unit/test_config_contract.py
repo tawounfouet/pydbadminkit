@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from pydbadminkit.domain.common import DatabaseEngine, EnvironmentName
-from pydbadminkit.domain.connection import ConnectionProfileName, SSLMode, SecretReference
+from pydbadminkit.domain.connection import ConnectionProfileName, SecretReference, SSLMode
 from pydbadminkit.infrastructure.config import (
     TomlConnectionProfileRepository,
     default_config_path,

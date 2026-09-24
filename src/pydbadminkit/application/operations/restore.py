@@ -4,7 +4,12 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 from pydbadminkit.domain.audit import AuditEvent, AuditEventType
-from pydbadminkit.domain.common import EnvironmentName, OperationName, OperationStatus, RiskLevel
+from pydbadminkit.domain.common import (
+    EnvironmentName,
+    OperationName,
+    OperationStatus,
+    RiskLevel,
+)
 from pydbadminkit.domain.connection import ResolvedConnectionConfig
 from pydbadminkit.domain.operations import (
     Backup,
