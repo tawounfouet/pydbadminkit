@@ -4,9 +4,21 @@
 
 ```text
 Ticket: T21-002
+Result: PASS
 Supported Python: 3.11, 3.12, 3.13, 3.14
 Qualification mechanism: full unit suite on every supported interpreter
 ```
+
+## Qualified result
+
+```text
+Python 3.11  419 passed / 44 deselected / coverage 86.15%
+Python 3.12  419 passed / 44 deselected / coverage 86.15%
+Python 3.13  419 passed / 44 deselected / coverage 86.15%
+Python 3.14  419 passed / 44 deselected / coverage 85.64%
+```
+
+Every supported interpreter clears the required 85% coverage gate.
 
 ## Contract
 

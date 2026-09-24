@@ -24,6 +24,33 @@
 - Quality: Ruff format/check and Mypy strict green.
 - Package: build, Twine validation, clean-wheel install and CLI smoke tests green.
 
+### LOT-21 qualification and documentation
+
+- Qualified the complete unit suite on Python 3.11, 3.12, 3.13 and 3.14.
+- Qualified PostgreSQL 14–18 with live server/client pairs; PostgreSQL 15–18 are Tier A and
+  PostgreSQL 14 remains Transitional.
+- Recorded real backup→restore qualification for custom and plain-SQL formats.
+- Recorded deterministic runtime concurrency qualification for waits, blocking graphs,
+  query cancellation and session termination.
+- Closed the 1.0 security qualification from hardening reviews plus live PostgreSQL
+  authorization/guardrail tests.
+- Frozen the machine-interface qualification around JSON shapes, error/exit codes, CLI,
+  operation names and capability names.
+- Expanded package qualification to wheel + source-distribution clean installs on Python
+  3.11–3.14.
+- Published final pre-RC README, CLI reference, Python API reference, support matrix and
+  migration/deprecation policy.
+
+### 1.0 qualification evidence
+
+- Python 3.11: 419 unit tests passed, 86.15% coverage.
+- Python 3.12: 419 unit tests passed, 86.15% coverage.
+- Python 3.13: 419 unit tests passed, 86.15% coverage.
+- Python 3.14: 419 unit tests passed, 85.64% coverage.
+- PostgreSQL 14, 15, 16, 17 and 18: 44 live integration tests passed on each server major.
+- Wheel and source-distribution installation smoke tests pass on Python 3.11–3.14.
+- Quality, strict typing and package metadata validation are green.
+
 ### Open 1.0 policy decision
 
 - The repository has no declared license. LOT-20 deliberately does not invent a legal
@@ -31,7 +58,8 @@
 
 ### Next
 
-LOT-21 — Qualification / Documentation.
+Complete the package license decision, then promote the frozen source to `1.0.0rc1`.
+No new feature work is planned for the RC.
 
 All notable PyDBAdminKit milestones are documented here.
 

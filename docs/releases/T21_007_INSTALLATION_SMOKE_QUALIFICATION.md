@@ -4,9 +4,15 @@
 
 ```text
 Ticket: T21-007
+Result: PASS
 Python matrix: 3.11, 3.12, 3.13, 3.14
 Artifacts: wheel + sdist
 ```
+
+All four Package matrix jobs are green. Each interpreter successfully builds the
+distribution, passes Twine validation, installs the wheel in a clean virtual environment,
+installs the source distribution in a second clean environment, imports `pydbadminkit`,
+and executes `pydbadmin --version` / `pydbadmin --help`.
 
 ## Qualification objective
 
