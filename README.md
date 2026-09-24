@@ -6,6 +6,79 @@ CLI-first, Python-first database administration framework.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
+## Quick start
+
+PyDBAdminKit requires Python 3.11–3.14. PostgreSQL 15–18 are the Tier A server line for
+the 1.0 qualification; PostgreSQL 14 is Transitional.
+
+From a source checkout:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e ".[binary]"
+pydbadmin --version
+pydbadmin --help
+```
+
+On Windows PowerShell, activate with `.\.venv\Scripts\Activate.ps1`.
+
+Create `config.toml`:
+
+```toml
+[connections.local]
+engine = "postgresql"
+host = "localhost"
+port = 5432
+database = "postgres"
+username = "postgres"
+environment = "development"
+read_only = true
+ssl_mode = "prefer"
+connect_timeout_seconds = 10
+
+[connections.local.secret]
+provider = "env"
+reference = "PYDBADMIN_LOCAL_PASSWORD"
+```
+
+Then expose the password through the environment rather than the config file and test the
+connection:
+
+```bash
+export PYDBADMIN_LOCAL_PASSWORD="..."
+pydbadmin --connection local connection test
+pydbadmin --connection local server info
+pydbadmin --connection local database list
+```
+
+Start with `read_only = true` while exploring a real server. Mutation commands use the
+shared dry-run/confirmation/audit guardrail pipeline.
+
+## 1.0 qualification status
+
+The feature implementation through `0.6.0` is complete and LOT-20 Hardening is closed.
+The repository is now in LOT-21 release qualification.
+
+Current executable qualification includes:
+
+```text
+Python 3.11   unit suite green
+Python 3.12   unit suite green
+Python 3.13   unit suite green
+Python 3.14   unit suite green
+
+PostgreSQL 14   Transitional matrix
+PostgreSQL 15   Tier A matrix
+PostgreSQL 16   Tier A matrix
+PostgreSQL 17   Tier A matrix
+PostgreSQL 18   Tier A matrix
+```
+
+The release remains `0.6.0` until the explicit 1.0 release-candidate promotion. The
+qualification phase does not silently change the installed package version.
+
 ## Current capabilities
 
 ### Foundation
@@ -562,11 +635,11 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.1.x  Foundation                  ✅
 0.2.x  Object Explorer            ✅
 0.3.x  Security Administration    ✅
-0.4.x  Runtime Administration     ✅ `0.4.0`
-0.5.x  Operations                     ✅ `0.5.0`
-0.6.x  Monitoring / Observability       ✅ `0.6.0`
-LOT-20 Hardening                        ✅
-LOT-21 Qualification / Documentation    ← CURRENT
+0.4.x  Runtime Administration      ✅ `0.4.0`
+0.5.x  Operations                  ✅ `0.5.0`
+0.6.x  Monitoring / Observability  ✅ `0.6.0`
+LOT-20 Hardening                   ✅
+LOT-21 Qualification / Docs        ← CURRENT
 1.0.0  Stable PostgreSQL API
 ```
 
