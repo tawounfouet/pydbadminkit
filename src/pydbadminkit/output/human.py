@@ -13,6 +13,7 @@ from pydbadminkit.domain.catalog import (
 )
 from pydbadminkit.domain.common import CapabilityStatus, OperationResult
 from pydbadminkit.domain.connection import ConnectionTestResult
+from pydbadminkit.domain.monitoring import HealthReport
 from pydbadminkit.domain.operations import (
     Backup,
     BackupValidation,
@@ -731,4 +732,14 @@ def render_maintenance_progress(entries: tuple[MaintenanceProgress, ...]) -> str
                 )
             )
         )
+    return "\n".join(lines)
+
+
+def render_health_report(report: HealthReport) -> str:
+    """Render a stable point-in-time health report."""
+
+    lines = ["CHECK\tSTATUS\tDETAILS"]
+    for check in report.checks:
+        lines.append(f"{check.name}\t{check.status.value}\t{check.message}")
+    lines.extend(("", f"Overall status: {report.overall_status.value}"))
     return "\n".join(lines)

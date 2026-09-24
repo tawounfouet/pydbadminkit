@@ -12,6 +12,7 @@ from pydbadminkit.cli.commands.capability import capability_app
 from pydbadminkit.cli.commands.connection import connection_app
 from pydbadminkit.cli.commands.database import database_app
 from pydbadminkit.cli.commands.effective_access import effective_access_app
+from pydbadminkit.cli.commands.health import health_app
 from pydbadminkit.cli.commands.index import index_app
 from pydbadminkit.cli.commands.lock import lock_app
 from pydbadminkit.cli.commands.ownership import ownership_app
@@ -54,6 +55,7 @@ app.add_typer(wait_app, name="wait")
 app.add_typer(lock_app, name="lock")
 app.add_typer(blocking_app, name="blocking")
 app.add_typer(capability_app, name="capability")
+app.add_typer(health_app, name="health")
 
 
 def _version_callback(value: bool) -> bool:

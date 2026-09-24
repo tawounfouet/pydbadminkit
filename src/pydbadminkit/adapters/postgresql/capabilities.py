@@ -52,6 +52,7 @@ class PostgreSQLCapabilityAdapter:
             "monitoring.database.sizes",
             "monitoring.table.statistics",
             "monitoring.index.statistics",
+            "monitoring.health",
             "postgres.vacuum.progress",
             "postgres.reindex.progress",
             "postgres.reindex.concurrently",

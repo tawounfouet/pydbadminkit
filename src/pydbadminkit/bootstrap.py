@@ -23,7 +23,7 @@ from pydbadminkit.adapters.postgresql import (
 from pydbadminkit.application.capability import CapabilityService
 from pydbadminkit.application.catalog import CatalogService
 from pydbadminkit.application.connection import ConnectionConfigResolver, ConnectionService
-from pydbadminkit.application.monitoring import MonitoringService
+from pydbadminkit.application.monitoring import HealthCheckConfig, HealthService, MonitoringService
 from pydbadminkit.application.operations import (
     BackupService,
     BackupValidationService,
@@ -189,6 +189,25 @@ def build_maintenance_service(
     return MaintenanceService(
         maintenance_port=adapter,
         audit_port=JsonlAuditSink(default_audit_path()),
+        config=config,
+    )
+
+
+def build_health_service(
+    profile_name: str,
+    config_path: Path | None = None,
+    *,
+    config: HealthCheckConfig | None = None,
+) -> HealthService:
+    """Build the default point-in-time PostgreSQL health suite."""
+
+    resolved = resolve_connection(profile_name, config_path)
+    factory = PostgreSQLConnectionFactory()
+    executor = PostgreSQLExecutor(factory, resolved)
+    return HealthService(
+        connectivity_probe=lambda: PostgreSQLConnectionTester(factory).test(resolved),
+        monitoring_service=MonitoringService(PostgreSQLMonitoringAdapter(executor)),
+        runtime_service=RuntimeService(PostgreSQLRuntimeAdapter(executor)),
         config=config,
     )
 
