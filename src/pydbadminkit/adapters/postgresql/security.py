@@ -32,6 +32,7 @@ from pydbadminkit.adapters.postgresql.queries.security import (
 )
 from pydbadminkit.domain.common import DatabaseObjectType
 from pydbadminkit.domain.security import (
+    AccessType,
     DirectAccess,
     EffectiveAccess,
     OwnershipInfo,

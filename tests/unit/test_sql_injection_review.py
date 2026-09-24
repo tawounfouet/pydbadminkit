@@ -129,7 +129,7 @@ def test_maintenance_relation_and_column_payloads_are_quoted() -> None:
     )
     column = 'payload"; DROP TABLE events; --'
 
-    vacuum = _render(VacuumCommand(table=relation) and _vacuum_query(VacuumCommand(table=relation)))
+    vacuum = _render(_vacuum_query(VacuumCommand(table=relation)))
     analyze = _render(
         _analyze_query(
             AnalyzeCommand(
