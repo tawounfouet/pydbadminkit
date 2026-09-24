@@ -246,6 +246,7 @@ ConfirmationRequiredError
 DatabaseConnectionError
 DatabaseConnectionTimeoutError
 DatabaseOperationError
+ErrorCode
 ExternalToolError
 FileCollisionError
 InternalError
@@ -267,7 +268,7 @@ UnsafePathError
 ValidationError
 ```
 
-Error codes themselves are reviewed separately by T20-004.
+Error codes are now exposed through `pydbadminkit.errors.ErrorCode` and frozen by T20-004.
 
 ## Bootstrap convenience API
 

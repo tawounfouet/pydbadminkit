@@ -14,6 +14,7 @@ from pydbadminkit.errors.configuration import (
     ProfileNotFoundError,
     SecretResolutionError,
 )
+from pydbadminkit.errors.codes import ErrorCode
 from pydbadminkit.errors.connection import (
     AuthenticationError,
     DatabaseConnectionError,
@@ -55,6 +56,7 @@ __all__ = [
     "DatabaseConnectionError",
     "DatabaseConnectionTimeoutError",
     "DatabaseOperationError",
+    "ErrorCode",
     "ExternalToolError",
     "FileCollisionError",
     "InternalError",

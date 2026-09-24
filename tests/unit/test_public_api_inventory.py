@@ -188,6 +188,7 @@ EXPECTED_PUBLIC_EXPORTS: dict[str, set[str]] = {
         "DatabaseConnectionError",
         "DatabaseConnectionTimeoutError",
         "DatabaseOperationError",
+        "ErrorCode",
         "ExternalToolError",
         "FileCollisionError",
         "InternalError",
