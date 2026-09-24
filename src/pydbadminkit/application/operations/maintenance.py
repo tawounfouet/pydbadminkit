@@ -7,6 +7,7 @@ from uuid import uuid4
 from pydbadminkit.domain.audit import AuditEvent, AuditEventType
 from pydbadminkit.domain.common import (
     EnvironmentName,
+    OperationName,
     OperationResult,
     OperationStatus,
     RiskLevel,
@@ -64,7 +65,7 @@ class MaintenanceService:
             effects.append("Refresh planner statistics after VACUUM.")
 
         return self._plan(
-            operation="maintenance.vacuum",
+            operation=OperationName.MAINTENANCE_VACUUM,
             target=target,
             risk=risk,
             effects=tuple(effects),
@@ -93,7 +94,7 @@ class MaintenanceService:
         if command.columns:
             effects.append("Refresh statistics for columns: " + ", ".join(command.columns) + ".")
         return self._plan(
-            operation="maintenance.analyze",
+            operation=OperationName.MAINTENANCE_ANALYZE,
             target=target,
             risk=risk,
             effects=tuple(effects),
@@ -130,7 +131,7 @@ class MaintenanceService:
         else:
             warnings.append("Non-concurrent REINDEX can block writes on the affected relation.")
         return self._plan(
-            operation="maintenance.reindex",
+            operation=OperationName.MAINTENANCE_REINDEX,
             target=target,
             risk=risk,
             effects=effects,

@@ -33,6 +33,7 @@ DatabaseObjectRef
 DatabaseObjectType
 DatabaseVersion
 EnvironmentName
+OperationName
 OperationResult
 OperationStatus
 QualifiedName

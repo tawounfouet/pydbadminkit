@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 from pydbadminkit.domain.audit import AuditEvent, AuditEventType
-from pydbadminkit.domain.common import EnvironmentName, OperationStatus, RiskLevel
+from pydbadminkit.domain.common import EnvironmentName, OperationName, OperationStatus, RiskLevel
 from pydbadminkit.domain.connection import ResolvedConnectionConfig
 from pydbadminkit.domain.operations import (
     Backup,
@@ -76,7 +76,7 @@ class RestoreService:
             warnings.append("Production restore requires exact typed-target confirmation.")
 
         return OperationPlan(
-            operation="backup.restore",
+            operation=OperationName.BACKUP_RESTORE,
             target=command.target_database,
             environment=self._config.environment,
             risk=risk,

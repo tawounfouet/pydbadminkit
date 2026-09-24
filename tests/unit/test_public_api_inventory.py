@@ -16,6 +16,7 @@ EXPECTED_PUBLIC_EXPORTS: dict[str, set[str]] = {
         "DatabaseObjectType",
         "DatabaseVersion",
         "EnvironmentName",
+        "OperationName",
         "OperationResult",
         "OperationStatus",
         "QualifiedName",

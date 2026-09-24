@@ -7,6 +7,7 @@ from uuid import uuid4
 from pydbadminkit.domain.audit import AuditEvent, AuditEventType
 from pydbadminkit.domain.common import (
     EnvironmentName,
+    OperationName,
     OperationResult,
     OperationStatus,
     RiskLevel,
@@ -45,7 +46,7 @@ class SecurityMutationService:
         risk = _role_create_risk(command)
         risk = self._escalate_for_environment(risk)
         return self._plan(
-            operation="security.role.create",
+            operation=OperationName.SECURITY_ROLE_CREATE,
             target=command.name,
             risk=risk,
             effects=(f"Create role '{command.name}'.",),
@@ -71,7 +72,7 @@ class SecurityMutationService:
         risk = self._escalate_for_environment(risk)
         changed = _altered_role_attributes(command)
         return self._plan(
-            operation="security.role.alter",
+            operation=OperationName.SECURITY_ROLE_ALTER,
             target=command.name,
             risk=risk,
             effects=(f"Alter role attributes: {', '.join(changed)}.",),
@@ -103,7 +104,7 @@ class SecurityMutationService:
             else RiskLevel.HIGH
         )
         return self._plan(
-            operation="security.role.drop",
+            operation=OperationName.SECURITY_ROLE_DROP,
             target=name,
             risk=risk,
             effects=(f"Drop role '{name}'.",),
@@ -129,7 +130,7 @@ class SecurityMutationService:
     def plan_add_membership(self, command: MembershipCommand) -> OperationPlan:
         base = RiskLevel.HIGH if command.admin_option else RiskLevel.MEDIUM
         return self._plan(
-            operation="security.membership.add",
+            operation=OperationName.SECURITY_MEMBERSHIP_ADD,
             target=f"{command.member}->{command.role}",
             risk=self._escalate_for_environment(base),
             effects=(f"Add role '{command.member}' to '{command.role}'.",),
@@ -156,7 +157,7 @@ class SecurityMutationService:
 
     def plan_remove_membership(self, command: MembershipCommand) -> OperationPlan:
         return self._plan(
-            operation="security.membership.remove",
+            operation=OperationName.SECURITY_MEMBERSHIP_REMOVE,
             target=f"{command.member}->{command.role}",
             risk=self._escalate_for_environment(RiskLevel.MEDIUM),
             effects=(f"Remove role '{command.member}' from '{command.role}'.",),
@@ -180,7 +181,7 @@ class SecurityMutationService:
         base = RiskLevel.HIGH if command.grant_option else RiskLevel.MEDIUM
         return self._plan_relation_access(
             command,
-            operation="security.access.grant",
+            operation=OperationName.SECURITY_ACCESS_GRANT,
             verb="Grant",
             base_risk=base,
         )
@@ -202,7 +203,7 @@ class SecurityMutationService:
     def plan_revoke_access(self, command: RelationAccessCommand) -> OperationPlan:
         return self._plan_relation_access(
             command,
-            operation="security.access.revoke",
+            operation=OperationName.SECURITY_ACCESS_REVOKE,
             verb="Revoke",
             base_risk=RiskLevel.HIGH,
         )

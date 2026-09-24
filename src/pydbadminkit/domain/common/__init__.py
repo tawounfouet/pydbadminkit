@@ -6,7 +6,12 @@ from pydbadminkit.domain.common.engine import DatabaseEngine
 from pydbadminkit.domain.common.environment import EnvironmentName
 from pydbadminkit.domain.common.names import QualifiedName, parse_qualified_name
 from pydbadminkit.domain.common.objects import DatabaseObjectRef, DatabaseObjectType
-from pydbadminkit.domain.common.operations import OperationResult, OperationStatus, RiskLevel
+from pydbadminkit.domain.common.operations import (
+    OperationName,
+    OperationResult,
+    OperationStatus,
+    RiskLevel,
+)
 
 __all__ = [
     "CapabilityAvailability",
@@ -16,6 +21,7 @@ __all__ = [
     "DatabaseObjectType",
     "DatabaseVersion",
     "EnvironmentName",
+    "OperationName",
     "OperationResult",
     "OperationStatus",
     "QualifiedName",

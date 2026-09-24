@@ -6,6 +6,7 @@ from uuid import uuid4
 from pydbadminkit.domain.audit import AuditEvent, AuditEventType
 from pydbadminkit.domain.common import (
     EnvironmentName,
+    OperationName,
     OperationStatus,
     RiskLevel,
 )
@@ -47,7 +48,7 @@ class BackupService:
             warnings.append("Existing backup artifact and metadata may be replaced.")
 
         return OperationPlan(
-            operation="backup.create",
+            operation=OperationName.BACKUP_CREATE,
             target=command.output_path,
             environment=self._config.environment,
             risk=risk,

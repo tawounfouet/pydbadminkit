@@ -20,6 +20,25 @@ class RiskLevel(IntEnum):
         return self.name.lower()
 
 
+class OperationName(StrEnum):
+    """Stable machine names for guarded administrative mutations."""
+
+    BACKUP_CREATE = "backup.create"
+    BACKUP_RESTORE = "backup.restore"
+    MAINTENANCE_ANALYZE = "maintenance.analyze"
+    MAINTENANCE_REINDEX = "maintenance.reindex"
+    MAINTENANCE_VACUUM = "maintenance.vacuum"
+    RUNTIME_QUERY_CANCEL = "runtime.query.cancel"
+    RUNTIME_SESSION_TERMINATE = "runtime.session.terminate"
+    SECURITY_ACCESS_GRANT = "security.access.grant"
+    SECURITY_ACCESS_REVOKE = "security.access.revoke"
+    SECURITY_MEMBERSHIP_ADD = "security.membership.add"
+    SECURITY_MEMBERSHIP_REMOVE = "security.membership.remove"
+    SECURITY_ROLE_ALTER = "security.role.alter"
+    SECURITY_ROLE_CREATE = "security.role.create"
+    SECURITY_ROLE_DROP = "security.role.drop"
+
+
 class OperationStatus(StrEnum):
     """Lifecycle/result states shared by administrative operations."""
 

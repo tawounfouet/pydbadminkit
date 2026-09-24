@@ -7,6 +7,7 @@ from uuid import uuid4
 from pydbadminkit.domain.audit import AuditEvent, AuditEventType
 from pydbadminkit.domain.common import (
     EnvironmentName,
+    OperationName,
     OperationResult,
     OperationStatus,
     RiskLevel,
@@ -45,7 +46,7 @@ class RuntimeMutationService:
     def plan_cancel_query(self, command: CancelQueryCommand) -> OperationPlan:
         risk = self._escalate_for_environment(RiskLevel.MEDIUM)
         return self._plan(
-            operation="runtime.query.cancel",
+            operation=OperationName.RUNTIME_QUERY_CANCEL,
             target=f"pid:{command.pid}",
             risk=risk,
             effects=(f"Request cancellation of the query on backend PID {command.pid}.",),
@@ -74,7 +75,7 @@ class RuntimeMutationService:
     def plan_terminate_session(self, command: TerminateSessionCommand) -> OperationPlan:
         risk = self._escalate_for_environment(RiskLevel.HIGH)
         return self._plan(
-            operation="runtime.session.terminate",
+            operation=OperationName.RUNTIME_SESSION_TERMINATE,
             target=f"pid:{command.pid}",
             risk=risk,
             effects=(f"Terminate client backend session PID {command.pid}.",),
