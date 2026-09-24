@@ -2,6 +2,35 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.5.0] — Operations
+
+### Stable scope
+
+- Logical PostgreSQL backup in custom and plain-SQL formats.
+- Backup validation with SHA-256 checksum and artifact metadata.
+- Restore through `pg_restore` and `psql`, with target inspection and post-restore verification.
+- VACUUM, ANALYZE and REINDEX maintenance operations.
+- Progress inspection for VACUUM and REINDEX.
+- Tool compatibility checks, secret-safe process environments, filesystem safety and shared guardrails/audit.
+
+### Qualification
+
+- Local notebook smoke validation on PostgreSQL 17.10 confirmed connection, capability discovery,
+  catalog/security surfaces, maintenance progress queries and dry-run planning.
+- The local Windows lab correctly reports backup/restore as unavailable when `pg_dump`,
+  `pg_restore` and `psql` are absent from PATH; it no longer prints or embeds a demo password.
+- PostgreSQL integration CI installs PostgreSQL 18 client tools and qualifies the real Operations
+  line, including backup, restore and maintenance suites.
+- The qualification run completed with 42 PostgreSQL integration tests passing.
+- Quality, unit tests, package build and PostgreSQL integration are green before promotion.
+
+### Roadmap
+
+- LOT-14 — Backup Foundation: complete.
+- LOT-15 — Restore: complete.
+- LOT-16 — Maintenance: complete.
+- Next: LOT-17 — Monitoring Core, then LOT-18 — Health Checks and LOT-19 — Observability Foundations.
+
 ## [0.5.0b1] — Maintenance Foundation
 
 ### Maintenance domain
