@@ -9,12 +9,12 @@ from pydbadminkit.errors.backup import (
 )
 from pydbadminkit.errors.base import PyDBAdminError, ValidationError
 from pydbadminkit.errors.capability import CapabilityNotAvailableError
+from pydbadminkit.errors.codes import ErrorCode
 from pydbadminkit.errors.configuration import (
     ConfigurationError,
     ProfileNotFoundError,
     SecretResolutionError,
 )
-from pydbadminkit.errors.codes import ErrorCode
 from pydbadminkit.errors.connection import (
     AuthenticationError,
     DatabaseConnectionError,
