@@ -31,6 +31,10 @@ def _password() -> str:
     return value
 
 
+def _major() -> int:
+    return int(os.getenv("PYDBADMIN_TEST_POSTGRES_MAJOR", "18"))
+
+
 def _resolved_config() -> ResolvedConnectionConfig:
     return ResolvedConnectionConfig(
         name=ConnectionProfileName("integration"),
@@ -53,7 +57,7 @@ def test_postgresql_connection_tester() -> None:
     result = tester.test(_resolved_config())
 
     assert result.engine is DatabaseEngine.POSTGRESQL
-    assert result.version.major == 18
+    assert result.version.major == _major()
     assert result.current_database == "pydbadmin_test"
     assert result.current_user == "postgres"
     assert result.latency_ms >= 0

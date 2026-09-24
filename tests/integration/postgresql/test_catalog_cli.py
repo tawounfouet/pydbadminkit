@@ -35,6 +35,10 @@ def _password() -> str:
     return os.getenv("PYDBADMIN_TEST_POSTGRES_PASSWORD", "postgres")
 
 
+def _major() -> int:
+    return int(os.getenv("PYDBADMIN_TEST_POSTGRES_MAJOR", "18"))
+
+
 def _config(tmp_path: Path) -> Path:
     path = tmp_path / "config.toml"
     path.write_text(
@@ -166,7 +170,7 @@ def test_server_info_cli(
 
     assert result.exit_code == 0, result.output
     assert "Engine: postgresql" in result.stdout
-    assert "Version: 18" in result.stdout
+    assert f"Version: {_major()}" in result.stdout
     assert f"Database: {_database()}" in result.stdout
 
 
@@ -187,7 +191,7 @@ def test_server_info_json_output(
     assert result.exit_code == 0, result.output
     parsed = json.loads(result.stdout)
     assert parsed["engine"] == "postgresql"
-    assert parsed["version"]["major"] == 18
+    assert parsed["version"]["major"] == _major()
     assert parsed["current_database"] == _database()
 
 

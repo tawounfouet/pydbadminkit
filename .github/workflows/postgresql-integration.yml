@@ -38,6 +38,7 @@ jobs:
       PYDBADMIN_TEST_POSTGRES_DATABASE: pydbadmin_test
       PYDBADMIN_TEST_POSTGRES_USER: postgres
       PYDBADMIN_TEST_POSTGRES_PASSWORD: postgres
+      PYDBADMIN_TEST_POSTGRES_MAJOR: ${{ matrix.postgres }}
 
     steps:
       - uses: actions/checkout@v4
