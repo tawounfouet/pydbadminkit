@@ -85,10 +85,7 @@ def test_collect_metrics_has_constant_port_call_budget() -> None:
 
         def get_database_sizes(self) -> tuple[DatabaseSizeMetric, ...]:
             self.database_size_calls += 1
-            return tuple(
-                DatabaseSizeMetric(f"db_{index}", index)
-                for index in range(100)
-            )
+            return tuple(DatabaseSizeMetric(f"db_{index}", index) for index in range(100))
 
     port = CountingMonitoringPort()
 
