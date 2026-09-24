@@ -12,10 +12,14 @@ jobs:
   postgresql:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: ["14", "15", "16", "17", "18"]
 
     services:
       postgres:
-        image: postgres:18
+        image: postgres:${{ matrix.postgres }}
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -42,7 +46,7 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install PostgreSQL 18 client tools
+      - name: Install matching PostgreSQL client tools
         run: |
           sudo apt-get update
           sudo apt-get install -y ca-certificates curl
@@ -53,10 +57,10 @@ jobs:
           echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
             | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update
-          sudo apt-get install -y postgresql-client-18
-          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
-          /usr/lib/postgresql/18/bin/pg_dump --version
-          /usr/lib/postgresql/18/bin/pg_restore --version
+          sudo apt-get install -y "postgresql-client-${{ matrix.postgres }}"
+          echo "/usr/lib/postgresql/${{ matrix.postgres }}/bin" >> "$GITHUB_PATH"
+          "/usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_dump" --version
+          "/usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_restore" --version
 
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev,binary]"
