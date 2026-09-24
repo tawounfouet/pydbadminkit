@@ -169,7 +169,7 @@ class PostgreSQLBackupAdapter:
             level = "logical"
             tool = self._required_tool("pg_restore")
             result = self._runner.run(
-                [tool.path or "pg_restore", "--list", backup.path],
+                [tool.path or "pg_restore", "--list", "--", backup.path],
                 timeout_seconds=timeout_seconds,
             )
             if result.return_code != 0:
@@ -262,6 +262,8 @@ class PostgreSQLBackupAdapter:
             "--username",
             config.username,
             "--no-password",
+            "--dbname",
+            command.database,
         ]
 
         if tool_version.major != server_version.major:
@@ -270,7 +272,6 @@ class PostgreSQLBackupAdapter:
         if command.format is BackupFormat.CUSTOM and command.compress is not None:
             args.append("--compress=6" if command.compress else "--compress=0")
 
-        args.append(command.database)
         return args
 
     def _require_config(self) -> ResolvedConnectionConfig:

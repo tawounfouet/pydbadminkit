@@ -80,3 +80,15 @@ def test_tool_resolver_reads_version(monkeypatch: pytest.MonkeyPatch) -> None:
     assert tool.available is True
     assert tool.version == "pg_dump (PostgreSQL) 18.1"
     assert runner.calls[0][0] == ["/usr/bin/pg_dump", "--version"]
+
+
+def test_subprocess_runner_treats_shell_metacharacters_as_literal_argument() -> None:
+    payload = "$(printf injected); echo still-literal"
+
+    result = SubprocessRunner().run(
+        [sys.executable, "-c", "import sys; print(sys.argv[1])", payload],
+        timeout_seconds=5,
+    )
+
+    assert result.return_code == 0
+    assert result.stdout.strip() == payload

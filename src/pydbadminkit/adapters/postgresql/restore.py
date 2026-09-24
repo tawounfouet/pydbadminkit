@@ -230,7 +230,7 @@ class PostgreSQLRestoreAdapter:
                 args.extend(("--clean", "--if-exists"))
             if command.jobs is not None:
                 args.extend(("--jobs", str(command.jobs)))
-            args.append(backup.path)
+            args.extend(("--", backup.path))
             return args
 
         if backup.format is BackupFormat.PLAIN_SQL:

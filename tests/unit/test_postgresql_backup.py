@@ -271,3 +271,22 @@ def test_validate_custom_and_plain_backups(tmp_path: Path) -> None:
     assert plain_validation.valid is True
     assert plain_validation.level == "artifact"
     assert plain_validation.warnings
+
+
+def test_backup_database_name_cannot_be_reinterpreted_as_tool_option(tmp_path: Path) -> None:
+    adapter, runner = _adapter(tmp_path)
+    database = "--help;$(touch /tmp/pydbadminkit-injected)"
+
+    adapter.create_backup(
+        CreateBackupCommand(
+            database=database,
+            format=BackupFormat.CUSTOM,
+            output_path=str(tmp_path / "option-safe.dump"),
+        )
+    )
+
+    args = runner.calls[0][0]
+    dbname_index = args.index("--dbname")
+    assert args[dbname_index + 1] == database
+    assert args[-1] == database
+    assert database not in args[:dbname_index]

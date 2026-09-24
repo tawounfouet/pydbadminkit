@@ -287,3 +287,30 @@ def test_restore_maps_process_and_verification_failures() -> None:
             RestoreBackupCommand("/tmp/source.dump", "target", create=True),
             _backup(),
         )
+
+
+def test_custom_restore_terminates_options_before_archive_path() -> None:
+    adapter, runner, _target = _adapter(exists=False)
+    backup = _backup()
+    hostile_path = "--help;$(touch /tmp/pydbadminkit-injected)"
+    backup = Backup(
+        id=backup.id,
+        database=backup.database,
+        format=backup.format,
+        path=hostile_path,
+        created_at=backup.created_at,
+        size_bytes=backup.size_bytes,
+        checksum=backup.checksum,
+        engine=backup.engine,
+        engine_version=backup.engine_version,
+        tool_version=backup.tool_version,
+        status=backup.status,
+    )
+
+    adapter.restore_backup(
+        RestoreBackupCommand(hostile_path, "target", create=True),
+        backup,
+    )
+
+    args = runner.calls[-1][0]
+    assert args[-2:] == ["--", hostile_path]
