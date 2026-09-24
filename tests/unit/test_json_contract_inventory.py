@@ -31,9 +31,8 @@ def test_connection_result_json_contract() -> None:
         "engine": "postgresql",
         "version": {
             "major": 18,
-            "minor": None,
-            "patch": None,
-            "raw": None,
+            "minor": 0,
+            "patch": 0,
         },
         "current_database": "analytics",
         "current_user": "app",

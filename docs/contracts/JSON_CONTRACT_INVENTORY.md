@@ -74,9 +74,8 @@ no key sorting
   "engine": "postgresql",
   "version": {
     "major": 18,
-    "minor": null,
-    "patch": null,
-    "raw": null
+    "minor": 0,
+    "patch": 0
   },
   "current_database": "analytics",
   "current_user": "app",

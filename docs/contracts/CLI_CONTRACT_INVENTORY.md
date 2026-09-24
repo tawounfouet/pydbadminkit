@@ -31,11 +31,14 @@ business logic remains behind application services.
 --yes, -y            approve simple/explicit confirmations
 --non-interactive    never prompt
 --version            print the installed version and exit
+--install-completion install shell completion (Typer-generated)
+--show-completion    show shell completion (Typer-generated)
 --help               Typer/Click help
 ```
 
 The first six options above are cross-cutting execution context. `--version` is eager.
-`--help` is framework-provided.
+Completion options and `--help` are framework-provided by Typer and are included in the
+observed CLI surface.
 
 ## Command tree
 

@@ -57,8 +57,10 @@ EXPECTED_ROOT_OPTIONS = {
     ("--config",),
     ("--connection", "-c"),
     ("--dry-run",),
+    ("--install-completion",),
     ("--non-interactive",),
     ("--output", "-o"),
+    ("--show-completion",),
     ("--version",),
     ("--yes", "-y"),
 }
