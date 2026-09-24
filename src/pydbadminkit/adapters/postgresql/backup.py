@@ -174,9 +174,10 @@ class PostgreSQLBackupAdapter:
                 timeout_seconds=timeout_seconds,
             )
             if result.return_code != 0:
+                secret = self._config.password if self._config is not None else None
                 errors.append(
                     "pg_restore could not list the custom backup archive: "
-                    f"{_safe_stderr_excerpt(result.stderr, self._config.password if self._config else None)}"
+                    f"{_safe_stderr_excerpt(result.stderr, secret)}"
                 )
         elif not errors and backup.format is BackupFormat.PLAIN_SQL:
             warnings.append(
