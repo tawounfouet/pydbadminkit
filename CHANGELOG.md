@@ -2,6 +2,53 @@
 
 All notable PyDBAdminKit milestones are documented here.
 
+## [0.6.0a1] — Monitoring Core
+
+### Monitoring domain
+
+- `Metric` for point-in-time observable facts with explicit units, labels and timestamps.
+- `HealthStatus`, `HealthCheckResult`, `HealthCheckEvidence` and `HealthReport`.
+- Stable health aggregation semantics: CRITICAL > WARNING > OK, with explicit UNKNOWN.
+- `Threshold` model for configurable warning/critical boundaries.
+- `ConnectionStatistics`, `DatabaseSizeMetric`, `TableSizeMetric`, `TableStatistics`
+  and `IndexStatistics`.
+- Table and index statistics retain their `QualifiedName` identity.
+
+### Monitoring architecture
+
+- Engine-neutral `MonitoringPort`.
+- Read-only `MonitoringService`.
+- Initial low-cardinality metric snapshot through `collect_metrics()`.
+- PostgreSQL-first `PostgreSQLMonitoringAdapter`.
+- Bootstrap wiring through `build_monitoring_service()`.
+- Capability discovery for connection statistics, database sizes, table statistics and
+  index statistics.
+
+### PostgreSQL sources
+
+- Connection usage from `pg_stat_activity` and `max_connections`.
+- Logical database sizes from `pg_database_size()`.
+- Table observations from `pg_stat_user_tables` plus `pg_class.reltuples`.
+- Index observations from `pg_stat_user_indexes` plus `pg_relation_size()`.
+- Cross-database relation filters fail explicitly instead of attempting unsafe inspection.
+
+### Qualification
+
+- Domain validation and aggregation tests cover metrics, thresholds and health semantics.
+- Adapter tests cover PostgreSQL row mapping, filters and error handling.
+- Application tests cover raw monitoring reads and low-cardinality metric collection.
+- PostgreSQL 18 integration creates a real table and index and validates connection, size,
+  table-statistics and index-statistics reads.
+- Qualification reached 316 unit tests and 43 PostgreSQL integration tests with the
+  project coverage gate above 85%.
+- Ruff format/check, Mypy strict, package build and installed-wheel smoke tests are green.
+
+### Next
+
+LOT-18 introduces the default health-check engine and the `pydbadmin health check`
+vertical slice: connectivity, connection usage, long queries, long transactions,
+idle transactions and waiting locks.
+
 ## [0.5.0] — Operations
 
 ### Stable scope

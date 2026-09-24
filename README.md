@@ -2,7 +2,7 @@
 
 CLI-first, Python-first database administration framework.
 
-> **Current release:** `0.5.0` — Operations (Backup / Restore / Maintenance).
+> **Current release:** `0.6.0a1` — Monitoring Core.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
@@ -17,6 +17,38 @@ PyDBAdminKit provides a safe, typed administration core for database servers fro
 - stable public error hierarchy and exit codes;
 - capability discovery;
 - package, quality, unit and PostgreSQL integration CI gates.
+
+### Monitoring Core — 0.6.0a1
+
+The first Monitoring slice is read-only and point-in-time. It exposes:
+
+- typed `Metric`, `HealthStatus`, `HealthCheckResult`, `HealthReport` and `Threshold` models;
+- connection statistics and utilization ratio;
+- logical database sizes;
+- PostgreSQL table statistics from `pg_stat_user_tables`;
+- PostgreSQL index statistics from `pg_stat_user_indexes`;
+- low-cardinality metric snapshots through the Python `MonitoringService`;
+- capability discovery for the Monitoring Core surface.
+
+Python example:
+
+```python
+from pathlib import Path
+
+from pydbadminkit.bootstrap import build_monitoring_service
+from pydbadminkit.domain.common import QualifiedName
+
+monitoring = build_monitoring_service("local", Path("config.toml"))
+
+connections = monitoring.get_connection_statistics()
+database_sizes = monitoring.get_database_sizes()
+table_stats = monitoring.get_table_statistics(
+    QualifiedName(schema="public", name="events")
+)
+metrics = monitoring.collect_metrics()
+```
+
+The `health check` CLI belongs to LOT-18 and is the next vertical slice.
 
 ### Object Explorer
 
@@ -484,8 +516,8 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.3.x  Security Administration    ✅
 0.4.x  Runtime Administration     ✅ `0.4.0`
 0.5.x  Operations                     ✅ `0.5.0`
-0.6.x  Observability
+0.6.x  Monitoring / Observability       🚧 `0.6.0a1`
 1.0.0  Stable PostgreSQL API
 ```
 
-`0.5.0` closes the planned Backup / Restore / Maintenance feature line. The next implementation milestone is LOT-17 — Monitoring Core, followed by LOT-18 — Health Checks and LOT-19 — Observability Foundations for the `0.6.x` line.
+`0.6.0a1` completes LOT-17 — Monitoring Core. The next implementation milestone is LOT-18 — Health Checks, followed by LOT-19 — Observability Foundations before promotion of the complete `0.6.x` line.
