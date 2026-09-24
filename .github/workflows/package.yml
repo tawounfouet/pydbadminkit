@@ -12,19 +12,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "${{ matrix.python }}"
 
       - run: python -m pip install --upgrade pip
       - run: pip install build twine
       - run: python -m build
       - run: twine check dist/*
-      - run: python -m venv /tmp/pydbadminkit-smoke
-      - run: /tmp/pydbadminkit-smoke/bin/pip install dist/*.whl
-      - run: /tmp/pydbadminkit-smoke/bin/pydbadmin --version
-      - run: /tmp/pydbadminkit-smoke/bin/pydbadmin --help
+      - name: Smoke install wheel
+        run: |
+          python -m venv /tmp/pydbadminkit-wheel
+          /tmp/pydbadminkit-wheel/bin/pip install dist/*.whl
+          /tmp/pydbadminkit-wheel/bin/python -c "import pydbadminkit; print(pydbadminkit.__version__)"
+          /tmp/pydbadminkit-wheel/bin/pydbadmin --version
+          /tmp/pydbadminkit-wheel/bin/pydbadmin --help
+      - name: Smoke install source distribution
+        run: |
+          python -m venv /tmp/pydbadminkit-sdist
+          /tmp/pydbadminkit-sdist/bin/pip install dist/*.tar.gz
+          /tmp/pydbadminkit-sdist/bin/python -c "import pydbadminkit; print(pydbadminkit.__version__)"
+          /tmp/pydbadminkit-sdist/bin/pydbadmin --version
+          /tmp/pydbadminkit-sdist/bin/pydbadmin --help
