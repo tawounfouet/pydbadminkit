@@ -42,9 +42,7 @@ monitoring = build_monitoring_service("local", Path("config.toml"))
 
 connections = monitoring.get_connection_statistics()
 database_sizes = monitoring.get_database_sizes()
-table_stats = monitoring.get_table_statistics(
-    QualifiedName(schema="public", name="events")
-)
+table_stats = monitoring.get_table_statistics(QualifiedName(schema="public", name="events"))
 metrics = monitoring.collect_metrics()
 ```
 
