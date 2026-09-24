@@ -34,6 +34,10 @@ from pydbadminkit.errors.context import ErrorContext
 
 _TABLE_RELKINDS = frozenset({"r", "p", "m"})
 _INDEX_RELKINDS = frozenset({"i", "I"})
+_REINDEX_TARGET_SQL = {
+    ReindexTargetType.INDEX: sql.SQL("INDEX"),
+    ReindexTargetType.TABLE: sql.SQL("TABLE"),
+}
 
 
 class PostgreSQLMaintenanceAdapter:
@@ -335,7 +339,7 @@ def _analyze_query(command: AnalyzeCommand) -> sql.SQL | sql.Composed:
 
 
 def _reindex_query(command: ReindexCommand) -> sql.Composed:
-    target_type = sql.SQL(command.target_type.value.upper())
+    target_type = _REINDEX_TARGET_SQL[command.target_type]
     concurrent = sql.SQL(" CONCURRENTLY") if command.concurrently else sql.SQL("")
     return sql.SQL("REINDEX {}{} {}").format(
         target_type,

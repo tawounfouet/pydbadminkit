@@ -47,6 +47,16 @@ from pydbadminkit.domain.security.mutations import (
 )
 from pydbadminkit.errors import ResourceNotFoundError
 
+_ACCESS_TYPE_SQL = {
+    AccessType.SELECT: sql.SQL("SELECT"),
+    AccessType.INSERT: sql.SQL("INSERT"),
+    AccessType.UPDATE: sql.SQL("UPDATE"),
+    AccessType.DELETE: sql.SQL("DELETE"),
+    AccessType.TRUNCATE: sql.SQL("TRUNCATE"),
+    AccessType.REFERENCES: sql.SQL("REFERENCES"),
+    AccessType.TRIGGER: sql.SQL("TRIGGER"),
+}
+
 
 class PostgreSQLSecurityAdapter:
     """PostgreSQL security inspection and mutation adapter."""
@@ -225,7 +235,7 @@ class PostgreSQLSecurityAdapter:
     def grant_access(self, command: RelationAccessCommand) -> None:
         relation = sql.Identifier(command.object.schema or "public", command.object.name)
         query = sql.SQL("GRANT {} ON TABLE {} TO {}").format(
-            sql.SQL(command.access_type.value),
+            _ACCESS_TYPE_SQL[command.access_type],
             relation,
             sql.Identifier(command.principal),
         )
@@ -236,7 +246,7 @@ class PostgreSQLSecurityAdapter:
     def revoke_access(self, command: RelationAccessCommand) -> None:
         relation = sql.Identifier(command.object.schema or "public", command.object.name)
         query = sql.SQL("REVOKE {} ON TABLE {} FROM {}").format(
-            sql.SQL(command.access_type.value),
+            _ACCESS_TYPE_SQL[command.access_type],
             relation,
             sql.Identifier(command.principal),
         )
