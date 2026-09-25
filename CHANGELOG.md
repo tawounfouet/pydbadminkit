@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.0] — Stable
+
+### Promotion
+
+- Promotes the fully qualified `1.0.0rc1` feature set to stable `1.0.0`.
+- No new functionality is introduced relative to the qualified RC.
+- Public Python API, CLI, JSON/machine contracts, error codes, exit codes, configuration,
+  capability names and operation names enter the stable compatibility policy.
+- Apache License 2.0 is the project license.
+
 ## [1.0.0rc1] — 1.0 Release Candidate
 
 ### LOT-20 complete
