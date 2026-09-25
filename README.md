@@ -59,7 +59,7 @@ shared dry-run/confirmation/audit guardrail pipeline.
 ## 1.0 qualification status
 
 The feature implementation through `0.6.0` is complete and LOT-20 Hardening is closed.
-The repository is now in LOT-21 release qualification.
+LOT-21 release qualification is complete and `1.0.0` is the qualified stable line.
 
 Current executable qualification includes:
 
@@ -640,15 +640,16 @@ The Domain does not depend on Psycopg, Typer, Rich or PostgreSQL catalog interna
 0.5.x  Operations                  ✅ `0.5.0`
 0.6.x  Monitoring / Observability  ✅ `0.6.0`
 LOT-20 Hardening                   ✅
-LOT-21 Qualification / Docs        ← CURRENT
-1.0.0  Stable PostgreSQL API
+LOT-21 Qualification / Docs        ✅
+1.0.0  Stable PostgreSQL API       ✅
 ```
 
 LOT-20 is complete: public/CLI/machine contracts are inventoried, error/exit/config/capability/
 operation identifiers are frozen, security/injection/redaction/performance reviews are closed,
 package metadata is hardened, and PostgreSQL 14–18 now runs as a real integration matrix.
-The roadmap now moves to LOT-21 — Qualification / Documentation before the `1.0.0`
-release-candidate gate.
+LOT-21 is complete: Python 3.11–3.14, PostgreSQL 14–18, security, backup/restore,
+runtime concurrency, machine interfaces, package installation and final documentation are
+qualified. The roadmap has reached stable `1.0.0`.
 
 
 ## License

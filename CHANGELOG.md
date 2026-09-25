@@ -5,6 +5,8 @@
 ### Promotion
 
 - Promotes the fully qualified `1.0.0rc1` feature set to stable `1.0.0`.
+- Stable promotion commit qualified green on Quality, Python 3.11–3.14, PostgreSQL
+  14–18 and wheel/sdist Package matrices.
 - No new functionality is introduced relative to the qualified RC.
 - Public Python API, CLI, JSON/machine contracts, error codes, exit codes, configuration,
   capability names and operation names enter the stable compatibility policy.
