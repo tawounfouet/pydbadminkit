@@ -89,6 +89,15 @@ The qualified `1.0.0rc1` source has been promoted to stable `1.0.0` without new
 functionality. The 1.0 public API, CLI and machine contracts are now governed by the
 migration/deprecation policy.
 
+## Documentation guides
+
+The task-oriented user documentation starts at
+[`docs/guides/00_GUIDES_INDEX.md`](docs/guides/00_GUIDES_INDEX.md).
+
+The guides are progressive and complement the normative material in `docs/reference/` and
+`docs/contracts/`. Start with Getting Started, Installation, First Connection, Configuration and
+Credentials before moving to CLI/API, administration, operations, monitoring and automation.
+
 ## Current capabilities
 
 ### Foundation
