@@ -6,6 +6,15 @@ CLI-first, Python-first database administration framework.
 
 PyDBAdminKit provides a safe, typed administration core for database servers from both a CLI and a Python API. PostgreSQL is the reference and initial engine.
 
+## Documentation
+
+Start with the task-oriented **[PyDBAdminKit Guides](docs/guides/00_GUIDES_INDEX.md)** for
+a progressive path from installation and first connection through Security, Runtime,
+Operations, Monitoring, automation and production safety.
+
+Normative CLI/Python contracts remain under `docs/reference/` and frozen machine/error
+contracts under `docs/contracts/`.
+
 ## Quick start
 
 PyDBAdminKit requires Python 3.11–3.14. PostgreSQL 15–18 are the Tier A server line for
