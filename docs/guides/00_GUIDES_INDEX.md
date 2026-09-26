@@ -215,7 +215,8 @@ references and provide secret values at the execution boundary.
 | 10 — Schemas, tables, views and indexes | Complete |
 | 11 — Security administration | Complete |
 | 12 — Roles, memberships and privileges | Complete |
-| 13–35 | Planned |
+| 13 — Effective access and ownership | Complete |
+| 14–35 | Planned |
 
 ## Normative references
 
