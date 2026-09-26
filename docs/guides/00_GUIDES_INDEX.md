@@ -219,7 +219,8 @@ references and provide secret values at the execution boundary.
 | 14 — Runtime administration | Complete |
 | 15 — Sessions, queries and transactions | Complete |
 | 16 — Locks, waits and blocking chains | Complete |
-| 17–35 | Planned |
+| 17 — Cancel and terminate operations | Complete |
+| 18–35 | Planned |
 
 ## Normative references
 
