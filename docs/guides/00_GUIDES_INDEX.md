@@ -212,7 +212,8 @@ references and provide secret values at the execution boundary.
 | 07 — Table, JSON and YAML output | Complete |
 | 08 — Python API fundamentals | Complete |
 | 09 — Database exploration | Complete |
-| 10–35 | Planned |
+| 10 — Schemas, tables, views and indexes | Complete |
+| 11–35 | Planned |
 
 ## Normative references
 
