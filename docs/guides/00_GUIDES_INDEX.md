@@ -208,7 +208,8 @@ references and provide secret values at the execution boundary.
 | 03 — First connection | Complete |
 | 04 — Configuration and profiles | Complete |
 | 05 — Credentials and secrets | Complete |
-| 06–35 | Planned |
+| 06 — CLI fundamentals | Complete |
+| 07–35 | Planned |
 
 ## Normative references
 
