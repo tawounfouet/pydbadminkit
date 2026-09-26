@@ -216,7 +216,8 @@ references and provide secret values at the execution boundary.
 | 11 — Security administration | Complete |
 | 12 — Roles, memberships and privileges | Complete |
 | 13 — Effective access and ownership | Complete |
-| 14–35 | Planned |
+| 14 — Runtime administration | Complete |
+| 15–35 | Planned |
 
 ## Normative references
 
