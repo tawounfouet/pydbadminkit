@@ -211,7 +211,8 @@ references and provide secret values at the execution boundary.
 | 06 — CLI fundamentals | Complete |
 | 07 — Table, JSON and YAML output | Complete |
 | 08 — Python API fundamentals | Complete |
-| 09–35 | Planned |
+| 09 — Database exploration | Complete |
+| 10–35 | Planned |
 
 ## Normative references
 
