@@ -205,7 +205,8 @@ references and provide secret values at the execution boundary.
 | 00 — Guides index | Complete |
 | 01 — Getting started | Complete |
 | 02 — Installation | Complete |
-| 03–35 | Planned |
+| 03 — First connection | Complete |
+| 04–35 | Planned |
 
 ## Normative references
 
