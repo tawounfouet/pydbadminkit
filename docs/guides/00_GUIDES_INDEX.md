@@ -214,7 +214,8 @@ references and provide secret values at the execution boundary.
 | 09 — Database exploration | Complete |
 | 10 — Schemas, tables, views and indexes | Complete |
 | 11 — Security administration | Complete |
-| 12–35 | Planned |
+| 12 — Roles, memberships and privileges | Complete |
+| 13–35 | Planned |
 
 ## Normative references
 
