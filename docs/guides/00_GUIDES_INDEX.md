@@ -207,7 +207,8 @@ references and provide secret values at the execution boundary.
 | 02 — Installation | Complete |
 | 03 — First connection | Complete |
 | 04 — Configuration and profiles | Complete |
-| 05–35 | Planned |
+| 05 — Credentials and secrets | Complete |
+| 06–35 | Planned |
 
 ## Normative references
 
