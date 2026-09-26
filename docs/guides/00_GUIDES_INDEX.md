@@ -213,7 +213,8 @@ references and provide secret values at the execution boundary.
 | 08 — Python API fundamentals | Complete |
 | 09 — Database exploration | Complete |
 | 10 — Schemas, tables, views and indexes | Complete |
-| 11–35 | Planned |
+| 11 — Security administration | Complete |
+| 12–35 | Planned |
 
 ## Normative references
 
