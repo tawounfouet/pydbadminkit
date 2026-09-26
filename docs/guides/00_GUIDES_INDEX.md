@@ -209,7 +209,8 @@ references and provide secret values at the execution boundary.
 | 04 — Configuration and profiles | Complete |
 | 05 — Credentials and secrets | Complete |
 | 06 — CLI fundamentals | Complete |
-| 07–35 | Planned |
+| 07 — Table, JSON and YAML output | Complete |
+| 08–35 | Planned |
 
 ## Normative references
 
