@@ -220,7 +220,8 @@ references and provide secret values at the execution boundary.
 | 15 — Sessions, queries and transactions | Complete |
 | 16 — Locks, waits and blocking chains | Complete |
 | 17 — Cancel and terminate operations | Complete |
-| 18–35 | Planned |
+| 18 — Backup | Complete |
+| 19–35 | Planned |
 
 ## Normative references
 
