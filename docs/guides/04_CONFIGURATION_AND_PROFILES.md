@@ -603,7 +603,7 @@ server = build_server_service(
     Path("./config.toml"),
 )
 
-info = server.get_server_info()
+info = server.get_info()
 print(info)
 ```
 
